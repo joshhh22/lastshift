@@ -12,7 +12,7 @@ public class NPCSpawner : MonoBehaviour
 
     [Header("Spawn Settings")]
     [SerializeField] private float spawnInterval = 4f;
-    [SerializeField] private bool autoSpawn = true;
+    [SerializeField] private bool autoSpawn = false;
 
     [Header("NPC Prefabs")]
     [SerializeField] private List<NPCController> npcPrefabs = new();
@@ -81,8 +81,10 @@ public class NPCSpawner : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
-        if (!counterManager.IsOccupied())
+        if (!counterManager.IsOccupied() &&
+            !counterManager.IsReserved())
         {
+            counterManager.ReserveCounter();
             npc.MoveToCounter(counterManager.CounterPoint);
         }
         else

@@ -86,6 +86,10 @@ public class NPCController : MonoBehaviour
 
     public void MoveToCounter(Transform target)
     {
+        Debug.Log(
+            $"MoveToCounter -> {name}\n" +
+            System.Environment.StackTrace);
+
         SetState(NPCState.WalkingToCounter);
 
         agent.isStopped = false;
@@ -98,6 +102,7 @@ public class NPCController : MonoBehaviour
 
     public void MoveToExit()
     {
+        Debug.Log(name + " mulai jalan ke Exit");
         Debug.Log("=== MoveToExit ===");
 
         SetState(NPCState.WalkingToExit);
@@ -134,17 +139,28 @@ public class NPCController : MonoBehaviour
     }
 
     IEnumerator ServeRoutine()
-{
-    yield return new WaitForSeconds(2f);
+    {
+        yield return new WaitForSeconds(2f);
 
-    isBeingServed = false;
+        Debug.Log("ServeRoutine selesai");
 
-    CounterManager.Instance.ReleaseCounter();
+        isBeingServed = false;
 
-    GateManager.Instance.OpenGate();
+        // Kosongkan counter
+        CounterManager.Instance.ReleaseCounter();
 
-    MoveToExit();
-}
+        Debug.Log("Memanggil MoveFrontToCounter");
+
+        // NPC paling depan di queue maju ke counter
+        QueueManager.Instance.MoveFrontToCounter();
+
+        // Buka gate
+        GateManager.Instance.OpenGate();
+
+        // NPC sekarang menuju exit
+        MoveToExit();
+    }
+
     private IEnumerator MoveQueueDelayed()
     {
         yield return new WaitForSeconds(0.3f);

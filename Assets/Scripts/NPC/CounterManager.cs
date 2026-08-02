@@ -9,6 +9,7 @@ public class CounterManager : MonoBehaviour
     [SerializeField] private CounterInteraction counterInteraction;
 
     private NPCController currentNPC;
+    private bool reserved = false;
 
     private void Awake()
     {
@@ -29,23 +30,45 @@ public class CounterManager : MonoBehaviour
         return currentNPC != null;
     }
 
+    public bool IsReserved()
+    {
+        return reserved;
+    }
+
+    public void ReserveCounter()
+    {
+        reserved = true;
+    }
+
     public bool TryOccupy(NPCController npc)
     {
+        Debug.Log("TryOccupy dipanggil oleh : " + npc.name);
+
         if (currentNPC != null)
+        {
+            Debug.Log("Counter masih dipakai : " + currentNPC.name);
             return false;
+        }
 
         currentNPC = npc;
+
         npc.SetState(NPCState.AtCounter);
+
         counterInteraction.currentNPC = npc;
-        Debug.Log($"{npc.name} occupied counter.");
+
+        Debug.Log("Counter sekarang dipakai : " + currentNPC.name);
 
         return true;
     }
 
     public void ReleaseCounter()
     {
+        Debug.Log("ReleaseCounter");
+
         currentNPC = null;
-        Debug.Log("Counter released.");
+        reserved = false;
+
+        counterInteraction.currentNPC = null;
     }
 
     public NPCController GetCurrentNPC()

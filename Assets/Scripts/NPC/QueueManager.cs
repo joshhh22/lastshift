@@ -27,15 +27,34 @@ public class QueueManager : MonoBehaviour
         return true;
     }
 
-    public void RemoveFrontNPC()
+    // ==========================
+    // NPC TERDEPAN MAJU KE COUNTER
+    // ==========================
+
+    public void MoveFrontToCounter()
     {
+        Debug.Log("MoveFrontToCounter dipanggil");
+
+        Debug.Log("Queue Count = " + queue.Count);
+
+        if (queue.Count > 0)
+            Debug.Log("NPC yang maju = " + queue[0].name);
+
         if (queue.Count == 0)
             return;
 
+        NPCController npc = queue[0];
+
         queue.RemoveAt(0);
+
+        npc.MoveToCounter(CounterManager.Instance.CounterPoint);
 
         UpdateQueue();
     }
+
+    // ==========================
+    // GESER SEMUA ANTRIAN
+    // ==========================
 
     void UpdateQueue()
     {
@@ -43,11 +62,6 @@ public class QueueManager : MonoBehaviour
         {
             queue[i].MoveToQueue(queuePoints[i]);
         }
-    }
-
-    public bool IsCounterAvailable()
-    {
-        return queue.Count == 0;
     }
 
     public bool HasSpace()

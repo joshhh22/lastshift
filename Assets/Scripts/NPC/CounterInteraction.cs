@@ -8,15 +8,15 @@ public class CounterInteraction : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("E DITEKAN");
+            Debug.Log("Tekan E");
 
             if (currentNPC == null)
             {
-                Debug.Log("NPC NULL");
+                Debug.Log("Tidak ada NPC di counter");
                 return;
             }
 
-            Debug.Log("SERVE");
+            Debug.Log("Serve : " + currentNPC.name);
 
             currentNPC.Serve();
         }
