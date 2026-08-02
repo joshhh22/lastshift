@@ -14,11 +14,14 @@ public class SpawnManager : MonoBehaviour
         Instance = this;
     }
 
+    // Jangan spawn apa pun saat game mulai.
+    // Spawn akan dipanggil oleh Objective Event.
     private void Start()
     {
-        SpawnPassenger(5, 5f, 10f);
+
     }
 
+    // Spawn sejumlah NPC
     public void SpawnPassenger(int amount, float minDelay, float maxDelay)
     {
         if (spawnRoutine != null)
@@ -28,6 +31,7 @@ public class SpawnManager : MonoBehaviour
             SpawnAmountRoutine(amount, minDelay, maxDelay));
     }
 
+    // Spawn tanpa henti
     public void SpawnForever(float minDelay, float maxDelay)
     {
         if (spawnRoutine != null)
@@ -40,30 +44,54 @@ public class SpawnManager : MonoBehaviour
     public void StopSpawn()
     {
         if (spawnRoutine != null)
+        {
             StopCoroutine(spawnRoutine);
+            spawnRoutine = null;
+        }
     }
 
-    IEnumerator SpawnAmountRoutine(int amount, float minDelay, float maxDelay)
+    private IEnumerator SpawnAmountRoutine(int amount, float minDelay, float maxDelay)
     {
         for (int i = 0; i < amount; i++)
         {
+            // Tunggu kalau counter + queue penuh
+            while (CounterManager.Instance.IsOccupied() &&
+                   !QueueManager.Instance.HasSpace())
+            {
+                yield return new WaitForSeconds(1f);
+            }
+
             npcSpawner.SpawnNPC();
 
-            float delay = Random.Range(minDelay, maxDelay);
-
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
         }
+
+        spawnRoutine = null;
     }
 
-    IEnumerator SpawnForeverRoutine(float minDelay, float maxDelay)
+    private IEnumerator SpawnForeverRoutine(float minDelay, float maxDelay)
     {
         while (true)
         {
+            while (CounterManager.Instance.IsOccupied() &&
+                   !QueueManager.Instance.HasSpace())
+            {
+                yield return new WaitForSeconds(1f);
+            }
+
             npcSpawner.SpawnNPC();
 
-            float delay = Random.Range(minDelay, maxDelay);
-
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
         }
+    }
+
+    public void SpawnDay1Passengers()
+    {
+        SpawnPassenger(5, 5f, 10f);
+    }
+
+    public void SpawnContinueWorking()
+    {
+        SpawnForever(12f, 20f);
     }
 }

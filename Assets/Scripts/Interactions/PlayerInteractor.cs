@@ -42,9 +42,14 @@ public class PlayerInteractor : MonoBehaviour
 
             if (interactable != null)
             {
-                currentInteractable = interactable;
-                interactionUI.Show(interactable.GetInteractionText());
-                return;
+                string text = interactable.GetInteractionText();
+
+                if (!string.IsNullOrEmpty(text))
+                {
+                    currentInteractable = interactable;
+                    interactionUI.Show(text);
+                    return;
+                }
             }
         }
 

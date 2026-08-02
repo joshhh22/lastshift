@@ -3,17 +3,26 @@ using UnityEngine;
 
 public class InteractionUI : MonoBehaviour
 {
-    [Header("UI References")]
-    [SerializeField] private TMP_Text actionText;
+    public static InteractionUI Instance;
 
-    public void Show(string interactionText)
+    [SerializeField] private GameObject root;
+    [SerializeField] private TMP_Text promptText;
+
+    private void Awake()
     {
-        gameObject.SetActive(true);
-        actionText.text = interactionText;
+        Instance = this;
+
+        Hide();
+    }
+
+    public void Show(string text)
+    {
+        root.SetActive(true);
+        promptText.text = $"[E] {text}";
     }
 
     public void Hide()
     {
-        gameObject.SetActive(false);
+        root.SetActive(false);
     }
 }

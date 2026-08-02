@@ -144,6 +144,8 @@ public class NPCController : MonoBehaviour
 
         Debug.Log("ServeRoutine selesai");
 
+        ObjectiveManager.Instance.AddProgress();
+
         isBeingServed = false;
 
         // Kosongkan counter

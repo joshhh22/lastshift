@@ -1,24 +1,22 @@
 using UnityEngine;
 
-public class CounterInteraction : MonoBehaviour
+public class CounterInteraction : MonoBehaviour, IInteractable
 {
     public NPCController currentNPC;
 
-    private void Update()
+    public string GetInteractionText()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Debug.Log("Tekan E");
+        if (currentNPC == null)
+            return "";
 
-            if (currentNPC == null)
-            {
-                Debug.Log("Tidak ada NPC di counter");
-                return;
-            }
+        return "Serve Passenger";
+    }
 
-            Debug.Log("Serve : " + currentNPC.name);
+    public void Interact()
+    {
+        if (currentNPC == null)
+            return;
 
-            currentNPC.Serve();
-        }
+        currentNPC.Serve();
     }
 }

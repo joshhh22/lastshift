@@ -4,48 +4,28 @@ using UnityEngine;
 
 public class NPCSpawner : MonoBehaviour
 {
+    public static NPCSpawner Instance;
+
     [Header("References")]
     [SerializeField] private CounterManager counterManager;
-
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Transform runtimeParent;
-
-    [Header("Spawn Settings")]
-    [SerializeField] private float spawnInterval = 4f;
-    [SerializeField] private bool autoSpawn = false;
 
     [Header("NPC Prefabs")]
     [SerializeField] private List<NPCController> npcPrefabs = new();
 
     private int lastIndex = -1;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Update()
     {
+        // DEBUG
         if (Input.GetKeyDown(KeyCode.P))
         {
-            SpawnNPC();
-        }
-    }
-
-    private void Start()
-    {
-        if (autoSpawn)
-            StartCoroutine(AutoSpawnRoutine());
-    }
-
-    private IEnumerator AutoSpawnRoutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(spawnInterval);
-
-            // Jangan spawn kalau counter + queue penuh
-            if (CounterManager.Instance.IsOccupied() &&
-                !QueueManager.Instance.HasSpace())
-            {
-                continue;
-            }
-
             SpawnNPC();
         }
     }
@@ -71,7 +51,7 @@ public class NPCSpawner : MonoBehaviour
         StartCoroutine(BeginRoutine(npc));
     }
 
-    IEnumerator BeginRoutine(NPCController npc)
+    private IEnumerator BeginRoutine(NPCController npc)
     {
         npc.SetState(NPCState.Idle);
 
@@ -81,12 +61,14 @@ public class NPCSpawner : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
+        // Counter kosong → langsung ke counter
         if (!counterManager.IsOccupied() &&
             !counterManager.IsReserved())
         {
             counterManager.ReserveCounter();
             npc.MoveToCounter(counterManager.CounterPoint);
         }
+        // Counter penuh → masuk queue
         else
         {
             QueueManager.Instance.AddNPC(npc);
