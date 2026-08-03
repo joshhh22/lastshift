@@ -24,6 +24,8 @@ public class SpawnManager : MonoBehaviour
     // Spawn sejumlah NPC
     public void SpawnPassenger(int amount, float minDelay, float maxDelay)
     {
+        Debug.Log($"SpawnPassenger Dipanggil ({amount})");
+
         if (spawnRoutine != null)
             StopCoroutine(spawnRoutine);
 
@@ -52,9 +54,12 @@ public class SpawnManager : MonoBehaviour
 
     private IEnumerator SpawnAmountRoutine(int amount, float minDelay, float maxDelay)
     {
+        Debug.Log("Coroutine Spawn Jalan");
+
         for (int i = 0; i < amount; i++)
         {
-            // Tunggu kalau counter + queue penuh
+            Debug.Log("Spawn NPC Ke-" + (i + 1));
+
             while (CounterManager.Instance.IsOccupied() &&
                    !QueueManager.Instance.HasSpace())
             {
