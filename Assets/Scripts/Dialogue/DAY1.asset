@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   lines:
   - speaker: Cleaning Staff
-    text: Cleaning Staff
+    text: Good Morning.
   - speaker: Joshua
     text: Morning.
   - speaker: Cleaning Staff
-    text: Good luck.
+    text: Welcome to your first day.
