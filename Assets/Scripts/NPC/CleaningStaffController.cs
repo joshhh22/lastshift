@@ -61,6 +61,14 @@ public class CleaningStaffController : MonoBehaviour
         isPatrolling = false;
     }
 
+    public void FacePlayer(Transform player)
+    {
+        Vector3 targetPosition = player.position;
+        targetPosition.y = transform.position.y;
+
+        transform.LookAt(targetPosition);
+    }
+
     private void Update()
     {
         if (isPatrolling)

@@ -31,7 +31,7 @@ public class DialogueManager : MonoBehaviour
 
         Instance = this;
 
-        dialogueUI.SetActive(false);
+        UIManager.Instance.HideDialogue();
     }
 
 
@@ -64,11 +64,13 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log("Start Dialogue");
 
+        PlayerLockManager.Instance.LockPlayer();
+
         currentDialogue = dialogue;
         currentIndex = 0;
         isPlaying = true;
 
-        dialogueUI.SetActive(true);
+        UIManager.Instance.ShowDialogue();
 
         ShowLine();
     }
@@ -112,9 +114,11 @@ public class DialogueManager : MonoBehaviour
     {
         isPlaying = false;
 
-        dialogueUI.SetActive(false);
+        UIManager.Instance.HideDialogue();
 
         currentDialogue = null;
+
+        PlayerLockManager.Instance.UnlockPlayer();
 
         onDialogueFinished?.Invoke();
     }

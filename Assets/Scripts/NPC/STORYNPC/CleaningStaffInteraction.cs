@@ -2,7 +2,11 @@ using UnityEngine;
 
 public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 {
+    [Header("Dialogue")]
     [SerializeField] private DialogueData dialogue;
+
+    [Header("Requirements")]
+    [SerializeField] private int requiredObjectiveIndex;
 
     private CleaningStaffController cleaningStaff;
 
@@ -27,6 +31,9 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         if (hasTalked)
             return "";
 
+        if (ObjectiveManager.Instance.GetCurrentIndex() != requiredObjectiveIndex)
+            return "";
+
         return "Talk";
     }
 
@@ -35,10 +42,16 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         if (hasTalked)
             return;
 
+        if (ObjectiveManager.Instance.GetCurrentIndex() != requiredObjectiveIndex)
+            return;
+
         hasTalked = true;
 
-        if (cleaningStaff != null)
-            cleaningStaff.StopPatrol();
+        cleaningStaff.StopPatrol();
+
+        Transform player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        cleaningStaff.FacePlayer(player);
 
         DialogueManager.Instance.StartDialogue(dialogue);
     }
