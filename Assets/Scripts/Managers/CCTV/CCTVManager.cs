@@ -11,10 +11,13 @@ public class CCTVManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text cameraLabel;
     [SerializeField] private TMP_Text recLabel;
+    [SerializeField] private GameObject cctvUI;
 
     private int currentIndex;
     private float blinkTimer;
     private bool blinkState = true;
+    private bool[] visited;
+    private bool objectiveCompleted;
     private float switchCooldown = 0.15f;
     private float lastSwitchTime;
 
@@ -31,12 +34,23 @@ public class CCTVManager : MonoBehaviour
 
     private void Start()
     {
+        visited = new bool[cameras.Length];
         CloseCCTV();
     }
 
     public void OpenCCTV()
     {
+        UIManager.Instance.ShowComputer();
+
+        cctvUI.SetActive(true);
+
         currentIndex = 0;
+
+        objectiveCompleted = false;
+
+        visited = new bool[cameras.Length];
+        visited[0] = true;
+
         recLabel.gameObject.SetActive(true);
         UpdateCamera();
     }
@@ -67,6 +81,8 @@ public class CCTVManager : MonoBehaviour
             currentIndex = 0;
 
         UpdateCamera();
+        visited[currentIndex] = true;
+        CheckObjective();
     }
 
     public void PreviousCamera()
@@ -80,6 +96,8 @@ public class CCTVManager : MonoBehaviour
             currentIndex = cameras.Length - 1;
 
         UpdateCamera();
+        visited[currentIndex] = true;
+        CheckObjective();
     }
 
     private void Update()
@@ -110,5 +128,24 @@ public class CCTVManager : MonoBehaviour
 
             cameraLabel.text = $"CAM {currentIndex + 1:00}";
         }
+    }
+
+    private void CheckObjective()
+    {
+        if (objectiveCompleted)
+            return;
+
+        if (ObjectiveManager.Instance.GetCurrentObjective() != "Check CCTV")
+            return;
+
+        foreach (bool cam in visited)
+        {
+            if (!cam)
+                return;
+        }
+
+        objectiveCompleted = true;
+
+        ObjectiveManager.Instance.CompleteObjective();
     }
 }

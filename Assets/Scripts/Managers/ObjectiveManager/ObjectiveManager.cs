@@ -104,6 +104,13 @@ public class ObjectiveManager : MonoBehaviour
         }
 
         objectiveUI.UpdateUI(day, text);
+
+        switch (obj.title)
+        {
+            case "Check Phone":
+                PhoneManager.Instance.ReceiveNotification();
+                break;
+        }
     }
 
     public string GetCurrentObjective()
