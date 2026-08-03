@@ -68,6 +68,21 @@ public class TerminalMenu : MonoBehaviour
             return;
         }
 
+        if (CurrentPage == TerminalPage.CCTV)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                CCTVManager.Instance.PreviousCamera();
+            }
+
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                CCTVManager.Instance.NextCamera();
+            }
+
+            return;
+        }
+
         if (CurrentPage != TerminalPage.MainMenu)
             return;
 
@@ -154,6 +169,9 @@ public class TerminalMenu : MonoBehaviour
             case 1:
                 cctvPage.SetActive(true);
                 CurrentPage = TerminalPage.CCTV;
+
+                CCTVManager.Instance.OpenCCTV();
+
                 break;
 
             case 2:
@@ -165,6 +183,11 @@ public class TerminalMenu : MonoBehaviour
 
     void BackToMainMenu()
     {
+        if (CurrentPage == TerminalPage.CCTV)
+        {
+            CCTVManager.Instance.CloseCCTV();
+        }
+
         assignmentPage.SetActive(false);
         cctvPage.SetActive(false);
         logsPage.SetActive(false);

@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57b505c02ebc92643803b7f2a9890fd8, type: 3}
   m_Name: Day1_CheckPhone
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
-  lines: []
+  lines:
+  - speaker: joshua
+    text: Let's see what my mom chat.
