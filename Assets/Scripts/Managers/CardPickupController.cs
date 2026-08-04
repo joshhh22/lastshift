@@ -30,6 +30,7 @@ public void ResetPickup()
     {
         if (picked)
             return;
+            Debug.Log("Card Position = " + card.anchoredPosition);
 
         // klik kartu
         if (Input.GetMouseButtonDown(0))

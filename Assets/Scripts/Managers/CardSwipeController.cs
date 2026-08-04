@@ -1,12 +1,9 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class CardSwipeController : MonoBehaviour,
-    IPointerDownHandler,
-    IDragHandler,
-    IPointerUpHandler
+public class CardSwipeController : MonoBehaviour
+
 {
     [Header("References")]
     [SerializeField] private RectTransform card;
@@ -57,8 +54,10 @@ public class CardSwipeController : MonoBehaviour,
 
     void Update()
     {
-        if (!canSwipe)
-            return;
+        if (canSwipe)
+{
+    Debug.Log("Swipe Controller Pos = " + card.anchoredPosition);
+}
 
         SwipeUpdate();
     }
@@ -119,77 +118,7 @@ public class CardSwipeController : MonoBehaviour,
         }
     }
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        if (!canSwipe)
-            return;
-
-        dragging = true;
-
-        enteredZone = false;
-        passedZone = false;
-
-        swipeStartTime = Time.time;
-        swipeStartX = card.anchoredPosition.x;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!dragging)
-            return;
-
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform,
-            eventData.position,
-            canvas.worldCamera,
-            out Vector2 localPoint);
-
-        // hanya horizontal
-        float x = Mathf.Clamp(localPoint.x, -600f, 600f);
-
-        card.anchoredPosition = new Vector2(
-            x,
-            startPos.y);
-
-        CheckReader();
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (!dragging)
-            return;
-
-        dragging = false;
-
-        // harus benar-benar melewati reader
-        if (!enteredZone || !passedZone)
-        {
-            Fail("Swipe Again");
-            return;
-        }
-
-        float distance = Mathf.Abs(card.anchoredPosition.x - swipeStartX);
-
-        float time = Time.time - swipeStartTime;
-
-        float speed = distance / time;
-
-        Debug.Log("Swipe Speed = " + speed);
-
-        if (speed < minSpeed)
-        {
-            Fail("Too Slow");
-            return;
-        }
-
-        if (speed > maxSpeed)
-        {
-            Fail("Too Fast");
-            return;
-        }
-
-        Success();
-    }
+    
 
     void ValidateSwipe(float distance, float speed)
     {
@@ -313,7 +242,6 @@ private IEnumerator SuccessRoutine()
     }
 
     ServePassengerUIController.Instance.Close();
-
 
 }
 
