@@ -15,6 +15,8 @@ public class ServePassengerUIController : MonoBehaviour
     [SerializeField] private TMP_Text talkText;
     [SerializeField] private TMP_Text cancelText;
 
+    [SerializeField] private CardSwipeController swipeController;
+
     private TMP_Text[] menuItems;
 
     private int currentIndex;

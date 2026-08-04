@@ -161,6 +161,8 @@ public class NPCController : MonoBehaviour
 
         // NPC sekarang menuju exit
         MoveToExit();
+
+        
     }
 
     private IEnumerator MoveQueueDelayed()

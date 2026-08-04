@@ -16,10 +16,13 @@ public class PassengerScheduleManager : MonoBehaviour
 
     private void Update()
     {
-        if (ObjectiveManager.Instance.GetCurrentObjective() != "Continue Working Until Shift Ends")
+        if (ObjectiveManager.Instance == null)
             return;
 
         if (GameTimeManager.Instance == null)
+            return;
+
+        if (ObjectiveManager.Instance.GetCurrentObjective() != "Continue Working Until Shift Ends")
             return;
 
         foreach (PassengerSchedule schedule in schedules)
@@ -31,7 +34,6 @@ public class PassengerScheduleManager : MonoBehaviour
                 GameTimeManager.Instance.Minute == schedule.minute)
             {
                 schedule.triggered = true;
-
                 StartCoroutine(SpawnRoutine(schedule));
             }
         }

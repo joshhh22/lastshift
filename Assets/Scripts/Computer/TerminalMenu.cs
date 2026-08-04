@@ -62,6 +62,9 @@ public class TerminalMenu : MonoBehaviour
         if (!ComputerUIController.Instance.IsOpen)
             return;
 
+        if (!ComputerUIController.Instance.IsOpen)
+        return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             HandleEscape();

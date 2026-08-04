@@ -16,6 +16,8 @@ public class CardSwipeController : MonoBehaviour,
     [SerializeField] private Canvas canvas;
     [SerializeField] private TMP_Text statusText;
 
+    [SerializeField] private CardPickupController pickupController;
+
     [Header("Swipe Speed (Pixel/Second)")]
     [SerializeField] private float minSpeed = 450f;
     [SerializeField] private float maxSpeed = 900f;
@@ -215,9 +217,7 @@ public class CardSwipeController : MonoBehaviour,
             return;
         }
 
-        statusText.text = "ACCESS GRANTED";
-
-        Debug.Log("SUCCESS");
+        Success();
     }
 
     void CheckReader()
@@ -268,11 +268,53 @@ public class CardSwipeController : MonoBehaviour,
 
         statusText.text = "ACCESS GRANTED";
 
-        Debug.Log("SUCCESS");
+        Debug.Log("SUCCESS12345");
 
-        // nanti disini:
-        // currentNPC.Serve();
-
-        // ServePassengerUIController.Instance.Close();
+        StartCoroutine(SuccessRoutine());
     }
+
+public void ResetCard()
+{
+    canSwipe = false;
+    dragging = false;
+    swiping = false;
+
+    enteredZone = false;
+    passedZone = false;
+
+    swipeStartTime = 0;
+    swipeStartX = 0;
+
+    card.anchoredPosition = startPos;
+
+    statusText.text = "Take Passenger Card";
+
+    if (pickupController != null)
+        pickupController.ResetPickup();
+}
+private IEnumerator SuccessRoutine()
+{
+    Debug.Log("SuccessRoutine START");
+
+    yield return new WaitForSeconds(0.5f);
+
+    NPCController npc = CounterManager.Instance.GetCurrentNPC();
+
+    Debug.Log("NPC = " + npc);
+
+    if (npc != null)
+    {
+        Debug.Log("Memanggil Serve()");
+        npc.Serve();
+    }
+    else
+    {
+        Debug.LogError("NPC NULL");
+    }
+
+    ServePassengerUIController.Instance.Close();
+
+
+}
+
 }

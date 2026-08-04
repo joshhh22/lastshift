@@ -9,18 +9,22 @@ public class CardPickupController : MonoBehaviour
     [SerializeField] private Canvas canvas;
     [SerializeField] private CardSwipeController swipeController;
     [SerializeField] private float snapDistance = 80f;
+    
 
     private bool dragging;
     private bool picked;
 
     public bool IsPicked => picked;
 
-    Camera cam;
 
-    private void Start()
-    {
-        cam = Camera.main;
-    }
+
+public void ResetPickup()
+{
+    picked = false;
+    dragging = false;
+
+    card.anchoredPosition = cardStartPoint.anchoredPosition;
+}
 
     void Update()
     {
@@ -76,9 +80,14 @@ public class CardPickupController : MonoBehaviour
                     card.anchoredPosition,
                     readerSlot.anchoredPosition);
 
+            Debug.Log("Distance Reader = " + distance);
+            Debug.Log("Snap Distance = " + snapDistance);
+
             if (distance < snapDistance)
             {
                 picked = true;
+
+                Debug.Log("Picked Setelah Set = " + picked);
 
                 card.anchoredPosition =
                     readerSlot.anchoredPosition;
@@ -91,8 +100,7 @@ public class CardPickupController : MonoBehaviour
             {
                 Debug.Log("Belum sampai reader");
 
-                card.anchoredPosition =
-                    new Vector2(313, 222);
+                card.anchoredPosition = cardStartPoint.anchoredPosition;
             }
         }
     }
