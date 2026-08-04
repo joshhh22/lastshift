@@ -12,6 +12,8 @@ namespace StarterAssets
 	public class FirstPersonController : MonoBehaviour
 	{
 		[Header("Player")]
+		[Tooltip("Allows the player to control movement and camera")]
+		public bool CanControl = true;
 		[Tooltip("Move speed of the character in m/s")]
 		public float MoveSpeed = 4.0f;
 		[Tooltip("Sprint speed of the character in m/s")]
@@ -112,6 +114,9 @@ namespace StarterAssets
 
 		private void Update()
 		{
+			if (!CanControl)
+				return;
+
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -119,6 +124,9 @@ namespace StarterAssets
 
 		private void LateUpdate()
 		{
+			if (!CanControl)
+				return;
+
 			CameraRotation();
 		}
 

@@ -1,31 +1,53 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using StarterAssets;
 
 public class PlayerLockManager : MonoBehaviour
 {
     public static PlayerLockManager Instance;
 
-    [Header("References")]
-    [SerializeField] private PlayerInput playerInput;
+    [SerializeField] private StarterAssetsInputs starterInput;
+    [SerializeField] private StarterAssets.FirstPersonController controller;
 
     private void Awake()
     {
         Instance = this;
     }
 
+    // ==========================================
+    // LEGACY
+    // ==========================================
+
     public void LockPlayer()
     {
-        if (playerInput != null)
-            playerInput.enabled = false;
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        EnterUIMode();
     }
 
     public void UnlockPlayer()
     {
-        if (playerInput != null)
-            playerInput.enabled = true;
+        ExitUIMode();
+    }
+
+    // ==========================================
+    // UI MODE
+    // ==========================================
+
+    public void EnterUIMode()
+    {
+        if (controller != null)
+            controller.CanControl = false;
+
+        starterInput.cursorInputForLook = false;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void ExitUIMode()
+    {
+        if (controller != null)
+            controller.CanControl = true;
+
+        starterInput.cursorInputForLook = true;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

@@ -17,6 +17,6 @@ public class CounterInteraction : MonoBehaviour, IInteractable
         if (currentNPC == null)
             return;
 
-        currentNPC.Serve();
+        ServePassengerUIController.Instance.Open(currentNPC);
     }
 }
