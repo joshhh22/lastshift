@@ -221,22 +221,40 @@ public class ServePassengerUIController : MonoBehaviour
         menuPanel.SetActive(true);
     }
 
-    public void OpenDialoguePanel(NPCController npc)
+public void OpenDialoguePanel(NPCController npc)
+{
+    menuPanel.SetActive(false);
+    swipePanel.SetActive(false);
+
+    dialoguePanel.SetActive(true);
+
+    inSwipePanel = false;
+    inDialoguePanel = true;
+    dialogueIndex = 0;
+
+    RefreshDialogue();
+
+    switch (npc.passengerData.ticket.status)
     {
-        menuPanel.SetActive(false);
-        swipePanel.SetActive(false);
-        dialoguePanel.SetActive(true);
+        case TicketStatus.Invalid:
+            dialogueTitleText.text = "INVALID TICKET";
+            break;
 
-        inSwipePanel = false;
-        inDialoguePanel = true;
+        case TicketStatus.Expired:
+            dialogueTitleText.text = "EXPIRED TICKET";
+            break;
 
-        dialogueIndex = 0;
+        case TicketStatus.Fake:
+            dialogueTitleText.text = "FAKE TICKET";
+            break;
 
-        RefreshDialogue();
-
-        dialogueTitleText.text = "INVALID TICKET";
-        reasonText.text = npc.passengerData.reason;
+        case TicketStatus.WrongDestination:
+            dialogueTitleText.text = "WRONG DESTINATION";
+            break;
     }
+
+    reasonText.text = npc.passengerData.reason;
+}
 
     void RefreshDialogue()
     {
@@ -274,6 +292,15 @@ public class ServePassengerUIController : MonoBehaviour
     {
         if (dialogueIndex == 0)
         {
+            if(currentNPC.passengerData.isReasonTrue)
+            {
+                // TODO Performance kecil
+            }
+            else
+            {
+                // TODO Performance besar
+            }
+
             currentNPC.Serve();
 
             Close();
@@ -282,6 +309,16 @@ public class ServePassengerUIController : MonoBehaviour
         }
         else
         {
+            if(currentNPC.passengerData.isReasonTrue)
+            {
+                // TODO Humanity turun
+                // TODO Performance naik
+            }
+            else
+            {
+                // TODO Performance naik besar
+            }
+
             currentNPC.Reject();
 
             Close();

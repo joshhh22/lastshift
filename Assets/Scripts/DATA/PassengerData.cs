@@ -8,4 +8,6 @@ public class PassengerData
     public TicketData ticket = new TicketData();
 
     public string reason;
+
+    public bool isReasonTrue;
 }
