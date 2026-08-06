@@ -14,6 +14,9 @@ public class NPCController : MonoBehaviour
 
     public NPCState State { get; private set; }
 
+    [Header("Passenger Data")]
+    public PassengerData passengerData = new PassengerData();
+
     private void Awake()
     {
         if (agent == null)
@@ -21,6 +24,17 @@ public class NPCController : MonoBehaviour
 
         if (animator == null)
             animator = GetComponent<Animator>();
+    }
+
+    public void InitializePassenger()
+    {
+        passengerData = TicketGenerator.GeneratePassenger();
+
+        Debug.Log(
+            $"Passenger : {passengerData.passengerName} | " +
+            $"{passengerData.ticket.originStation} -> " +
+            $"{passengerData.ticket.destinationStation}"
+        );
     }
 
     private void Update()
@@ -39,16 +53,6 @@ public class NPCController : MonoBehaviour
 
                 animator.SetFloat("Speed", 0);
             }
-        }
-
-        if (State == NPCState.WalkingToExit)
-        {
-            Debug.Log(
-                "Remaining = " + agent.remainingDistance +
-                " | Stopped = " + agent.isStopped +
-                " | Pending = " + agent.pathPending +
-                " | HasPath = " + agent.hasPath
-            );
         }
 
         if (State == NPCState.WalkingToExit && HasReachedDestination())
@@ -100,7 +104,7 @@ public class NPCController : MonoBehaviour
     // MENUJU EXIT
     // ===========================
 
-    public void MoveToExit()
+    public void MoveToExit(Transform target)
     {
         Debug.Log(name + " mulai jalan ke Exit");
         Debug.Log("=== MoveToExit ===");
@@ -109,9 +113,9 @@ public class NPCController : MonoBehaviour
 
         agent.isStopped = false;
 
-        agent.SetDestination(CounterManager.Instance.ExitPoint.position);
+        agent.SetDestination(target.position);
 
-        Debug.Log("Destination = " + CounterManager.Instance.ExitPoint.position);
+        Debug.Log("Destination = " + target.position);
         Debug.Log("Path Status = " + agent.pathStatus);
         Debug.Log("Has Path = " + agent.hasPath);
     }
@@ -160,9 +164,39 @@ public class NPCController : MonoBehaviour
         GateManager.Instance.OpenGate();
 
         // NPC sekarang menuju exit
-        MoveToExit();
+        MoveToExit(
+            CounterManager.Instance.PlatformExitPoint);
 
         
+    }
+
+    public void Reject()
+    {
+        if (!canBeServed)
+            return;
+
+        canBeServed = false;
+        isBeingServed = true;
+
+        SetState(NPCState.BeingServed);
+
+        Debug.Log(name + " ditolak");
+
+        StartCoroutine(RejectRoutine());
+    }
+
+    private IEnumerator RejectRoutine()
+    {
+        yield return new WaitForSeconds(2f);
+
+        Debug.Log("RejectRoutine selesai");
+
+        CounterManager.Instance.ReleaseCounter();
+
+        QueueManager.Instance.MoveFrontToCounter();
+
+        MoveToExit(
+            CounterManager.Instance.LobbyExitPoint);
     }
 
     private IEnumerator MoveQueueDelayed()

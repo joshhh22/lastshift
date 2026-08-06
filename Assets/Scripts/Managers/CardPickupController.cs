@@ -28,9 +28,6 @@ public void ResetPickup()
 
     void Update()
     {
-        if (picked)
-            return;
-            Debug.Log("Card Position = " + card.anchoredPosition);
 
         // klik kartu
         if (Input.GetMouseButtonDown(0))
@@ -58,7 +55,7 @@ public void ResetPickup()
         // drag
         if (dragging)
         {
-            Debug.Log("Dragging");
+           
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvas.transform as RectTransform,

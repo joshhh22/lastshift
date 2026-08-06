@@ -55,9 +55,6 @@ public class CardSwipeController : MonoBehaviour
     void Update()
     {
         if (canSwipe)
-{
-    Debug.Log("Swipe Controller Pos = " + card.anchoredPosition);
-}
 
         SwipeUpdate();
     }
@@ -195,7 +192,7 @@ public class CardSwipeController : MonoBehaviour
     {
         StopAllCoroutines();
 
-        statusText.text = "ACCESS GRANTED";
+        statusText.text = "VALIDATING...";
 
         Debug.Log("SUCCESS12345");
 
@@ -229,19 +226,80 @@ private IEnumerator SuccessRoutine()
 
     NPCController npc = CounterManager.Instance.GetCurrentNPC();
 
+    Debug.Log("===== TICKET =====");
+
+    Debug.Log("Passenger : " + npc.passengerData.passengerName);
+
+    Debug.Log("Ticket ID : " + npc.passengerData.ticket.ticketID);
+
+    Debug.Log("Origin : " + npc.passengerData.ticket.originStation);
+
+    Debug.Log("Destination : " + npc.passengerData.ticket.destinationStation);
+
+    Debug.Log("Status : " + npc.passengerData.ticket.status);
+
     Debug.Log("NPC = " + npc);
 
     if (npc != null)
     {
         Debug.Log("Memanggil Serve()");
-        npc.Serve();
+        TicketStatus result =
+            TicketValidator.Validate(
+                npc.passengerData.ticket);
+
+        Debug.Log("Ticket Result : " + result);
+
+        switch (result)
+        {
+            case TicketStatus.Valid:
+
+                statusText.text = "ACCESS GRANTED";
+
+                npc.Serve();
+
+                ServePassengerUIController.Instance.Close();
+
+                ResetCard();
+
+                break;
+
+            case TicketStatus.Invalid:
+
+                statusText.text = "INVALID TICKET";
+
+                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+
+                break;
+
+            case TicketStatus.Expired:
+
+                statusText.text = "TICKET EXPIRED";
+
+                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+
+                break;
+
+            case TicketStatus.Fake:
+
+                statusText.text = "FAKE TICKET";
+
+                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+
+                break;
+
+            case TicketStatus.WrongDestination:
+
+                statusText.text = "WRONG DESTINATION";
+
+                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+
+                break;
+        }
     }
     else
     {
         Debug.LogError("NPC NULL");
     }
-
-    ServePassengerUIController.Instance.Close();
 
 }
 

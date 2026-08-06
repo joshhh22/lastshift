@@ -48,6 +48,9 @@ public class NPCSpawner : MonoBehaviour
             spawnPoint.rotation,
             runtimeParent);
 
+        NPCController controller = npc.GetComponent<NPCController>();
+        controller.InitializePassenger();
+
         StartCoroutine(BeginRoutine(npc));
     }
 

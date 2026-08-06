@@ -5,7 +5,8 @@ public class CounterManager : MonoBehaviour
     public static CounterManager Instance { get; private set; }
 
     [SerializeField] private Transform counterPoint;
-    [SerializeField] private Transform exitPoint;
+    [SerializeField] private Transform platformExitPoint;
+    [SerializeField] private Transform lobbyExitPoint;
     [SerializeField] private CounterInteraction counterInteraction;
 
     private NPCController currentNPC;
@@ -23,7 +24,8 @@ public class CounterManager : MonoBehaviour
     }
 
     public Transform CounterPoint => counterPoint;
-    public Transform ExitPoint => exitPoint;
+    public Transform PlatformExitPoint => platformExitPoint;
+    public Transform LobbyExitPoint => lobbyExitPoint;
 
     public bool IsOccupied()
     {

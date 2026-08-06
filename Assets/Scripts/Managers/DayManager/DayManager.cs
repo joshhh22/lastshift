@@ -13,15 +13,22 @@ public enum GameDay
 
 public class DayManager : MonoBehaviour
 {
+    public static DayManager Instance { get; private set; }
+
     public GameDay CurrentDay { get; private set; }
 
-    public int CurrentDayNumber
-    {
-        get { return (int)CurrentDay; }
-    }
+    public int CurrentDayNumber => (int)CurrentDay;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
         SetDay(GameDay.Day1);
     }
 

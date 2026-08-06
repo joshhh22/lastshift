@@ -17,6 +17,21 @@ public class ServePassengerUIController : MonoBehaviour
 
     [SerializeField] private CardSwipeController swipeController;
 
+    [Header("Ticket Info")]
+    [SerializeField] private TMP_Text passengerNameText;
+    [SerializeField] private TMP_Text ticketIDText;
+    [SerializeField] private TMP_Text originText;
+    [SerializeField] private TMP_Text destinationText;
+
+    [Header("Dialogue Panel")]
+    [SerializeField] private GameObject dialoguePanel;
+
+    [SerializeField] private TMP_Text dialogueTitleText;
+    [SerializeField] private TMP_Text reasonText;
+
+    [SerializeField] private TMP_Text acceptText;
+    [SerializeField] private TMP_Text rejectText;
+
     private TMP_Text[] menuItems;
 
     private int currentIndex;
@@ -25,6 +40,9 @@ public class ServePassengerUIController : MonoBehaviour
 
     private bool isOpen;
     private bool inSwipePanel;
+    private bool inDialoguePanel;
+
+    private int dialogueIndex;
 
     public bool IsOpen => isOpen;
 
@@ -54,6 +72,12 @@ public class ServePassengerUIController : MonoBehaviour
                 BackToMenu();
             }
 
+            return;
+        }
+
+        if (inDialoguePanel)
+        {
+            HandleDialogueInput();
             return;
         }
 
@@ -94,6 +118,7 @@ public class ServePassengerUIController : MonoBehaviour
 
         isOpen = true;
         inSwipePanel = false;
+        inDialoguePanel = false;
 
         currentIndex = 0;
 
@@ -101,6 +126,7 @@ public class ServePassengerUIController : MonoBehaviour
 
         menuPanel.SetActive(true);
         swipePanel.SetActive(false);
+        dialoguePanel.SetActive(false);   // <-- TAMBAHKAN
 
         RefreshMenu();
 
@@ -110,8 +136,14 @@ public class ServePassengerUIController : MonoBehaviour
     public void Close()
     {
         isOpen = false;
+        inSwipePanel = false;
+        inDialoguePanel = false;
 
         currentNPC = null;
+
+        menuPanel.SetActive(false);
+        swipePanel.SetActive(false);
+        dialoguePanel.SetActive(false);
 
         rootUI.SetActive(false);
 
@@ -164,6 +196,20 @@ public class ServePassengerUIController : MonoBehaviour
 
         menuPanel.SetActive(false);
         swipePanel.SetActive(true);
+
+        PassengerData data = currentNPC.passengerData;
+
+        passengerNameText.text =
+            "Name : " + data.passengerName;
+
+        ticketIDText.text =
+            "Ticket ID : " + data.ticket.ticketID;
+
+        originText.text =
+            "Origin : " + data.ticket.originStation;
+
+        destinationText.text =
+            "Destination : " + data.ticket.destinationStation;
     }
 
     void BackToMenu()
@@ -171,6 +217,76 @@ public class ServePassengerUIController : MonoBehaviour
         inSwipePanel = false;
 
         swipePanel.SetActive(false);
+        dialoguePanel.SetActive(false);   // <-- TAMBAHKAN
         menuPanel.SetActive(true);
+    }
+
+    public void OpenDialoguePanel(NPCController npc)
+    {
+        menuPanel.SetActive(false);
+        swipePanel.SetActive(false);
+        dialoguePanel.SetActive(true);
+
+        inSwipePanel = false;
+        inDialoguePanel = true;
+
+        dialogueIndex = 0;
+
+        RefreshDialogue();
+
+        dialogueTitleText.text = "INVALID TICKET";
+        reasonText.text = npc.passengerData.reason;
+    }
+
+    void RefreshDialogue()
+    {
+        acceptText.text = "Accept";
+        rejectText.text = "Reject";
+
+        if (dialogueIndex == 0)
+            acceptText.text = "> Accept";
+        else
+            rejectText.text = "> Reject";
+    }
+
+    void HandleDialogueInput()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow) ||
+            Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            dialogueIndex = 1 - dialogueIndex;
+
+            RefreshDialogue();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            ConfirmDialogue();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            return; // jangan boleh keluar
+        }
+    }
+
+    void ConfirmDialogue()
+    {
+        if (dialogueIndex == 0)
+        {
+            currentNPC.Serve();
+
+            Close();
+
+            swipeController.ResetCard();
+        }
+        else
+        {
+            currentNPC.Reject();
+
+            Close();
+
+            swipeController.ResetCard();
+        }
     }
 }
