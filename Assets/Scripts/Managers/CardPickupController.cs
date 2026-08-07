@@ -32,7 +32,7 @@ public void ResetPickup()
         // klik kartu
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Klik Mouse");
+
 
             Vector2 mouse = Input.mousePosition;
 
@@ -43,11 +43,10 @@ public void ResetPickup()
 
             float distance = Vector2.Distance(mouse, screenPos);
 
-            Debug.Log(distance);
+
 
             if (distance < 180f)
             {
-                Debug.Log("Kartu Dipilih");
                 dragging = true;
             }
         }
@@ -69,8 +68,6 @@ public void ResetPickup()
         // lepas
         if (Input.GetMouseButtonUp(0))
         {
-            Debug.Log("Mouse Up");
-
             dragging = false;
 
             float distance =
@@ -78,26 +75,17 @@ public void ResetPickup()
                     card.anchoredPosition,
                     readerSlot.anchoredPosition);
 
-            Debug.Log("Distance Reader = " + distance);
-            Debug.Log("Snap Distance = " + snapDistance);
-
             if (distance < snapDistance)
             {
                 picked = true;
 
-                Debug.Log("Picked Setelah Set = " + picked);
-
                 card.anchoredPosition =
                     readerSlot.anchoredPosition;
-
-                Debug.Log("CARD SNAPPED");
 
                 swipeController.EnableSwipe();
             }
             else
             {
-                Debug.Log("Belum sampai reader");
-
                 card.anchoredPosition = cardStartPoint.anchoredPosition;
             }
         }

@@ -50,4 +50,14 @@ public class PassengerScheduleManager : MonoBehaviour
 
         yield break;
     }
+
+    public void ResetSchedules()
+    {
+        foreach (PassengerSchedule schedule in schedules)
+        {
+            schedule.triggered = false;
+        }
+
+        Debug.Log("Passenger Schedule Reset");
+    }
 }

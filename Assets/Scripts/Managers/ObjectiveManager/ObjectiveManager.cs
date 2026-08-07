@@ -130,4 +130,19 @@ public class ObjectiveManager : MonoBehaviour
     {
         return currentObjectiveIndex;
     }
+
+    public void ResetObjectives()
+    {
+        currentObjectiveIndex = 0;
+
+        foreach (Objective obj in objectives)
+        {
+            obj.completed = false;
+            obj.currentAmount = 0;
+        }
+
+        ShowCurrentObjective();
+
+        Debug.Log("Objectives Reset");
+    }
 }

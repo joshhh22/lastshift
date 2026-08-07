@@ -289,41 +289,24 @@ public void OpenDialoguePanel(NPCController npc)
     }
 
     void ConfirmDialogue()
+{
+    bool accepted = dialogueIndex == 0;
+
+    PerformanceManager.Instance.EvaluateDecision(
+        accepted,
+        currentNPC.passengerData
+    );
+
+    if (accepted)
     {
-        if (dialogueIndex == 0)
-        {
-            if(currentNPC.passengerData.isReasonTrue)
-            {
-                // TODO Performance kecil
-            }
-            else
-            {
-                // TODO Performance besar
-            }
-
-            currentNPC.Serve();
-
-            Close();
-
-            swipeController.ResetCard();
-        }
-        else
-        {
-            if(currentNPC.passengerData.isReasonTrue)
-            {
-                // TODO Humanity turun
-                // TODO Performance naik
-            }
-            else
-            {
-                // TODO Performance naik besar
-            }
-
-            currentNPC.Reject();
-
-            Close();
-
-            swipeController.ResetCard();
-        }
+        currentNPC.Serve();
     }
+    else
+    {
+        currentNPC.Reject();
+    }
+
+    Close();
+    swipeController.ResetCard();
+}
 }

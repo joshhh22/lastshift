@@ -6,8 +6,8 @@ public class GameTimeManager : MonoBehaviour
     public static GameTimeManager Instance;
 
     [Header("Start Time")]
-    [SerializeField] private int startHour = 22;
-    [SerializeField] private int startMinute = 0;
+    [SerializeField] private int startHour = 4;
+    [SerializeField] private int startMinute = 58;
 
     [Header("Time Settings")]
     [SerializeField] private float secondsPerGameMinute = 1f;
@@ -17,6 +17,7 @@ public class GameTimeManager : MonoBehaviour
 
     public int Hour { get; private set; }
     public int Minute { get; private set; }
+    public bool IsShiftEnded { get; private set; }
 
     private float timer;
 
@@ -64,6 +65,14 @@ public class GameTimeManager : MonoBehaviour
         }
 
         UpdateClockUI();
+
+        // Shift selesai jam 05:00
+        if (!IsShiftEnded && IsTime(5, 0))
+        {
+            IsShiftEnded = true;
+
+            Debug.Log("SHIFT ENDED");
+        }
     }
 
     void UpdateClockUI()
@@ -88,4 +97,18 @@ public class GameTimeManager : MonoBehaviour
     }
 
     public int TotalMinutes => Hour * 60 + Minute;
+
+    public void ResetTime()
+    {
+        Hour = startHour;
+        Minute = startMinute;
+
+        timer = 0f;
+
+        IsShiftEnded = false;
+
+        UpdateClockUI();
+
+        Debug.Log("Time Reset");
+    }
 }

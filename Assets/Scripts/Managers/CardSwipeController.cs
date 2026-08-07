@@ -107,9 +107,7 @@ public class CardSwipeController : MonoBehaviour
             float speed =
                 distance / duration;
 
-            Debug.Log("Distance : " + distance);
-            Debug.Log("Duration : " + duration);
-            Debug.Log("Speed : " + speed);
+
 
             ValidateSwipe(distance, speed);
         }
@@ -194,8 +192,6 @@ public class CardSwipeController : MonoBehaviour
 
         statusText.text = "VALIDATING...";
 
-        Debug.Log("SUCCESS12345");
-
         StartCoroutine(SuccessRoutine());
     }
 
@@ -218,50 +214,37 @@ public void ResetCard()
     if (pickupController != null)
         pickupController.ResetPickup();
 }
+
+
 private IEnumerator SuccessRoutine()
 {
-    Debug.Log("SuccessRoutine START");
-
     yield return new WaitForSeconds(0.5f);
 
     NPCController npc = CounterManager.Instance.GetCurrentNPC();
 
-    Debug.Log("===== TICKET =====");
-
-    Debug.Log("Passenger : " + npc.passengerData.passengerName);
-
-    Debug.Log("Ticket ID : " + npc.passengerData.ticket.ticketID);
-
-    Debug.Log("Origin : " + npc.passengerData.ticket.originStation);
-
-    Debug.Log("Destination : " + npc.passengerData.ticket.destinationStation);
-
-    Debug.Log("Status : " + npc.passengerData.ticket.status);
-
-    Debug.Log("NPC = " + npc);
-
     if (npc != null)
     {
-        Debug.Log("Memanggil Serve()");
         TicketStatus result =
             TicketValidator.Validate(
                 npc.passengerData.ticket);
-
-        Debug.Log("Ticket Result : " + result);
 
         switch (result)
         {
             case TicketStatus.Valid:
 
-                statusText.text = "ACCESS GRANTED";
+    statusText.text = "ACCESS GRANTED";
 
-                npc.Serve();
+    PerformanceManager.Instance.AddPerformance(5);
+    PerformanceManager.Instance.AddCorrectDecision();
+    PerformanceManager.Instance.AddPassengerServed();
 
-                ServePassengerUIController.Instance.Close();
+    npc.Serve();
 
-                ResetCard();
+    ServePassengerUIController.Instance.Close();
 
-                break;
+    ResetCard();
+
+    break;
 
             case TicketStatus.Invalid:
 
@@ -296,11 +279,6 @@ private IEnumerator SuccessRoutine()
                 break;
         }
     }
-    else
-    {
-        Debug.LogError("NPC NULL");
-    }
-
 }
 
 }

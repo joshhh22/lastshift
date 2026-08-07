@@ -6,16 +6,44 @@ public class CardReaderInteractable : MonoBehaviour, IInteractable
 
     public string GetInteractionText()
     {
-        return interactionText;
+        string currentObjective =
+            ObjectiveManager.Instance.GetCurrentObjective();
+
+        if (currentObjective == "Clock In")
+            return "Clock In";
+
+        if (currentObjective == "Clock Out")
+            return "Clock Out";
+
+        return "";
     }
 
     public void Interact()
     {
-        if (ObjectiveManager.Instance.GetCurrentObjective() != "Clock In")
-            return;
+        string currentObjective =
+            ObjectiveManager.Instance.GetCurrentObjective();
 
-        Debug.Log("Shift Started");
+        Debug.Log("Interact -> " + currentObjective);
 
-        ObjectiveManager.Instance.CompleteObjective();
+        switch (currentObjective)
+        {
+            case "Clock In":
+
+                Debug.Log("Shift Started");
+
+                ObjectiveManager.Instance.CompleteObjective();
+
+                break;
+
+            case "Clock Out":
+
+                Debug.Log("Shift Ended");
+
+                ObjectiveManager.Instance.CompleteObjective();
+
+                SummaryUIController.Instance.Open();
+
+                break;
+        }
     }
 }
