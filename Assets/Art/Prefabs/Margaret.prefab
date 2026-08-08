@@ -261,6 +261,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7d0d3c41539a7e54280f0f5ce063807a, type: 3}
       insertIndex: -1
       addedObject: {fileID: -7233913901652628334}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7d0d3c41539a7e54280f0f5ce063807a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -6733517686195605670}
   m_SourcePrefab: {fileID: 100100000, guid: 7d0d3c41539a7e54280f0f5ce063807a, type: 3}
 --- !u!95 &2219173277557323146 stripped
 Animator:
@@ -333,3 +336,27 @@ MonoBehaviour:
   animator: {fileID: 2219173277557323146}
   isBeingServed: 0
   canBeServed: 0
+  passengerData:
+    passengerName: 
+    ticket:
+      ticketID: 
+      originStation: 
+      destinationStation: 
+      trainLine: 
+      status: 0
+    reason: 
+    isReasonTrue: 0
+--- !u!114 &-6733517686195605670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4857108208715199818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e7f418d9b0ca5d48845ea21c760c5c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCIdentity
+  passengerName: Margaret
+  gender: 1

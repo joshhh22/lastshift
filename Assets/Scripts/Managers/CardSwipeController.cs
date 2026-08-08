@@ -68,6 +68,7 @@ public class CardSwipeController : MonoBehaviour
                 Input.mousePosition,
                 null))
             {
+                AudioManager.Instance.PlaySwipeCard();
                 swiping = true;
                 swipeStartX = card.anchoredPosition.x;
                 swipeStartTime = Time.time;
@@ -232,6 +233,7 @@ private IEnumerator SuccessRoutine()
         {
             case TicketStatus.Valid:
 
+    AudioManager.Instance.PlayAccessGranted();
     statusText.text = "ACCESS GRANTED";
 
     PerformanceManager.Instance.AddPerformance(5);
@@ -248,6 +250,7 @@ private IEnumerator SuccessRoutine()
 
             case TicketStatus.Invalid:
 
+                AudioManager.Instance.PlayAccessDenied();
                 statusText.text = "INVALID TICKET";
 
                 ServePassengerUIController.Instance.OpenDialoguePanel(npc);
@@ -256,6 +259,7 @@ private IEnumerator SuccessRoutine()
 
             case TicketStatus.Expired:
 
+                AudioManager.Instance.PlayAccessDenied();
                 statusText.text = "TICKET EXPIRED";
 
                 ServePassengerUIController.Instance.OpenDialoguePanel(npc);
@@ -264,6 +268,7 @@ private IEnumerator SuccessRoutine()
 
             case TicketStatus.Fake:
 
+                AudioManager.Instance.PlayAccessDenied();
                 statusText.text = "FAKE TICKET";
 
                 ServePassengerUIController.Instance.OpenDialoguePanel(npc);
@@ -272,6 +277,7 @@ private IEnumerator SuccessRoutine()
 
             case TicketStatus.WrongDestination:
 
+                AudioManager.Instance.PlayAccessDenied();
                 statusText.text = "WRONG DESTINATION";
 
                 ServePassengerUIController.Instance.OpenDialoguePanel(npc);

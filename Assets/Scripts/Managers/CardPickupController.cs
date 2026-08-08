@@ -20,6 +20,8 @@ public class CardPickupController : MonoBehaviour
 
 public void ResetPickup()
 {
+    AudioManager.Instance.PlayPutCard();
+
     picked = false;
     dragging = false;
 
@@ -47,6 +49,7 @@ public void ResetPickup()
 
             if (distance < 180f)
             {
+                AudioManager.Instance.PlayPickupCard();
                 dragging = true;
             }
         }

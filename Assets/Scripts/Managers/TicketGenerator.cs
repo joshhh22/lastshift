@@ -2,22 +2,6 @@ using UnityEngine;
 
 public static class TicketGenerator
 {
-    static readonly string[] names =
-    {
-        "Andi",
-        "Budi",
-        "Citra",
-        "Dimas",
-        "Eka",
-        "Farhan",
-        "Gilang",
-        "Hana",
-        "Indra",
-        "Joshua",
-        "Kevin",
-        "Nadia"
-    };
-
     static readonly string[] stations =
     {
         "Manggarai",
@@ -101,11 +85,8 @@ public static class TicketGenerator
     {
         PassengerData data = new PassengerData();
 
-        data.passengerName =
-            names[Random.Range(0, names.Length)];
-
         data.ticket.ticketID =
-            Random.Range(100000, 999999).ToString();
+            Random.Range(100000,999999).ToString();
 
         data.ticket.originStation =
             stations[Random.Range(0, stations.Length)];

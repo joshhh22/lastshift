@@ -229,6 +229,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
       insertIndex: -1
       addedObject: {fileID: 117213384195758759}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -357245579043117825}
   m_SourcePrefab: {fileID: 100100000, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
 --- !u!1 &1228851631671890359 stripped
 GameObject:
@@ -296,6 +299,30 @@ MonoBehaviour:
   animator: {fileID: 5523170662106780023}
   isBeingServed: 0
   canBeServed: 0
+  passengerData:
+    passengerName: 
+    ticket:
+      ticketID: 
+      originStation: 
+      destinationStation: 
+      trainLine: 
+      status: 0
+    reason: 
+    isReasonTrue: 0
+--- !u!114 &-357245579043117825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1228851631671890359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e7f418d9b0ca5d48845ea21c760c5c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCIdentity
+  passengerName: Liam
+  gender: 0
 --- !u!95 &5523170662106780023 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}

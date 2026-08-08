@@ -43,6 +43,10 @@ public class PassengerScheduleManager : MonoBehaviour
     {
         Debug.Log($"Train Arrived ({schedule.hour:00}:{schedule.minute:00})");
 
+        AudioManager.Instance.PlayTrainArrive();
+
+        yield return new WaitForSeconds(3f);
+
         SpawnManager.Instance.SpawnPassenger(
             schedule.spawnCount,
             schedule.spawnInterval,

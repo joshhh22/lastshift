@@ -261,6 +261,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7855c3b5110cdcb41b4fb40aee5ec647, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3527442006400604825}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7855c3b5110cdcb41b4fb40aee5ec647, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5066395699648870878}
   m_SourcePrefab: {fileID: 100100000, guid: 7855c3b5110cdcb41b4fb40aee5ec647, type: 3}
 --- !u!1 &255903691872613823 stripped
 GameObject:
@@ -306,6 +309,16 @@ MonoBehaviour:
   animator: {fileID: 6784351185664652671}
   isBeingServed: 0
   canBeServed: 0
+  passengerData:
+    passengerName: 
+    ticket:
+      ticketID: 
+      originStation: 
+      destinationStation: 
+      trainLine: 
+      status: 0
+    reason: 
+    isReasonTrue: 0
 --- !u!195 &3527442006400604825
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -328,6 +341,20 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &-5066395699648870878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255903691872613823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e7f418d9b0ca5d48845ea21c760c5c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCIdentity
+  passengerName: Ava
+  gender: 1
 --- !u!95 &6784351185664652671 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 7855c3b5110cdcb41b4fb40aee5ec647, type: 3}

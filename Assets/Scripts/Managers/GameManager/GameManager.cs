@@ -30,6 +30,11 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         SetGameState(GameState.Playing);
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StartAmbient();
+        }
     }
 
     public void SetGameState(GameState newState)
@@ -40,6 +45,10 @@ public class GameManager : MonoBehaviour
         {
             case GameState.MainMenu:
                 Time.timeScale = 1f;
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.StopAmbient();
+                }
                 break;
 
             case GameState.Playing:

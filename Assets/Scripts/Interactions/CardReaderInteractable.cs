@@ -29,6 +29,7 @@ public class CardReaderInteractable : MonoBehaviour, IInteractable
         {
             case "Clock In":
 
+                AudioManager.Instance.PlayClockBeep();
                 Debug.Log("Shift Started");
 
                 ObjectiveManager.Instance.CompleteObjective();
@@ -37,6 +38,7 @@ public class CardReaderInteractable : MonoBehaviour, IInteractable
 
             case "Clock Out":
 
+                AudioManager.Instance.PlayClockBeep();
                 Debug.Log("Shift Ended");
 
                 ObjectiveManager.Instance.CompleteObjective();

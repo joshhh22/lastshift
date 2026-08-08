@@ -30,6 +30,14 @@ public class NPCController : MonoBehaviour
     {
         passengerData = TicketGenerator.GeneratePassenger();
 
+        NPCIdentity identity = GetComponent<NPCIdentity>();
+
+        if (identity != null)
+        {
+            passengerData.passengerName = identity.PassengerName;
+            passengerData.gender = identity.Gender;
+        }
+
         Debug.Log(
             $"Passenger : {passengerData.passengerName} | " +
             $"{passengerData.ticket.originStation} -> " +

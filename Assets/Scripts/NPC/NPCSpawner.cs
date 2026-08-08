@@ -11,10 +11,6 @@ public class NPCSpawner : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Transform runtimeParent;
 
-    [Header("NPC Prefabs")]
-    [SerializeField] private List<NPCController> npcPrefabs = new();
-
-    private int lastIndex = -1;
 
     private void Awake()
     {
@@ -32,24 +28,16 @@ public class NPCSpawner : MonoBehaviour
 
     public void SpawnNPC()
     {
-        int index;
-
-        do
-        {
-            index = Random.Range(0, npcPrefabs.Count);
-        }
-        while (npcPrefabs.Count > 1 && index == lastIndex);
-
-        lastIndex = index;
+        NPCController prefab =
+            NPCDatabase.Instance.GetRandomNPC();
 
         NPCController npc = Instantiate(
-            npcPrefabs[index],
+            prefab,
             spawnPoint.position,
             spawnPoint.rotation,
             runtimeParent);
 
-        NPCController controller = npc.GetComponent<NPCController>();
-        controller.InitializePassenger();
+        npc.InitializePassenger();
 
         StartCoroutine(BeginRoutine(npc));
     }

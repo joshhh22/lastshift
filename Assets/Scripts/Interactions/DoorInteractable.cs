@@ -65,6 +65,8 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     {
         isMoving = true;
 
+        AudioManager.Instance.PlayDoorOpen();
+
         Quaternion targetRotation = isOpen ? closedRotation : openRotation;
 
         while (Quaternion.Angle(transform.localRotation, targetRotation) > 0.1f)

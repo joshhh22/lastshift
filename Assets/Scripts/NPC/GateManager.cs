@@ -13,6 +13,7 @@ public class GateManager : MonoBehaviour
 
     public void OpenGate()
     {
+        AudioManager.Instance.PlayGateOpen();
         gate.Open();
     }
 }

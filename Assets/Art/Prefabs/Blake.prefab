@@ -229,6 +229,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aab2bcb10b960e0488f3189993d16e5c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4166743528196631105}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aab2bcb10b960e0488f3189993d16e5c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8674211064375475882}
   m_SourcePrefab: {fileID: 100100000, guid: aab2bcb10b960e0488f3189993d16e5c, type: 3}
 --- !u!1 &2023030290422639217 stripped
 GameObject:
@@ -296,6 +299,30 @@ MonoBehaviour:
   animator: {fileID: 4735749605041547953}
   isBeingServed: 1
   canBeServed: 1
+  passengerData:
+    passengerName: 
+    ticket:
+      ticketID: 
+      originStation: 
+      destinationStation: 
+      trainLine: 
+      status: 0
+    reason: 
+    isReasonTrue: 0
+--- !u!114 &8674211064375475882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2023030290422639217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e7f418d9b0ca5d48845ea21c760c5c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCIdentity
+  passengerName: Blake
+  gender: 0
 --- !u!95 &4735749605041547953 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: aab2bcb10b960e0488f3189993d16e5c, type: 3}
