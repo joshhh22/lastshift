@@ -25,6 +25,7 @@ public class ServePassengerUIController : MonoBehaviour
 
     [Header("Dialogue Panel")]
     [SerializeField] private GameObject dialoguePanel;
+    [SerializeField] private TypewriterEffect typewriter; // Tambahan Typewriter Effect
 
     [SerializeField] private TMP_Text dialogueTitleText;
     [SerializeField] private TMP_Text reasonText;
@@ -253,7 +254,14 @@ public void OpenDialoguePanel(NPCController npc)
             break;
     }
 
-    reasonText.text = npc.passengerData.reason;
+    if (typewriter != null)
+    {
+        typewriter.StartTyping(reasonText, npc.passengerData.reason);
+    }
+    else
+    {
+        reasonText.text = npc.passengerData.reason;
+    }
 }
 
     void RefreshDialogue()
@@ -279,7 +287,14 @@ public void OpenDialoguePanel(NPCController npc)
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            ConfirmDialogue();
+            if (typewriter != null && typewriter.IsTyping)
+            {
+                typewriter.CompleteTyping();
+            }
+            else
+            {
+                ConfirmDialogue();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))

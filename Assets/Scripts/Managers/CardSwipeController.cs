@@ -227,7 +227,7 @@ private IEnumerator SuccessRoutine()
     {
         TicketStatus result =
             TicketValidator.Validate(
-                npc.passengerData.ticket);
+                npc.passengerData);
 
         switch (result)
         {
@@ -236,7 +236,7 @@ private IEnumerator SuccessRoutine()
     AudioManager.Instance.PlayAccessGranted();
     statusText.text = "ACCESS GRANTED";
 
-    PerformanceManager.Instance.AddPerformance(5);
+    PerformanceManager.Instance.AddPerformance(2);
     PerformanceManager.Instance.AddCorrectDecision();
     PerformanceManager.Instance.AddPassengerServed();
 

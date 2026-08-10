@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b505c02ebc92643803b7f2a9890fd8, type: 3}
+  m_Name: day 6
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - speaker: Cleaning Staff
+    text: Ini badai terburuk yang pernah terjadi. Tidak ada lagi pagi hari, langit
+      ditutup awan abu-abu dan salju.
+  - speaker: Cleaning Staff
+    text: Stasiun-stasiun utara sudah jebol oleh massa yang menerobos masuk dari
+      badai es. Stasiun ini adalah benteng terakhir.
+  - speaker: Cleaning Staff
+    text: Menjadi orang berhati dingin (Heartless) dengan menolak penumpang memang
+      kejam... Tapi, kau sadar kau sedang mengamankan nyawa orang lain yang sudah
+      di dalam kereta.
+  - speaker: Cleaning Staff
+    text: Untuk bertahan hidup, terkadang mencoret satu nyawa lebih baik demi menyelamatkan
+      sepuluh nyawa. Tetap waras, nak.

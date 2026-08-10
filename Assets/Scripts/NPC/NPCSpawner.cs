@@ -37,6 +37,20 @@ public class NPCSpawner : MonoBehaviour
             spawnPoint.rotation,
             runtimeParent);
 
+        // ===== SNAPPING KE NAVMESH =====
+        // Agar NPC baru yang pivot/porosnya agak melayang bisa dipaksa nempel ke tanah
+        UnityEngine.AI.NavMeshAgent agent = npc.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.enabled = false;
+            if (UnityEngine.AI.NavMesh.SamplePosition(spawnPoint.position, out UnityEngine.AI.NavMeshHit hit, 5.0f, UnityEngine.AI.NavMesh.AllAreas))
+            {
+                npc.transform.position = hit.position;
+            }
+            agent.enabled = true;
+        }
+        // ===============================
+
         npc.InitializePassenger();
 
         StartCoroutine(BeginRoutine(npc));

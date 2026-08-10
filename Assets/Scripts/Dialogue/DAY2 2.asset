@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b505c02ebc92643803b7f2a9890fd8, type: 3}
+  m_Name: DAY2 2
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - speaker: Cleaning Staff
+    text: Hati-hati kalau mengambil kartu tiket mereka malam ini, nak. Jangan sampai
+      jari telanjangmu bersentuhan dengan jari mereka.
+  - speaker: Cleaning Staff
+    text: Rupanya berita soal karantina stasiun Snowtrench benar. Ribuan orang terjebak
+      salju dan kini paru-parunya hancur membeku.
+  - speaker: Cleaning Staff
+    text: Jangan sampai kau lengah dan meloloskan pengungsi dari tempat itu ke dalam
+      gerbong. Nafas mereka bisa membekukan paru-parumu nyaris seketika.
+  - speaker: Cleaning Staff
+    text: Cek baik-baik tulisan Asal Stasiun (Origin) di layar tiket mereka. Menjadi
+      kejam terkadang adalah satu-satunya cara kita bertahan hidup.

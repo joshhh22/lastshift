@@ -12,4 +12,6 @@ public class PassengerData
     public string reason;
 
     public bool isReasonTrue;
+    
+    public bool isMonster;
 }

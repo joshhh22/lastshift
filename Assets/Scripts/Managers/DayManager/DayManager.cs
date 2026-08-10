@@ -19,6 +19,9 @@ public class DayManager : MonoBehaviour
 
     public int CurrentDayNumber => (int)CurrentDay;
 
+    [Header("Testing")]
+    [SerializeField] private GameDay startingDay = GameDay.Day1;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -29,7 +32,7 @@ public class DayManager : MonoBehaviour
 
         Instance = this;
 
-        SetDay(GameDay.Day1);
+        SetDay(startingDay);
     }
 
     public void SetDay(GameDay day)

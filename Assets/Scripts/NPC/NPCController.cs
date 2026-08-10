@@ -34,7 +34,16 @@ public class NPCController : MonoBehaviour
 
         if (identity != null)
         {
-            passengerData.passengerName = identity.PassengerName;
+            string cleanName = identity.PassengerName;
+            
+            // Hapus akhiran acak "_123" yang dibuat oleh tool rename jika ada
+            int underscoreIndex = cleanName.IndexOf('_');
+            if (underscoreIndex > 0)
+            {
+                cleanName = cleanName.Substring(0, underscoreIndex);
+            }
+
+            passengerData.passengerName = cleanName;
             passengerData.gender = identity.Gender;
         }
 
@@ -87,9 +96,24 @@ public class NPCController : MonoBehaviour
     public void MoveToQueue(Transform target)
     {
         SetState(NPCState.InQueue);
+        StartCoroutine(MoveWhenReady(target));
+    }
 
-        agent.isStopped = false;
-        agent.SetDestination(target.position);
+    private IEnumerator MoveWhenReady(Transform target)
+    {
+        // Tunggu maksimal 1 detik atau sampai agent berhasil berpijak di atas NavMesh
+        float timeout = 1f;
+        while (!agent.isOnNavMesh && timeout > 0)
+        {
+            timeout -= Time.deltaTime;
+            yield return null;
+        }
+
+        if (agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+            agent.SetDestination(target.position);
+        }
     }
 
     // ===========================
@@ -103,9 +127,7 @@ public class NPCController : MonoBehaviour
             System.Environment.StackTrace);
 
         SetState(NPCState.WalkingToCounter);
-
-        agent.isStopped = false;
-        agent.SetDestination(target.position);
+        StartCoroutine(MoveWhenReady(target));
     }
 
     // ===========================
@@ -118,19 +140,19 @@ public class NPCController : MonoBehaviour
         Debug.Log("=== MoveToExit ===");
 
         SetState(NPCState.WalkingToExit);
-
-        agent.isStopped = false;
-
-        agent.SetDestination(target.position);
-
-        Debug.Log("Destination = " + target.position);
+        StartCoroutine(MoveWhenReady(target));
+        
+        Debug.Log("Destination (via Coroutine) = " + target.position);
         Debug.Log("Path Status = " + agent.pathStatus);
         Debug.Log("Has Path = " + agent.hasPath);
     }
 
     public void StopMoving()
     {
-        agent.isStopped = true;
+        if (agent.isOnNavMesh)
+        {
+            agent.isStopped = true;
+        }
 
         SetState(NPCState.Idle);
     }
@@ -199,6 +221,8 @@ public class NPCController : MonoBehaviour
 
         Debug.Log("RejectRoutine selesai");
 
+        ObjectiveManager.Instance.AddProgress();
+
         CounterManager.Instance.ReleaseCounter();
 
         QueueManager.Instance.MoveFrontToCounter();
@@ -215,6 +239,9 @@ public class NPCController : MonoBehaviour
 
     public bool HasReachedDestination()
     {
+        if (!agent.isOnNavMesh)
+            return false;
+
         if (agent.pathPending)
             return false;
 

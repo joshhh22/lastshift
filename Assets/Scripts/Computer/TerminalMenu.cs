@@ -10,6 +10,7 @@ public enum TerminalPage
 }
 public class TerminalMenu : MonoBehaviour
 {
+    public static TerminalMenu Instance;
 
     public TerminalPage CurrentPage { get; private set; } = TerminalPage.MainMenu;
 
@@ -34,6 +35,8 @@ public class TerminalMenu : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+
         menuItems = new TextMeshProUGUI[]
         {
             assignmentText,

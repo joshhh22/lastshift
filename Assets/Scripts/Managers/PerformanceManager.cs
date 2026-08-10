@@ -38,71 +38,84 @@ public class PerformanceManager : MonoBehaviour
     }
 
     public void EvaluateDecision(bool accepted, PassengerData data)
-{
-
-
-    DecisionResult result;
-
-    if (accepted)
     {
-        if (data.isReasonTrue)
-            result = DecisionResult.Merciful;
+        // =====================================
+        // PENGECEKAN KHUSUS MONSTER ANOMALI
+        // =====================================
+        if (data.isMonster)
+        {
+            if (accepted)
+            {
+                // Katastrofi jika membiarkan Anomali masuk!
+                AddPerformance(-50);
+                AddHumanity(-10); // Menyelundupkan monster membahayakan penghuni kereta
+                AddWrongDecision();
+            }
+            else
+            {
+                // Bagus, mengusir Anomali dengan benar
+                AddPerformance(+5); 
+                AddCorrectDecision();
+            }
+            
+            AddPassengerServed();
+            return;
+        }
+
+        DecisionResult result;
+
+        if (accepted)
+        {
+            if (data.isReasonTrue)
+                result = DecisionResult.Merciful;
+            else
+                result = DecisionResult.Gullible;
+        }
         else
-            result = DecisionResult.Gullible;
+        {
+            if (data.isReasonTrue)
+                result = DecisionResult.Heartless;
+            else
+                result = DecisionResult.Correct;
+        }
+
+        ApplyResult(result);
+
+        AddPassengerServed();
     }
-    else
-    {
-        if (data.isReasonTrue)
-            result = DecisionResult.Heartless;
-        else
-            result = DecisionResult.Correct;
-    }
-
-    ApplyResult(result);
-
-    AddPassengerServed();
-
-
-}
 
     void ApplyResult(DecisionResult result)
-{
-    switch (result)
     {
-        case DecisionResult.Correct:
+        switch (result)
+        {
+            case DecisionResult.Correct:
+                // Kerja bagus = performance naik tipis. Bekerja benar itu sebuah kewajiban.
+                AddPerformance(+2); 
+                AddCorrectDecision();
+                break;
 
-            AddPerformance(+5);
-            AddCorrectDecision();
+            case DecisionResult.Merciful:
+                // Kasihan pada penumpang = Melanggar aturan. Humanity naik, Performance turun.
+                AddPerformance(-5);
+                AddHumanity(+5);
+                AddWrongDecision();
+                break;
 
-            break;
+            case DecisionResult.Gullible:
+                // Ketipu penumpang = Performance anjlok.
+                AddPerformance(-10);
+                AddWrongDecision();
+                break;
 
-        case DecisionResult.Merciful:
-
-            AddPerformance(-2);
-            AddHumanity(+3);
-
-            AddWrongDecision();
-
-            break;
-
-        case DecisionResult.Gullible:
-
-            AddPerformance(-8);
-
-            AddWrongDecision();
-
-            break;
-
-        case DecisionResult.Heartless:
-
-            AddPerformance(+2);
-            AddHumanity(-5);
-
-            AddWrongDecision();
-
-            break;
+            case DecisionResult.Heartless:
+                // Menolak penumpang yang jujur dengan kasar = Humanity turun.
+                // Tapi secara teknis kamu ngikutin alat (tiket salah wajar ditolak).
+                AddPerformance(+1);
+                AddHumanity(-10);
+                AddWrongDecision();
+                break;
+        }
     }
-}
 
     public void AddPerformance(int amount)
     {

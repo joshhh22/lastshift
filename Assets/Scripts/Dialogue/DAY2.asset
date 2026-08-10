@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b505c02ebc92643803b7f2a9890fd8, type: 3}
+  m_Name: DAY2
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - speaker: Cleaning Staff
+    text: Kamu dengar beritanya lewat radio? Pipa uap bawah tanah di Stasiun Frostgate
+      baru saja meledak karena beku.
+  - speaker: Cleaning Staff
+    text: Pusat menyuruh kita menolak siapapun yang tiketnya menuju ke sana. Cawang
+      sudah menjadi makam es raksasa.
+  - speaker: Cleaning Staff
+    text: Pasti nanti banyak penumpang memohon masuk, mereka tidak tahu bahwa rumah
+      dan keluarga mereka di Cawang sudah membeku tak tersisa.
+  - speaker: Cleaning Staff
+    text: Jangan goyah, nak. Menerima tiket mereka ke Cawang sama saja mengirim mereka
+      ke peti mati es. Suruh mereka pulang, meski mereka menangis.

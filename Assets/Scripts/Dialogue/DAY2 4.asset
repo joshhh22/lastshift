@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b505c02ebc92643803b7f2a9890fd8, type: 3}
+  m_Name: DAY2 4
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - speaker: Cleaning Staff
+    text: Astaga... uap hidungku rasanya berubah jadi serpihan kristal es.
+  - speaker: Cleaning Staff
+    text: Aku baru saja menguping dari radio mekanik... Mesin pemanas gerbong kereta
+      sudah di 98% muatan!
+  - speaker: Cleaning Staff
+    text: Jika kau terus mengasihani orang (Merciful) dan memasukkan penumpang tanpa
+      tiket sah, generator kereta akan jebol kelebihan beban listrik!
+  - speaker: Cleaning Staff
+    text: Kalau pemanasnya mati di tengah jalan, RATUSAN orang di dalam kereta itu
+      akan mati membeku. Pikirkanlah itu setiap mau mengasihani seseorang.

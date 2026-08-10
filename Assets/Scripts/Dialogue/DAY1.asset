@@ -14,8 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   lines:
   - speaker: Cleaning Staff
-    text: Good Morning.
-  - speaker: Joshua
-    text: Morning.
+    text: Hawa dingin dari ventilasi makin menusuk tulang ya? Pakai mantelmu yang
+      berlapis-lapis, nak.
   - speaker: Cleaning Staff
-    text: Welcome to your first day.
+    text: Orang-orang di peron luar itu rela membunuh demi selembar tiket. Kereta
+      bawah tanah kita adalah satu-satunya tempat yang mesin pemanasnya masih menyala.
+  - speaker: Cleaning Staff
+    text: Tugasmu berat. Menolak mereka berarti membiarkan mereka menjadi patung
+      es di jalanan besok pagi. Tapi kuota kereta terbatas.
+  - speaker: Cleaning Staff
+    text: Aku harus mengepel cairan es yang mencair dari sepatu mereka. Jangan berikan
+      akses pada sembarang orang.

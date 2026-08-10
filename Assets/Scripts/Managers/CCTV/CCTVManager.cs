@@ -14,6 +14,7 @@ public class CCTVManager : MonoBehaviour
     [SerializeField] private GameObject cctvUI;
 
     private int currentIndex;
+    public int CurrentIndex => currentIndex;
     private float blinkTimer;
     private bool blinkState = true;
     private bool[] visited;

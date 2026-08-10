@@ -4,17 +4,17 @@ public static class TicketGenerator
 {
     static readonly string[] stations =
     {
-        "Manggarai",
-        "Tebet",
-        "Cawang",
-        "Pasar Minggu",
-        "Depok",
-        "Bogor"
+        "Sector 5",
+        "Ironhold",
+        "Frostgate", // Pengganti Cawang
+        "Snowtrench",
+        "New Avalon",
+        "The Core"
     };
 
     static readonly string[] lines =
     {
-        "Red Line"
+        "Thermal Line"
     };
 
     static readonly string[] invalidHonest =
@@ -80,6 +80,33 @@ public static class TicketGenerator
         "The previous station accepted it."
     };
 
+    static readonly string[] maleNames =
+    {
+        "Bagas", "Dimas", "Raka", "Yusuf", "Adrian", 
+        "Bima", "Satria", "Rendi", "Tirta", "Danish",
+        "Leon", "Arthur", "Danu", "Surya", "Gilang",
+        "Joko", "Toni", "Vance", "Kael", "Rudi"
+    };
+
+    static readonly string[] femaleNames =
+    {
+        "Maya", "Widya", "Kartika", "Sari", "Risa", 
+        "Nadia", "Alya", "Laras", "Diana", "Ratna",
+        "Kira", "Elena", "Nisa", "Siska", "Tania",
+        "Lyra", "Nova", "Elara", "Serena", "Anya"
+    };
+
+    public static string GetRandomName(NPCGender gender)
+    {
+        if (gender == NPCGender.Male)
+        {
+            return maleNames[Random.Range(0, maleNames.Length)];
+        }
+        else
+        {
+            return femaleNames[Random.Range(0, femaleNames.Length)];
+        }
+    }
 
     public static PassengerData GeneratePassenger()
     {

@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 {
-    [Header("Dialogue")]
-    [SerializeField] private DialogueData dialogue;
+    [Header("Daily Dialogues")]
+    [Tooltip("Index 0 = Day 1, Index 1 = Day 2, etc.")]
+    [SerializeField] private DialogueData[] dailyDialogues;
+
+    [Header("Fallback Dialogue")]
+    [SerializeField] private DialogueData fallbackDialogue;
 
     [Header("Requirements")]
     [SerializeField] private int requiredObjectiveIndex;
@@ -53,7 +57,21 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
         cleaningStaff.FacePlayer(player);
 
-        DialogueManager.Instance.StartDialogue(dialogue);
+        DialogueData dialogueToPlay = fallbackDialogue;
+
+        if (DayManager.Instance != null)
+        {
+            int dayIndex = (int)DayManager.Instance.CurrentDay - 1;
+            if (dailyDialogues != null && dayIndex >= 0 && dayIndex < dailyDialogues.Length && dailyDialogues[dayIndex] != null)
+            {
+                dialogueToPlay = dailyDialogues[dayIndex];
+            }
+        }
+
+        if (dialogueToPlay != null)
+        {
+            DialogueManager.Instance.StartDialogue(dialogueToPlay);
+        }
     }
 
     private void OnDialogueFinished()
