@@ -14,14 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   lines:
   - speaker: Cleaning Staff
-    text: Hari ketujuh... Malam penentuan. Termostat stasiun sudah hancur beku menembus
-      minus 45 derajat.
+    text: Jadi... ini adalah shift terakhir kita.
   - speaker: Cleaning Staff
-    text: '"Orang-orang akan makin putus asa. Darah dan keributan ada di mana-mana.
-      Tanganmu pasti gemetar.'
+    text: Gudang sudah kosong. Kereta malam ini adalah kereta evakuasi yang terakhir.
   - speaker: Cleaning Staff
-    text: Ini bukan lagi sekadar memeriksa tiket Valid atau Invalid. Kau ditugaskan
-      Tuhan untuk menjadi penentu buku kehidupan dan kematian.
+    text: Aku tahu banyak penumpang di luar sana yang memohon untuk masuk, meskipun
+      tiket mereka salah atau kadaluwarsa.
   - speaker: Cleaning Staff
-    text: Tutup rapat jaketmu. Jika badai abadi ini mereda besok pagi... Kuharap
-      Tuhan mau memaafkan dosa yang kita buat malam ini.
+    text: Aku tidak akan menilai keputusanmu. Apakah kamu akan menjadi mesin tanpa
+      hati demi melindungi sistem, atau bertaruh melanggar aturan demi menyelamatkan
+      mereka...
+  - speaker: Cleaning Staff
+    text: Terima kasih sudah menemaniku di stasiun gelap ini, Petugas 404. Semoga...
+      kita bertemu lagi di seberang sana. Jika tempat itu memang ada.

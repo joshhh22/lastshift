@@ -11,14 +11,12 @@ public class SpawnManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
-    }
-
-    // Jangan spawn apa pun saat game mulai.
-    // Spawn akan dipanggil oleh Objective Event.
-    private void Start()
-    {
-
     }
 
     // Spawn sejumlah NPC

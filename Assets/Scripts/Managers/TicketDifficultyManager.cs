@@ -6,25 +6,19 @@ public static class TicketDifficultyManager
     {
         float random = Random.value;
 
-        // Jika DayManager belum ada, peluang Valid 50%
         float validChance = 0.5f;
 
         if (DayManager.Instance != null)
         {
-            // Di Day 1, kemungkinan tiket Valid 70%
-            if (DayManager.Instance.CurrentDay == GameDay.Day1)
+            switch (DayManager.Instance.CurrentDay)
             {
-                validChance = 0.7f;
-            }
-            // Di Day 2, mulai agak kacau, kemungkinan Valid 50%
-            else if (DayManager.Instance.CurrentDay == GameDay.Day2)
-            {
-                validChance = 0.5f;
-            }
-            // Day 3 ke atas, Valid cuma 40%
-            else
-            {
-                validChance = 0.4f;
+                case GameDay.Day1: validChance = 0.70f; break;
+                case GameDay.Day2: validChance = 0.50f; break;
+                case GameDay.Day3: validChance = 0.40f; break;
+                case GameDay.Day4: validChance = 0.35f; break;
+                case GameDay.Day5: validChance = 0.30f; break;
+                case GameDay.Day6: validChance = 0.25f; break;
+                case GameDay.Day7: validChance = 0.20f; break;
             }
         }
 

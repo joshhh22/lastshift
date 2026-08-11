@@ -210,7 +210,8 @@ public class ServePassengerUIController : MonoBehaviour
             "Origin : " + data.ticket.originStation;
 
         destinationText.text =
-            "Destination : " + data.ticket.destinationStation;
+            "Dest : " + data.ticket.destinationStation +
+            "  |  Class : " + data.ticket.seatClass.ToString();
     }
 
     void BackToMenu()

@@ -13,29 +13,36 @@ public class CardPickupController : MonoBehaviour
 
     private bool dragging;
     private bool picked;
+    private Vector2 initialPos;
 
     public bool IsPicked => picked;
 
+    private void Start()
+    {
+        if (card != null)
+        {
+            initialPos = card.anchoredPosition;
+        }
+    }
 
+    public void ResetPickup()
+    {
+        AudioManager.Instance.PlayPutCard();
 
-public void ResetPickup()
-{
-    AudioManager.Instance.PlayPutCard();
+        picked = false;
+        dragging = false;
 
-    picked = false;
-    dragging = false;
-
-    card.anchoredPosition = cardStartPoint.anchoredPosition;
-}
+        card.anchoredPosition = initialPos;
+    }
 
     void Update()
     {
+        if (picked)
+            return;
 
         // klik kartu
         if (Input.GetMouseButtonDown(0))
         {
-
-
             Vector2 mouse = Input.mousePosition;
 
             Vector2 screenPos =
@@ -44,8 +51,6 @@ public void ResetPickup()
                     card.position);
 
             float distance = Vector2.Distance(mouse, screenPos);
-
-
 
             if (distance < 180f)
             {
@@ -57,8 +62,6 @@ public void ResetPickup()
         // drag
         if (dragging)
         {
-           
-
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvas.transform as RectTransform,
                 Input.mousePosition,
@@ -89,7 +92,7 @@ public void ResetPickup()
             }
             else
             {
-                card.anchoredPosition = cardStartPoint.anchoredPosition;
+                card.anchoredPosition = initialPos;
             }
         }
     }

@@ -40,8 +40,8 @@ private void Awake()
         playerController.enabled = false;
         playerInteractor.enabled = false;
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
         crosshair.SetActive(false);
     }

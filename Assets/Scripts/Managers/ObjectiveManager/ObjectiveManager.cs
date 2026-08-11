@@ -17,6 +17,9 @@ public class ObjectiveManager : MonoBehaviour
     [Header("Objective Events")]
     [SerializeField] private UnityEvent[] objectiveEvents;
 
+    // Tambahan event C# agar benda-benda bisa bereaksi jika jadi target
+    public System.Action<string> OnObjectiveChanged;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -111,6 +114,8 @@ public class ObjectiveManager : MonoBehaviour
                 PhoneManager.Instance.ReceiveNotification();
                 break;
         }
+
+        OnObjectiveChanged?.Invoke(obj.title);
     }
 
     public string GetCurrentObjective()

@@ -127,6 +127,78 @@ public class RuleManager : MonoBehaviour
             }
         }
 
+        // ==========================================
+        // ATURAN DAY 5: ZONA THE CORE DITUTUP
+        // (Wabah "Pelupa Es" menyebar dari pusat pemerintahan)
+        // ==========================================
+        if (DayManager.Instance.CurrentDay >= GameDay.Day5)
+        {
+            if (data.ticket.originStation == "The Core")
+            {
+                if (data.ticket.status == TicketStatus.Valid)
+                {
+                    data.isReasonTrue = (Random.value > 0.5f);
+
+                    if (data.isReasonTrue)
+                    {
+                        string[] honestReasons = {
+                            "Saya tidak tahu soal wabah itu! Saya hanya ingin pergi sebelum semuanya berakhir...",
+                            "Pelupa Es? Saya tidak terinfeksi! Tolong percaya saya, dokter bilang saya bersih.",
+                            "Saya melarikan diri dari The Core karena tahu apa yang terjadi di sana. Tolong."
+                        };
+                        data.reason = honestReasons[Random.Range(0, honestReasons.Length)];
+                    }
+                    else
+                    {
+                        string[] fakeReasons = {
+                            "Wabah Pelupa Es itu fiksi pemerintah untuk mengurung kita. Buka pintunya!",
+                            "Saya pejabat tinggi The Core. Anda tidak berhak menahan saya.",
+                            "The Core baik-baik saja! Ini konspirasi untuk menjaga kita tetap terkurung."
+                        };
+                        data.reason = fakeReasons[Random.Range(0, fakeReasons.Length)];
+                    }
+                }
+
+                return TicketStatus.Invalid;
+            }
+        }
+
+        // ==========================================
+        // ATURAN DAY 6: HANYA SEAT CLASS A YANG DIIZINKAN
+        // (Kapasitas kereta di bawah 30%, prioritas evakuasi cepat)
+        // ==========================================
+        if (DayManager.Instance.CurrentDay >= GameDay.Day6)
+        {
+            if (data.ticket.seatClass != SeatClass.A)
+            {
+                if (data.ticket.status == TicketStatus.Valid)
+                {
+                    data.isReasonTrue = (Random.value > 0.5f);
+
+                    if (data.isReasonTrue)
+                    {
+                        string[] honestReasons = {
+                            "Class A? Saya tidak tahu, ini tiket terakhir yang tersisa ketika saya beli...",
+                            "Ini yang mampu saya bayar. Tolong, saya tidak punya tempat lagi untuk pergi.",
+                            "Saya pikir semua kelas boleh, tidak ada pengumuman soal itu di papan informasi."
+                        };
+                        data.reason = honestReasons[Random.Range(0, honestReasons.Length)];
+                    }
+                    else
+                    {
+                        string[] fakeReasons = {
+                            "Saya punya Class A, coba scan lagi mesinnya. Pasti sistemmu yang error.",
+                            "Tiket Class A sudah habis dijual, jadi yang ini sama saja harusnya.",
+                            "Kelas tiket sudah tidak relevan, kereta sudah mau berangkat terakhir kali."
+                        };
+                        data.reason = fakeReasons[Random.Range(0, fakeReasons.Length)];
+                    }
+                }
+
+                return TicketStatus.Invalid;
+            }
+        }
+
         // Jika tidak melanggar aturan harian, biarkan mesin mengecek keaslian tiket
         return TicketStatus.Valid;
     }

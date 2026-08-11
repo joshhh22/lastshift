@@ -31,12 +31,16 @@ public class PlayerInteractor : MonoBehaviour
     {
         currentInteractable = null;
 
+        // Raycast hit ke semua layer (kecuali Player) agar tembok memblokir interaksi
+        int layerMask = ~LayerMask.GetMask("Player", "Ignore Raycast");
+
         if (Physics.Raycast(
             playerCamera.transform.position,
             playerCamera.transform.forward,
             out RaycastHit hit,
             interactDistance,
-            interactLayer))
+            layerMask,
+            QueryTriggerInteraction.Collide))
         {
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
 

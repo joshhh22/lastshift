@@ -128,6 +128,25 @@ public static class TicketGenerator
         data.ticket.trainLine =
             lines[0];
 
+        // Generate Seat Class — Day 6+ semakin sedikit Class A
+        if (DayManager.Instance != null && DayManager.Instance.CurrentDay >= GameDay.Day6)
+        {
+            // Day 6+: hanya 25% chance dapat Class A
+            float roll = Random.value;
+            if (roll < 0.25f)
+                data.ticket.seatClass = SeatClass.A;
+            else if (roll < 0.62f)
+                data.ticket.seatClass = SeatClass.B;
+            else
+                data.ticket.seatClass = SeatClass.C;
+        }
+        else
+        {
+            // Day 1-5: Class A dominan (80%)
+            data.ticket.seatClass = Random.value < 0.8f ? SeatClass.A :
+                                    Random.value < 0.5f ? SeatClass.B : SeatClass.C;
+        }
+
         data.ticket.status =
             TicketDifficultyManager.GenerateStatus();
 

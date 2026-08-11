@@ -47,6 +47,13 @@ public class NPCController : MonoBehaviour
             passengerData.gender = identity.Gender;
         }
 
+        // Apply anomaly data synchronously to prevent 1-frame race conditions
+        AnomalyPassenger anomaly = GetComponent<AnomalyPassenger>();
+        if (anomaly != null)
+        {
+            anomaly.ApplyAnomalyData();
+        }
+
         Debug.Log(
             $"Passenger : {passengerData.passengerName} | " +
             $"{passengerData.ticket.originStation} -> " +
@@ -56,7 +63,14 @@ public class NPCController : MonoBehaviour
 
     private void Update()
     {
-        animator.SetFloat("Speed", agent.velocity.magnitude);
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            animator.SetFloat("Speed", agent.velocity.magnitude);
+        }
+        else
+        {
+            animator.SetFloat("Speed", 0f);
+        }
 
         if (State == NPCState.WalkingToCounter && HasReachedDestination())
         {
@@ -122,9 +136,7 @@ public class NPCController : MonoBehaviour
 
     public void MoveToCounter(Transform target)
     {
-        Debug.Log(
-            $"MoveToCounter -> {name}\n" +
-            System.Environment.StackTrace);
+        Debug.Log($"MoveToCounter -> {name}");
 
         SetState(NPCState.WalkingToCounter);
         StartCoroutine(MoveWhenReady(target));
@@ -229,12 +241,6 @@ public class NPCController : MonoBehaviour
 
         MoveToExit(
             CounterManager.Instance.LobbyExitPoint);
-    }
-
-    private IEnumerator MoveQueueDelayed()
-    {
-        yield return new WaitForSeconds(0.3f);
-
     }
 
     public bool HasReachedDestination()

@@ -14,15 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   lines:
   - speaker: Cleaning Staff
-    text: Ini badai terburuk yang pernah terjadi. Tidak ada lagi pagi hari, langit
-      ditutup awan abu-abu dan salju.
+    text: Lampu terus berkedip hari ini. Bahan bakar generator stasiun sepertinya
+      hampir habis.
   - speaker: Cleaning Staff
-    text: Stasiun-stasiun utara sudah jebol oleh massa yang menerobos masuk dari
-      badai es. Stasiun ini adalah benteng terakhir.
+    text: Kamu tahu apa yang paling menakutkan? Kudengar The Core merilis dekrit
+      baru. Hanya pemegang tiket 'Kelas A' yang boleh dievakuasi.
   - speaker: Cleaning Staff
-    text: Menjadi orang berhati dingin (Heartless) dengan menolak penumpang memang
-      kejam... Tapi, kau sadar kau sedang mengamankan nyawa orang lain yang sudah
-      di dalam kereta.
+    text: Bahkan tiketku yang ku-cicil selama 5 tahun ini hanya tiket Kelas C biasa.
+      Aku... aku rasa aku tidak akan bisa masuk ke kereta itu besok.
   - speaker: Cleaning Staff
-    text: Untuk bertahan hidup, terkadang mencoret satu nyawa lebih baik demi menyelamatkan
-      sepuluh nyawa. Tetap waras, nak.
+    text: Apakah ini akhirnya? Menyapu debu di tempat ini, lalu ditinggal mati kedinginan?

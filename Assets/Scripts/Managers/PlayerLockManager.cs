@@ -13,6 +13,12 @@ public class PlayerLockManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        // Pastikan saat masuk scene game (dari Main Menu), cursor langsung terkunci dan tersembunyi
+        ExitUIMode();
+    }
+
     // ==========================================
     // LEGACY
     // ==========================================

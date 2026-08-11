@@ -22,6 +22,12 @@ public class SummaryUIController : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
 
         root.SetActive(false);
@@ -67,6 +73,18 @@ public class SummaryUIController : MonoBehaviour
 
     void NextDay()
     {
+        // Jika sudah Day 7, trigger ending bukan ganti hari
+        if (DayManager.Instance.CurrentDay == GameDay.Day7)
+        {
+            if (EndingManager.Instance != null)
+            {
+                root.SetActive(false);
+                opened = false;
+                EndingManager.Instance.TriggerEnding();
+            }
+            return;
+        }
+
         StartCoroutine(NextDayRoutine());
     }
 
@@ -82,23 +100,64 @@ public class SummaryUIController : MonoBehaviour
         // Teleport player
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
+        if (playerSpawnPoint == null)
+        {
+            GameObject sp = GameObject.Find("PlayerSpawnPoint");
+            if (sp != null)
+            {
+                playerSpawnPoint = sp.transform;
+            }
+            else
+            {
+                Debug.LogWarning("PlayerSpawnPoint GameObject not found in scene!");
+            }
+        }
+
         if (player != null && playerSpawnPoint != null)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
+            var fpc = player.GetComponent<StarterAssets.FirstPersonController>();
 
             if (cc != null)
                 cc.enabled = false;
+            
+            if (fpc != null)
+                fpc.enabled = false;
+
+            // Naikkan posisi sedikit biar tidak clip/nembus collider lantai
+            Vector3 spawnPos = playerSpawnPoint.position;
+            spawnPos.y += 0.2f;
 
             player.transform.SetPositionAndRotation(
-                playerSpawnPoint.position,
+                spawnPos,
                 playerSpawnPoint.rotation);
+
+            // Tunggu 1 frame agar physics engine Unity mensinkronisasi koordinat baru
+            yield return null;
 
             if (cc != null)
                 cc.enabled = true;
+
+            if (fpc != null)
+                fpc.enabled = true;
         }
 
         // Ganti hari
         DayManager.Instance.NextDay();
+
+        // Bersihkan remaining NPCs dan counter status
+        if (NPCSpawner.Instance != null)
+        {
+            NPCSpawner.Instance.ClearRuntimeNPCs();
+        }
+        if (CounterManager.Instance != null)
+        {
+            CounterManager.Instance.ReleaseCounter();
+        }
+        if (NPCDatabase.Instance != null)
+        {
+            NPCDatabase.Instance.ResetDayNPCs();
+        }
 
         // Reset semua manager
         ObjectiveManager.Instance.ResetObjectives();

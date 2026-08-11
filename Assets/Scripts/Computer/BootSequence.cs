@@ -28,6 +28,9 @@ public class BootSequence : MonoBehaviour
 
         bootScreen.SetActive(false);
         mainMenu.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     IEnumerator Step(string text, float progress, float delay)

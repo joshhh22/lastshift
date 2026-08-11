@@ -22,7 +22,6 @@ public class CardSwipeController : MonoBehaviour
 
     private Vector2 startPos;
 
-    private bool dragging;
     private bool canSwipe;
     private bool swiping;
 
@@ -55,8 +54,9 @@ public class CardSwipeController : MonoBehaviour
     void Update()
     {
         if (canSwipe)
-
-        SwipeUpdate();
+        {
+            SwipeUpdate();
+        }
     }
 
     void SwipeUpdate()
@@ -92,6 +92,8 @@ public class CardSwipeController : MonoBehaviour
                 startPoint.anchoredPosition.x,
                 endPoint.anchoredPosition.x - halfCardWidth);
 
+            current.y = startPoint.anchoredPosition.y;
+
             card.anchoredPosition = current;
         }
 
@@ -108,13 +110,9 @@ public class CardSwipeController : MonoBehaviour
             float speed =
                 distance / duration;
 
-
-
             ValidateSwipe(distance, speed);
         }
     }
-
-    
 
     void ValidateSwipe(float distance, float speed)
     {
@@ -143,27 +141,6 @@ public class CardSwipeController : MonoBehaviour
         }
 
         Success();
-    }
-
-    void CheckReader()
-    {
-        float cardX = card.position.x;
-
-        float left =
-            swipeZone.position.x -
-            swipeZone.rect.width * 0.5f;
-
-        float right =
-            swipeZone.position.x +
-            swipeZone.rect.width * 0.5f;
-
-        // mulai masuk area reader
-        if (cardX <= right)
-            enteredZone = true;
-
-        // sudah melewati seluruh reader
-        if (cardX <= left)
-            passedZone = true;
     }
 
     void Fail(string message)
@@ -196,95 +173,82 @@ public class CardSwipeController : MonoBehaviour
         StartCoroutine(SuccessRoutine());
     }
 
-public void ResetCard()
-{
-    canSwipe = false;
-    dragging = false;
-    swiping = false;
-
-    enteredZone = false;
-    passedZone = false;
-
-    swipeStartTime = 0;
-    swipeStartX = 0;
-
-    card.anchoredPosition = startPos;
-
-    statusText.text = "Take Passenger Card";
-
-    if (pickupController != null)
-        pickupController.ResetPickup();
-}
-
-
-private IEnumerator SuccessRoutine()
-{
-    yield return new WaitForSeconds(0.5f);
-
-    NPCController npc = CounterManager.Instance.GetCurrentNPC();
-
-    if (npc != null)
+    public void ResetCard()
     {
-        TicketStatus result =
-            TicketValidator.Validate(
-                npc.passengerData);
+        canSwipe = false;
+        swiping = false;
 
-        switch (result)
+        enteredZone = false;
+        passedZone = false;
+
+        swipeStartTime = 0;
+        swipeStartX = 0;
+
+        card.anchoredPosition = startPos;
+
+        statusText.text = "Take Passenger Card";
+
+        if (pickupController != null)
+            pickupController.ResetPickup();
+    }
+
+    private IEnumerator SuccessRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        NPCController npc = CounterManager.Instance.GetCurrentNPC();
+
+        if (npc != null)
         {
-            case TicketStatus.Valid:
+            TicketStatus result =
+                TicketValidator.Validate(
+                    npc.passengerData);
 
-    AudioManager.Instance.PlayAccessGranted();
-    statusText.text = "ACCESS GRANTED";
+            switch (result)
+            {
+                case TicketStatus.Valid:
+                    AudioManager.Instance.PlayAccessGranted();
+                    statusText.text = "ACCESS GRANTED";
 
-    PerformanceManager.Instance.AddPerformance(2);
-    PerformanceManager.Instance.AddCorrectDecision();
-    PerformanceManager.Instance.AddPassengerServed();
+                    PerformanceManager.Instance.AddPerformance(2);
+                    PerformanceManager.Instance.AddCorrectDecision();
+                    PerformanceManager.Instance.AddPassengerServed();
 
-    npc.Serve();
+                    npc.Serve();
 
-    ServePassengerUIController.Instance.Close();
+                    ServePassengerUIController.Instance.Close();
 
-    ResetCard();
+                    ResetCard();
+                    break;
 
-    break;
+                case TicketStatus.Invalid:
+                    AudioManager.Instance.PlayAccessDenied();
+                    statusText.text = "INVALID TICKET";
 
-            case TicketStatus.Invalid:
+                    ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+                    break;
 
-                AudioManager.Instance.PlayAccessDenied();
-                statusText.text = "INVALID TICKET";
+                case TicketStatus.Expired:
+                    AudioManager.Instance.PlayAccessDenied();
+                    statusText.text = "TICKET EXPIRED";
 
-                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+                    ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+                    break;
 
-                break;
+                case TicketStatus.Fake:
+                    AudioManager.Instance.PlayAccessDenied();
+                    statusText.text = "FAKE TICKET";
 
-            case TicketStatus.Expired:
+                    ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+                    break;
 
-                AudioManager.Instance.PlayAccessDenied();
-                statusText.text = "TICKET EXPIRED";
+                case TicketStatus.WrongDestination:
+                    AudioManager.Instance.PlayAccessDenied();
+                    statusText.text = "WRONG DESTINATION";
 
-                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
-
-                break;
-
-            case TicketStatus.Fake:
-
-                AudioManager.Instance.PlayAccessDenied();
-                statusText.text = "FAKE TICKET";
-
-                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
-
-                break;
-
-            case TicketStatus.WrongDestination:
-
-                AudioManager.Instance.PlayAccessDenied();
-                statusText.text = "WRONG DESTINATION";
-
-                ServePassengerUIController.Instance.OpenDialoguePanel(npc);
-
-                break;
+                    ServePassengerUIController.Instance.OpenDialoguePanel(npc);
+                    break;
+            }
         }
     }
-}
-
 }

@@ -5,7 +5,7 @@ public class AnomalyPassenger : MonoBehaviour
 {
     private NPCController controller;
 
-    private void Start()
+    public void ApplyAnomalyData()
     {
         controller = GetComponent<NPCController>();
         

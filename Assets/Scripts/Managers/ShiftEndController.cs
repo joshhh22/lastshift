@@ -17,8 +17,8 @@ public class ShiftEndController : MonoBehaviour
         if (QueueManager.Instance.GetQueueCount() > 0)
             return;
 
-        // Masih ada NPC di counter
-        if (CounterManager.Instance.IsOccupied())
+        // Masih ada NPC di counter atau berjalan menuju counter
+        if (CounterManager.Instance.IsOccupied() || CounterManager.Instance.IsReserved())
             return;
 
         completed = true;

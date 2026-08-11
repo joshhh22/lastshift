@@ -14,6 +14,11 @@ public class NPCSpawner : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
 
@@ -77,6 +82,20 @@ public class NPCSpawner : MonoBehaviour
         else
         {
             QueueManager.Instance.AddNPC(npc);
+        }
+    }
+
+    public void ClearRuntimeNPCs()
+    {
+        if (runtimeParent != null)
+        {
+            foreach (Transform child in runtimeParent)
+            {
+                if (child != null)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
         }
     }
 }
