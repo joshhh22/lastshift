@@ -15,6 +15,7 @@ public class NPCDatabase : MonoBehaviour
     [SerializeField] private List<NPCController> monsterPrefabs = new();
 
     private HashSet<NPCController> spawnedNPCsOfToday = new();
+    private bool monsterSpawnedToday = false;
 
     private void Awake()
     {
@@ -29,6 +30,7 @@ public class NPCDatabase : MonoBehaviour
     public void ResetDayNPCs()
     {
         spawnedNPCsOfToday.Clear();
+        monsterSpawnedToday = false;
         Debug.Log("Daily spawn history cleared.");
     }
 
@@ -49,7 +51,7 @@ public class NPCDatabase : MonoBehaviour
                 case GameDay.Day7: monsterChance = 0.50f; break;
             }
 
-            if (monsterChance > 0f && Random.value < monsterChance)
+            if (monsterChance > 0f && !monsterSpawnedToday && Random.value < monsterChance)
             {
                 List<NPCController> availableMonsters = new();
                 foreach (var p in monsterPrefabs)
@@ -74,6 +76,7 @@ public class NPCDatabase : MonoBehaviour
                 {
                     selectedPrefab = availableMonsters[Random.Range(0, availableMonsters.Count)];
                     spawnedNPCsOfToday.Add(selectedPrefab);
+                    monsterSpawnedToday = true; // Blokir monster kedua hari ini
                     return selectedPrefab;
                 }
             }

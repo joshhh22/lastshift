@@ -15,19 +15,25 @@ public class CCTVScreamer : MonoBehaviour
 
     private void Awake()
     {
-        // Pastikan model monster disembunyikan di awal
         SetMonsterVisible(false);
+    }
+
+    // Dipanggil oleh ObjectiveManager atau DayManager saat hari baru dimulai
+    public void ResetForNewDay()
+    {
+        hasTriggered = false;
     }
 
     private void Update()
     {
-        // Kalau belum ngetrigger dan udah masuk harinya
         if (!hasTriggered && DayManager.Instance != null && (int)DayManager.Instance.CurrentDay >= targetDay)
         {
-            // Cek apakah CCTV Manager sedang aktif dan pemain sedang ngelihat kamera target (CCTV 2)
+            // Hanya trigger saat objective aktif adalah "Open CCTV"
+            if (ObjectiveManager.Instance == null) return;
+            if (ObjectiveManager.Instance.GetCurrentObjective() != "Open CCTV") return;
+
             if (CCTVManager.Instance != null && CCTVManager.Instance.CurrentIndex == targetCameraIndex)
             {
-                // Jika UI CCTV juga sedang terbuka di komputer
                 if (TerminalMenu.Instance != null && TerminalMenu.Instance.CurrentPage == TerminalPage.CCTV)
                 {
                     StartCoroutine(TriggerJumpscare());

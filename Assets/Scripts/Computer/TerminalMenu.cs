@@ -121,7 +121,19 @@ public class TerminalMenu : MonoBehaviour
         {
             case TerminalPage.Assignment:
             case TerminalPage.CCTV:
+                BackToMainMenu();
+                break;
+
             case TerminalPage.Logs:
+                // Cek dulu apakah LogsPageController masih di sub-layer
+                LogsPageController logsCtrl = logsPage.GetComponent<LogsPageController>();
+                if (logsCtrl != null && !logsCtrl.IsAtRoot)
+                {
+                    // Biarkan LogsPageController yang handle ESC (mundur satu layer)
+                    // Update() LogsPageController akan memrosesnya
+                    return;
+                }
+                // Sudah di root Logs → kembali ke Terminal Main Menu
                 BackToMainMenu();
                 break;
 

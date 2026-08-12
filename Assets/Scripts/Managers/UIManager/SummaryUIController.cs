@@ -165,6 +165,16 @@ public class SummaryUIController : MonoBehaviour
         GameTimeManager.Instance.ResetTime();
         PassengerScheduleManager.Instance.ResetSchedules();
 
+        // Stop Cleaning Staff agar tidak langsung jalan-jalan di hari baru
+        // (akan mulai jalan lagi setelah dialogue selesai lewat CleaningStaffInteraction)
+        CleaningStaffController cleaningStaff = FindFirstObjectByType<CleaningStaffController>();
+        if (cleaningStaff != null)
+            cleaningStaff.StopPatrol();
+
+        // Reset jumpscare CCTV agar bisa trigger lagi di hari berikutnya
+        foreach (CCTVScreamer screamer in FindObjectsByType<CCTVScreamer>(FindObjectsSortMode.None))
+            screamer.ResetForNewDay();
+
         // Fade masuk lagi
         yield return FadeController.Instance.FadeIn();
     }
