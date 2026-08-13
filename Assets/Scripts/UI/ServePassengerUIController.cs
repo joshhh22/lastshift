@@ -52,14 +52,60 @@ public class ServePassengerUIController : MonoBehaviour
     {
         Instance = this;
 
-        menuItems = new TMP_Text[]
-        {
-            validateText,
-            talkText,
-            cancelText
-        };
+        System.Collections.Generic.List<TMP_Text> items = new System.Collections.Generic.List<TMP_Text>();
+        if (validateText != null) items.Add(validateText);
+        if (talkText != null) items.Add(talkText);
+        if (cancelText != null) items.Add(cancelText);
+        menuItems = items.ToArray();
 
-        rootUI.SetActive(false);
+        if (rootUI != null)
+            rootUI.SetActive(false);
+    }
+
+    void RefreshMenu()
+    {
+        if (validateText != null) validateText.text = "Validate Ticket";
+        if (talkText != null) talkText.text = "Talk";
+        if (cancelText != null) cancelText.text = "Cancel";
+
+        switch (currentIndex)
+        {
+            case 0:
+                if (validateText != null) validateText.text = "> Validate Ticket";
+                break;
+
+            case 1:
+                if (talkText != null)
+                    talkText.text = "> Talk";
+                else if (cancelText != null)
+                    cancelText.text = "> Cancel";
+                break;
+
+            case 2:
+                if (cancelText != null) cancelText.text = "> Cancel";
+                break;
+        }
+    }
+
+    void SelectCurrent()
+    {
+        switch (currentIndex)
+        {
+            case 0:
+                OpenSwipePanel();
+                break;
+
+            case 1:
+                if (talkText != null)
+                    Debug.Log("Talk");
+                else
+                    Close();
+                break;
+
+            case 2:
+                Close();
+                break;
+        }
     }
 
     private void Update()
