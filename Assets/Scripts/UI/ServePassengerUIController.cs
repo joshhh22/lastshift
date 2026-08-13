@@ -12,7 +12,6 @@ public class ServePassengerUIController : MonoBehaviour
 
     [Header("Menu")]
     [SerializeField] private TMP_Text validateText;
-    [SerializeField] private TMP_Text talkText;
     [SerializeField] private TMP_Text cancelText;
 
     [SerializeField] private CardSwipeController swipeController;
@@ -54,7 +53,6 @@ public class ServePassengerUIController : MonoBehaviour
 
         System.Collections.Generic.List<TMP_Text> items = new System.Collections.Generic.List<TMP_Text>();
         if (validateText != null) items.Add(validateText);
-        if (talkText != null) items.Add(talkText);
         if (cancelText != null) items.Add(cancelText);
         menuItems = items.ToArray();
 
@@ -64,27 +62,8 @@ public class ServePassengerUIController : MonoBehaviour
 
     void RefreshMenu()
     {
-        if (validateText != null) validateText.text = "Validate Ticket";
-        if (talkText != null) talkText.text = "Talk";
-        if (cancelText != null) cancelText.text = "Cancel";
-
-        switch (currentIndex)
-        {
-            case 0:
-                if (validateText != null) validateText.text = "> Validate Ticket";
-                break;
-
-            case 1:
-                if (talkText != null)
-                    talkText.text = "> Talk";
-                else if (cancelText != null)
-                    cancelText.text = "> Cancel";
-                break;
-
-            case 2:
-                if (cancelText != null) cancelText.text = "> Cancel";
-                break;
-        }
+        if (validateText != null) validateText.text = (currentIndex == 0) ? "> VALIDATE TICKET" : "VALIDATE TICKET";
+        if (cancelText != null) cancelText.text = (currentIndex == 1) ? "> CANCEL" : "CANCEL";
     }
 
     void SelectCurrent()
@@ -96,13 +75,6 @@ public class ServePassengerUIController : MonoBehaviour
                 break;
 
             case 1:
-                if (talkText != null)
-                    Debug.Log("Talk");
-                else
-                    Close();
-                break;
-
-            case 2:
                 Close();
                 break;
         }
@@ -196,46 +168,6 @@ public class ServePassengerUIController : MonoBehaviour
         rootUI.SetActive(false);
 
         PlayerLockManager.Instance.ExitUIMode();
-    }
-
-    void RefreshMenu()
-    {
-        validateText.text = "Validate Ticket";
-        talkText.text = "Talk";
-        cancelText.text = "Cancel";
-
-        switch (currentIndex)
-        {
-            case 0:
-                validateText.text = "> Validate Ticket";
-                break;
-
-            case 1:
-                talkText.text = "> Talk";
-                break;
-
-            case 2:
-                cancelText.text = "> Cancel";
-                break;
-        }
-    }
-
-    void SelectCurrent()
-    {
-        switch (currentIndex)
-        {
-            case 0:
-                OpenSwipePanel();
-                break;
-
-            case 1:
-                Debug.Log("Talk");
-                break;
-
-            case 2:
-                Close();
-                break;
-        }
     }
 
     void OpenSwipePanel()
