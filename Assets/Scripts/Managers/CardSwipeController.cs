@@ -27,6 +27,7 @@ public class CardSwipeController : MonoBehaviour
 
     private float swipeStartTime;
     private float swipeStartX;
+    private float swipeMouseOffsetX;
 
     private bool enteredZone;
     private bool passedZone;
@@ -34,21 +35,33 @@ public class CardSwipeController : MonoBehaviour
 
     void Start()
     {
-        startPos = startPoint.anchoredPosition;
+        if (startPoint != null)
+            startPos = startPoint.anchoredPosition;
 
-        statusText.text = "Take Passenger Card";
+        if (statusText != null)
+            statusText.text = "Take Passenger Card";
     }
 
     public void EnableSwipe()
     {
         canSwipe = true;
 
-        requiredDistance =
-            (endPoint.anchoredPosition.x -
-            startPoint.anchoredPosition.x)
-            * requiredSwipePercent;
+        if (startPoint != null && card != null)
+        {
+            // Pasang kartu persis di mulut scanner (startPoint) tanpa loncat
+            card.anchoredPosition = startPoint.anchoredPosition;
+        }
 
-        statusText.text = "READY TO SCAN";
+        if (endPoint != null && startPoint != null)
+        {
+            requiredDistance =
+                (endPoint.anchoredPosition.x -
+                startPoint.anchoredPosition.x)
+                * requiredSwipePercent;
+        }
+
+        if (statusText != null)
+            statusText.text = "READY TO SCAN";
     }
 
     void Update()
@@ -63,13 +76,24 @@ public class CardSwipeController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (RectTransformUtility.RectangleContainsScreenPoint(
+            if (card != null && RectTransformUtility.RectangleContainsScreenPoint(
                 card,
                 Input.mousePosition,
                 null))
             {
-                AudioManager.Instance.PlaySwipeCard();
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlaySwipeCard();
+
                 swiping = true;
+
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    canvas.transform as RectTransform,
+                    Input.mousePosition,
+                    null,
+                    out Vector2 mousePos);
+
+                // Catat selisih posisi kursor terhadap kartu agar tidak mendadak loncat
+                swipeMouseOffsetX = card.anchoredPosition.x - mousePos.x;
                 swipeStartX = card.anchoredPosition.x;
                 swipeStartTime = Time.time;
             }
@@ -87,8 +111,10 @@ public class CardSwipeController : MonoBehaviour
 
             float halfCardWidth = card.rect.width * card.lossyScale.x * 0.5f;
 
+            float targetX = pos.x + swipeMouseOffsetX;
+
             current.x = Mathf.Clamp(
-                pos.x,
+                targetX,
                 startPoint.anchoredPosition.x,
                 endPoint.anchoredPosition.x - halfCardWidth);
 
@@ -97,7 +123,7 @@ public class CardSwipeController : MonoBehaviour
             card.anchoredPosition = current;
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && swiping)
         {
             swiping = false;
 
@@ -108,7 +134,7 @@ public class CardSwipeController : MonoBehaviour
                 Time.time - swipeStartTime;
 
             float speed =
-                distance / duration;
+                duration > 0f ? (distance / duration) : 0f;
 
             ValidateSwipe(distance, speed);
         }
@@ -118,25 +144,25 @@ public class CardSwipeController : MonoBehaviour
     {
         if (distance <= 0)
         {
-            statusText.text = "WRONG DIRECTION";
+            Fail("WRONG DIRECTION");
             return;
         }
 
         if (distance < requiredDistance)
         {
-            statusText.text = "SWIPE FURTHER";
+            Fail("SWIPE FURTHER");
             return;
         }
 
         if (speed < minSpeed)
         {
-            statusText.text = "TOO SLOW";
+            Fail("TOO SLOW");
             return;
         }
 
         if (speed > maxSpeed)
         {
-            statusText.text = "TOO FAST";
+            Fail("TOO FAST");
             return;
         }
 
@@ -147,7 +173,13 @@ public class CardSwipeController : MonoBehaviour
     {
         StopAllCoroutines();
 
-        statusText.text = message;
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayAccessDenied();
+        }
+
+        if (statusText != null)
+            statusText.text = message;
 
         StartCoroutine(ResetRoutine());
     }
@@ -156,12 +188,7 @@ public class CardSwipeController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.8f);
 
-        card.anchoredPosition = startPos;
-
-        enteredZone = false;
-        passedZone = false;
-
-        statusText.text = "Swipe Card";
+        ResetCard();
     }
 
     void Success()

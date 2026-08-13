@@ -50,6 +50,8 @@ public class SummaryUIController : MonoBehaviour
 
         root.SetActive(true);
 
+        HideOtherUI(true);
+
         PerformanceManager p = PerformanceManager.Instance;
 
         dayText.text =
@@ -80,6 +82,7 @@ public class SummaryUIController : MonoBehaviour
             {
                 root.SetActive(false);
                 opened = false;
+                HideOtherUI(true);
                 EndingManager.Instance.TriggerEnding();
             }
             return;
@@ -177,5 +180,39 @@ public class SummaryUIController : MonoBehaviour
 
         // Fade masuk lagi
         yield return FadeController.Instance.FadeIn();
+
+        // Kembalikan UI Objective dan Markers untuk hari baru
+        HideOtherUI(false);
+    }
+
+    private void HideOtherUI(bool hide)
+    {
+        // 1. Sembunyikan/tampilkan ObjectiveUI
+        ObjectiveUI objUI = FindFirstObjectByType<ObjectiveUI>(FindObjectsInactive.Include);
+        if (objUI != null)
+            objUI.gameObject.SetActive(!hide);
+
+        // 2. Sembunyikan/tampilkan InteractionUI
+        if (InteractionUI.Instance != null)
+        {
+            if (hide)
+                InteractionUI.Instance.Hide();
+            else
+                InteractionUI.Instance.gameObject.SetActive(true);
+        }
+
+        // 3. Sembunyikan/tampilkan semua ObjectiveMarkerHUD / marker UI
+        foreach (ObjectiveMarkerHUD marker in FindObjectsByType<ObjectiveMarkerHUD>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (marker != null)
+                marker.gameObject.SetActive(!hide);
+        }
+
+        // 4. Sembunyikan/tampilkan ObjectiveHighlight
+        foreach (ObjectiveHighlight highlight in FindObjectsByType<ObjectiveHighlight>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (highlight != null)
+                highlight.gameObject.SetActive(!hide);
+        }
     }
 }

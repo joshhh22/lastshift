@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ISaveable
+public interface ISaveable
 {
     
 }

@@ -17,7 +17,7 @@ public class MainMenuManager : MonoBehaviour
     public TypewriterEffect typewriterEffect;
 
     [Header("Settings")]
-    public string gameSceneName = "SampleScene"; // GANTI DENGAN NAMA SCENE GAME KAMU NANTI!
+    public string gameSceneName = "Gameplay"; // GANTI DENGAN NAMA SCENE GAME KAMU NANTI!
     public float textStayDuration = 2f; // Dikurangi sedikit agar gabosan nungguin abis ngetik
     public float fadeDuration = 1.0f;
 

@@ -32,6 +32,7 @@ public class ServePassengerUIController : MonoBehaviour
 
     [SerializeField] private TMP_Text acceptText;
     [SerializeField] private TMP_Text rejectText;
+    [SerializeField] private TMP_Text cancelDialogueText; // Opsional: Teks UI Cancel
 
     private TMP_Text[] menuItems;
 
@@ -223,66 +224,95 @@ public class ServePassengerUIController : MonoBehaviour
         menuPanel.SetActive(true);
     }
 
-public void OpenDialoguePanel(NPCController npc)
-{
-    menuPanel.SetActive(false);
-    swipePanel.SetActive(false);
-
-    dialoguePanel.SetActive(true);
-
-    inSwipePanel = false;
-    inDialoguePanel = true;
-    dialogueIndex = 0;
-
-    RefreshDialogue();
-
-    switch (npc.passengerData.ticket.status)
+    public void OpenDialoguePanel(NPCController npc)
     {
-        case TicketStatus.Invalid:
-            dialogueTitleText.text = "INVALID TICKET";
-            break;
+        menuPanel.SetActive(false);
+        swipePanel.SetActive(false);
 
-        case TicketStatus.Expired:
-            dialogueTitleText.text = "EXPIRED TICKET";
-            break;
+        dialoguePanel.SetActive(true);
 
-        case TicketStatus.Fake:
-            dialogueTitleText.text = "FAKE TICKET";
-            break;
+        // Auto-find cancelDialogueText jika belum di-drag ke Inspector
+        if (cancelDialogueText == null && dialoguePanel != null)
+        {
+            foreach (TMP_Text t in dialoguePanel.GetComponentsInChildren<TMP_Text>(true))
+            {
+                if (t.name.ToLower().Contains("cancel"))
+                {
+                    cancelDialogueText = t;
+                    break;
+                }
+            }
+        }
 
-        case TicketStatus.WrongDestination:
-            dialogueTitleText.text = "WRONG DESTINATION";
-            break;
+        inSwipePanel = false;
+        inDialoguePanel = true;
+        dialogueIndex = 0;
+
+        RefreshDialogue();
+
+        switch (npc.passengerData.ticket.status)
+        {
+            case TicketStatus.Invalid:
+                dialogueTitleText.text = "INVALID TICKET";
+                break;
+
+            case TicketStatus.Expired:
+                dialogueTitleText.text = "EXPIRED TICKET";
+                break;
+
+            case TicketStatus.Fake:
+                dialogueTitleText.text = "FAKE TICKET";
+                break;
+
+            case TicketStatus.WrongDestination:
+                dialogueTitleText.text = "WRONG DESTINATION";
+                break;
+        }
+
+        if (typewriter != null)
+        {
+            typewriter.StartTyping(reasonText, npc.passengerData.reason);
+        }
+        else
+        {
+            reasonText.text = npc.passengerData.reason;
+        }
     }
-
-    if (typewriter != null)
-    {
-        typewriter.StartTyping(reasonText, npc.passengerData.reason);
-    }
-    else
-    {
-        reasonText.text = npc.passengerData.reason;
-    }
-}
 
     void RefreshDialogue()
     {
-        acceptText.text = "Accept";
-        rejectText.text = "Reject";
-
-        if (dialogueIndex == 0)
-            acceptText.text = "> Accept";
-        else
-            rejectText.text = "> Reject";
+        if (acceptText != null) acceptText.text = (dialogueIndex == 0) ? "> ACCEPT" : "ACCEPT";
+        if (rejectText != null) rejectText.text = (dialogueIndex == 1) ? "> REJECT" : "REJECT";
+        if (cancelDialogueText != null) cancelDialogueText.text = (dialogueIndex == 2) ? "> CANCEL" : "CANCEL";
     }
+
+    private bool inReaction;
 
     void HandleDialogueInput()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow) ||
-            Input.GetKeyDown(KeyCode.DownArrow))
+        if (inReaction)
         {
-            dialogueIndex = 1 - dialogueIndex;
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (typewriter != null && typewriter.IsTyping)
+                {
+                    typewriter.CompleteTyping();
+                }
+            }
+            return;
+        }
 
+        int maxOptions = (cancelDialogueText != null) ? 3 : 2;
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            dialogueIndex = (dialogueIndex + 1) % maxOptions;
+            RefreshDialogue();
+        }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            dialogueIndex = (dialogueIndex - 1 + maxOptions) % maxOptions;
             RefreshDialogue();
         }
 
@@ -298,31 +328,85 @@ public void OpenDialoguePanel(NPCController npc)
             }
         }
 
+        // Bolehkan Escape untuk membatalkan dialog dan keluar cek terminal
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            return; // jangan boleh keluar
+            CancelDialogue();
         }
     }
 
     void ConfirmDialogue()
-{
-    bool accepted = dialogueIndex == 0;
-
-    PerformanceManager.Instance.EvaluateDecision(
-        accepted,
-        currentNPC.passengerData
-    );
-
-    if (accepted)
     {
-        currentNPC.Serve();
-    }
-    else
-    {
-        currentNPC.Reject();
+        if (dialogueIndex == 2)
+        {
+            CancelDialogue();
+            return;
+        }
+
+        bool accepted = (dialogueIndex == 0);
+
+        if (PerformanceManager.Instance != null && currentNPC != null)
+        {
+            PerformanceManager.Instance.EvaluateDecision(
+                accepted,
+                currentNPC.passengerData
+            );
+        }
+
+        StartCoroutine(ShowReactionRoutine(accepted));
     }
 
-    Close();
-    swipeController.ResetCard();
-}
+    private System.Collections.IEnumerator ShowReactionRoutine(bool accepted)
+    {
+        inReaction = true;
+
+        if (dialogueTitleText != null)
+            dialogueTitleText.text = accepted ? "PASSENGER ACCEPTED" : "PASSENGER REJECTED";
+
+        if (acceptText != null) acceptText.text = "";
+        if (rejectText != null) rejectText.text = "";
+        if (cancelDialogueText != null) cancelDialogueText.text = "";
+
+        string reaction = TicketGenerator.GetDecisionReaction(currentNPC != null ? currentNPC.passengerData : null, accepted);
+
+        if (typewriter != null)
+        {
+            typewriter.StartTyping(reasonText, reaction);
+            yield return new WaitForSeconds(0.2f);
+
+            while (typewriter.IsTyping)
+            {
+                yield return null;
+            }
+        }
+        else if (reasonText != null)
+        {
+            reasonText.text = reaction;
+        }
+
+        // Jeda bentar biar player bisa baca reaksi penumpangnya
+        yield return new WaitForSeconds(1.5f);
+
+        inReaction = false;
+
+        if (currentNPC != null)
+        {
+            if (accepted)
+                currentNPC.Serve();
+            else
+                currentNPC.Reject();
+        }
+
+        Close();
+        if (swipeController != null)
+            swipeController.ResetCard();
+    }
+
+    public void CancelDialogue()
+    {
+        inReaction = false;
+        Close();
+        if (swipeController != null)
+            swipeController.ResetCard();
+    }
 }

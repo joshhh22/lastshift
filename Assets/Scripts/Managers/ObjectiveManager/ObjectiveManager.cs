@@ -38,6 +38,12 @@ public class ObjectiveManager : MonoBehaviour
 
     public void CompleteObjective()
     {
+        if (objectives == null || objectives.Count == 0 || currentObjectiveIndex >= objectives.Count)
+        {
+            Debug.LogWarning("CompleteObjective dipanggil tapi semua objective sudah selesai.");
+            return;
+        }
+
         objectives[currentObjectiveIndex].completed = true;
 
         Debug.Log($"Completed : {objectives[currentObjectiveIndex].title}");
@@ -75,6 +81,9 @@ public class ObjectiveManager : MonoBehaviour
 
     public void AddProgress(int amount = 1)
     {
+        if (objectives == null || objectives.Count == 0 || currentObjectiveIndex >= objectives.Count)
+            return;
+
         Objective obj = objectives[currentObjectiveIndex];
 
         if (obj.targetAmount <= 0)
@@ -95,7 +104,10 @@ public class ObjectiveManager : MonoBehaviour
 
     private void ShowCurrentObjective()
     {
-        int day = dayManager.CurrentDayNumber;
+        if (objectives == null || objectives.Count == 0 || currentObjectiveIndex >= objectives.Count)
+            return;
+
+        int day = dayManager != null ? dayManager.CurrentDayNumber : 1;
 
         Objective obj = objectives[currentObjectiveIndex];
 
@@ -106,12 +118,16 @@ public class ObjectiveManager : MonoBehaviour
             text += $" ({obj.currentAmount}/{obj.targetAmount})";
         }
 
-        objectiveUI.UpdateUI(day, text);
+        if (objectiveUI != null)
+        {
+            objectiveUI.UpdateUI(day, text);
+        }
 
         switch (obj.title)
         {
             case "Check Phone":
-                PhoneManager.Instance.ReceiveNotification();
+                if (PhoneManager.Instance != null)
+                    PhoneManager.Instance.ReceiveNotification();
                 break;
         }
 

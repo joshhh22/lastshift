@@ -15,7 +15,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: -0.08
+    m_Value: -0.16
   xMultiplier:
     m_OverrideState: 0
     m_Value: 1
@@ -49,12 +49,12 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.341
+    m_Value: 0.38
   smoothness:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.35
   rounded:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
@@ -74,6 +74,7 @@ MonoBehaviour:
   - {fileID: 7285019798016127271}
   - {fileID: 8810325807744763473}
   - {fileID: -4819123275201981407}
+  - {fileID: 5022670468524641137}
 --- !u!114 &4276005504619121656
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -89,16 +90,32 @@ MonoBehaviour:
   active: 1
   type:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 8
   intensity:
     m_OverrideState: 1
-    m_Value: 0.691
+    m_Value: 0.75
   response:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1
   texture:
     m_OverrideState: 0
     m_Value: {fileID: 0}
+--- !u!114 &5022670468524641137
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180773991d8724ab7f2d216912b564, type: 3}
+  m_Name: ChromaticAberration
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ChromaticAberration
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.5
 --- !u!114 &7285019798016127271
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -117,13 +134,13 @@ MonoBehaviour:
     m_Value: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.75
   intensity:
     m_OverrideState: 1
-    m_Value: 0.65
+    m_Value: 1.25
   scatter:
     m_OverrideState: 1
-    m_Value: 0.7
+    m_Value: 0.72
   clamp:
     m_OverrideState: 0
     m_Value: 65472
@@ -161,7 +178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 221518ef91623a7438a71fef23660601, type: 3}
   m_Name: WhiteBalance
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.WhiteBalance
-  active: 1
+  active: 0
   temperature:
     m_OverrideState: 1
     m_Value: -8
