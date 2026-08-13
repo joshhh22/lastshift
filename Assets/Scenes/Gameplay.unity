@@ -5164,6 +5164,7 @@ MonoBehaviour:
   canvas: {fileID: 1742579235}
   swipeController: {fileID: 2038600538}
   snapDistance: 80
+  dragSensitivity: 1
 --- !u!1 &349150334
 GameObject:
   m_ObjectHideFlags: 0
@@ -9637,7 +9638,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 493.7279, y: 357.6474}
+  m_AnchoredPosition: {x: 706.40485, y: 1}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &601928705
@@ -9675,57 +9676,308 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'LAST SHIFT
+  m_text: '
 
-    A Game by: [Nama Tim atau Namamu]
+    ========================================
 
+    LAST SHIFT
 
+    ========================================
 
-    LEAD PROGRAMMER
+    
 
-    Josh
+    A
+    GAME BY
 
+    Joshua Benjamin Rompis
 
+    Fadlan muzacky
+
+    farras zafir imran
+
+    
+
+    
+
+    ========================================
+
+    DEVELOPMENT
+    & GAME DESIGN
+
+    ========================================
+
+    
+
+    Lead
+    Programmer & Game Designer
+
+    Joshua Benjamin Rompis
+
+    
+
+    AI-Assisted
+    Development
+
+    AI Partner
+
+    
+
+    
+
+    ========================================
 
     GAME
-    DESIGN & NARRATIVE
+    TESTING
 
-    Josh & AI Partner
+    ========================================
 
+    
 
+    Game Tester
 
-    3D ASSETS
+    Fadlan
+    Muzacky
 
-    [Nama Kreator
-    3D] - Asset Store
+    
 
-    "Stylized Environment Pack" by [Nama]
+    
 
+    ========================================
 
+    VIDEO
+    PRODUCTION
 
-    AUDIO & SOUND
+    ========================================
+
+    
+
+    Video
+    Editing
+
+    Fadlan Muzacky
+
+    
+
+    
+
+    ========================================
+
+    3D
     DESIGN
 
-    "Creepy Ambient" by [Kreator Audio] di freesound.org
+    ========================================
 
-    Footsteps
-    oleh [Sebutkan Namanya]
+    
 
+    3D Design
 
+    Farras
+    Zafir Imran
 
-    TERIMA KASIH KEPADA
+    
 
-    Panitia IndieGame Ignite
-    CompFest
+    
 
-    Para Juri yang telah bermain
+    ========================================
 
-    Keluarga & Teman-teman
+    3D
+    ASSETS & MODELS
 
+    ========================================
 
+    
 
-    (Tekan
-    ESC Untuk Keluar)'
+    "Office
+    PSX Asset Pack"
+
+    by Alex
+
+    @arexmotion / Apfelgarten
+
+    
+
+    "Surveillance
+    Camera"
+
+    by AK Studio Art
+
+    Unity Asset Store
+
+    
+
+    "LowPoly
+    Asset Pack Free"
+
+    CC0 Public Domain
+
+    
+
+    "Starter Assets - First
+    Person Controller"
+
+    by Unity Technologies
+
+    
+
+    
+
+    ========================================
+
+    AUDIO
+    & SOUND EFFECTS
+
+    ========================================
+
+    
+
+    "Door
+    Open 01"
+
+    by anthousai
+
+    Freesound.org
+
+    
+
+    Notification SFX
+
+    Inspired
+    by Fears to Fathom
+
+    
+
+    "Ambient Hallway & Concrete Footstep
+
+    SFX
+    Collection"
+
+    
+
+    "Jumpscare SFX Collection"
+
+    
+
+    
+
+    ========================================
+
+    SHADERS
+    & VISUAL EFFECTS
+
+    ========================================
+
+    
+
+    "URP
+    Retro CRT Shader"
+
+    by Cyanilux
+
+    MIT License
+
+    
+
+    "Day-Night
+    Skyboxes"
+
+    by Pulsar Bytes
+
+    
+
+    "Massive Crosshair Bundle"
+
+    by
+    OccaSoftware
+
+    
+
+    
+
+    ========================================
+
+    FONTS
+
+    ========================================
+
+    
+
+    "Home
+    Video Font"
+
+    by Save The Fonts / Tepache Labs
+
+    
+
+    "SF Compact Rounded"
+
+    by
+    FontsFree
+
+    
+
+    TextMesh Pro
+
+    by Unity Technologies
+
+    
+
+    
+
+    ========================================
+
+    COMPETITION
+
+    ========================================
+
+    
+
+    Developed
+    as an entry for
+
+    
+
+    Indie Game Ignite
+
+    COMPFEST
+
+    Universitas
+    Indonesia
+
+    
+
+    
+
+    ========================================
+
+    SPECIAL
+    THANKS
+
+    ========================================
+
+    
+
+    Thank you
+    for playing LAST SHIFT.
+
+    
+
+    Good luck, and stay until the
+
+    end
+    of your shift.
+
+    
+
+    
+
+    ========================================
+
+    LAST
+    SHIFT
+
+    ========================================
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5e92dbd056fcb1748a3d8cf487fa29bb, type: 2}
   m_sharedMaterial: {fileID: -3330799871885042781, guid: 5e92dbd056fcb1748a3d8cf487fa29bb, type: 2}
@@ -16294,7 +16546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75cb88f01529097489468e26e68e9bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DayManager
-  startingDay: 7
+  startingDay: 1
 --- !u!1 &1020468365
 GameObject:
   m_ObjectHideFlags: 0
@@ -19033,7 +19285,6 @@ MonoBehaviour:
   menuPanel: {fileID: 414806790}
   swipePanel: {fileID: 1578892308}
   validateText: {fileID: 1768827392}
-  talkText: {fileID: 0}
   cancelText: {fileID: 301464217}
   swipeController: {fileID: 2038600538}
   passengerNameText: {fileID: 1629780838}
@@ -27189,7 +27440,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1578892309
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29968,7 +30219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2687726f3605c0344bcf9974250fa4b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimeManager
-  startHour: 3
+  startHour: 22
   startMinute: 0
   secondsPerGameMinute: 1
   timeTexts:
