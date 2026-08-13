@@ -50,6 +50,15 @@ public class PauseUIController : MonoBehaviour
     {
         if (pausePanel != null)
         {
+            pausePanel.transform.SetAsLastSibling();
+
+            Canvas canvasComp = pausePanel.GetComponent<Canvas>();
+            if (canvasComp != null)
+            {
+                canvasComp.overrideSorting = true;
+                canvasComp.sortingOrder = 100;
+            }
+
             pausePanel.transform.localScale = Vector3.one;
 
             RectTransform rect = pausePanel.GetComponent<RectTransform>();
@@ -59,12 +68,15 @@ public class PauseUIController : MonoBehaviour
                 rect.anchorMax = Vector2.one;
                 rect.offsetMin = Vector2.zero;
                 rect.offsetMax = Vector2.one;
+                rect.anchoredPosition = Vector2.zero;
+                rect.localPosition = Vector3.zero;
                 rect.pivot = new Vector2(0.5f, 0.5f);
                 rect.localScale = Vector3.one;
             }
 
             foreach (Transform child in pausePanel.transform)
             {
+                child.gameObject.SetActive(true);
                 child.localScale = Vector3.one;
             }
         }
@@ -215,6 +227,6 @@ public class PauseUIController : MonoBehaviour
             exitText.text = (currentIndex == 1) ? "> EXIT TO MAIN MENU" : "EXIT TO MAIN MENU";
 
         if (hintText != null)
-            hintText.text = "[↑/↓] MOVE   [ENTER] CONFIRM   [ESC] RESUME";
+            hintText.text = "[↑/↓] MOVE   [ENTER] CONFIRM";
     }
 }

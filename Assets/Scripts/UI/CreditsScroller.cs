@@ -24,6 +24,11 @@ public class CreditsScroller : MonoBehaviour
     {
         isEnding = false;
 
+        if (rectTransform == null)
+        {
+            rectTransform = GetComponent<RectTransform>();
+        }
+
         if (rectTransform != null)
         {
             rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, -Screen.height);
@@ -70,6 +75,14 @@ public class CreditsScroller : MonoBehaviour
 
     private IEnumerator ReturnToMainMenuRoutine()
     {
+        // Jika berada di MainMenu, cukup tutup panel credits dan kembali ke menu utama
+        if (MainMenuManager.Instance != null && SceneManager.GetActiveScene().name == mainMenuSceneName)
+        {
+            MainMenuManager.Instance.CloseSubPanels();
+            isEnding = false;
+            yield break;
+        }
+
         if (FadeController.Instance != null)
         {
             yield return FadeController.Instance.FadeOut();
