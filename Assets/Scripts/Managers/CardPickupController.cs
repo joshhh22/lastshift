@@ -11,12 +11,29 @@ public class CardPickupController : MonoBehaviour
     [SerializeField] private float snapDistance = 250f; // Toleransi diperbesar agar jauh lebih mudah nge-snap
 
 
+    [Header("Sensitivity Settings")]
+    [SerializeField] private float dragSensitivity = 1.0f;
+
     private bool dragging;
     private bool picked;
     private Vector2 initialPos;
     private Vector2 dragOffset;
 
     public bool IsPicked => picked;
+
+    private Camera GetCamera()
+    {
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            return canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
+        }
+        return null;
+    }
+
+    private RectTransform GetParentRect()
+    {
+        return (card != null && card.parent != null) ? (card.parent as RectTransform) : (canvas.transform as RectTransform);
+    }
 
     private void Start()
     {
@@ -47,7 +64,7 @@ public class CardPickupController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mouse = Input.mousePosition;
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, card.position);
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(GetCamera(), card.position);
 
             float distance = Vector2.Distance(mouse, screenPos);
 
@@ -55,30 +72,36 @@ public class CardPickupController : MonoBehaviour
             {
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.PlayPickupCard();
-                
+
                 dragging = true;
 
-                // Hitung offset agar kartu tidak mendadak loncat ke titik kursor
+                // Hitung offset presisi dalam ruang koordinat parent kartu
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    canvas.transform as RectTransform,
+                    GetParentRect(),
                     Input.mousePosition,
-                    null,
+                    GetCamera(),
                     out Vector2 mouseLocalPos);
 
                 dragOffset = card.anchoredPosition - mouseLocalPos;
             }
         }
 
-        // Drag kartu ikuti kursor dengan offset
+        // Drag kartu ikuti kursor dengan offset & sensitivitas 1:1 presisi
         if (dragging)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                canvas.transform as RectTransform,
+                GetParentRect(),
                 Input.mousePosition,
-                null,
+                GetCamera(),
                 out Vector2 mouseLocalPos);
 
-            card.anchoredPosition = mouseLocalPos + dragOffset;
+            Vector2 targetPos = mouseLocalPos + dragOffset;
+            if (dragSensitivity != 1.0f)
+            {
+                targetPos = Vector2.Lerp(card.anchoredPosition, targetPos, dragSensitivity);
+            }
+
+            card.anchoredPosition = targetPos;
         }
 
         // Lepas klik

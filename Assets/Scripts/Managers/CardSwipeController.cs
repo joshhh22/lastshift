@@ -72,6 +72,20 @@ public class CardSwipeController : MonoBehaviour
         }
     }
 
+    private Camera GetCamera()
+    {
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            return canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
+        }
+        return null;
+    }
+
+    private RectTransform GetParentRect()
+    {
+        return (card != null && card.parent != null) ? (card.parent as RectTransform) : (canvas.transform as RectTransform);
+    }
+
     void SwipeUpdate()
     {
         if (Input.GetMouseButtonDown(0))
@@ -79,7 +93,7 @@ public class CardSwipeController : MonoBehaviour
             if (card != null && RectTransformUtility.RectangleContainsScreenPoint(
                 card,
                 Input.mousePosition,
-                null))
+                GetCamera()))
             {
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.PlaySwipeCard();
@@ -87,9 +101,9 @@ public class CardSwipeController : MonoBehaviour
                 swiping = true;
 
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    canvas.transform as RectTransform,
+                    GetParentRect(),
                     Input.mousePosition,
-                    null,
+                    GetCamera(),
                     out Vector2 mousePos);
 
                 // Catat selisih posisi kursor terhadap kartu agar tidak mendadak loncat
@@ -102,9 +116,9 @@ public class CardSwipeController : MonoBehaviour
         if (swiping)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                canvas.transform as RectTransform,
+                GetParentRect(),
                 Input.mousePosition,
-                null,
+                GetCamera(),
                 out Vector2 pos);
 
             Vector2 current = card.anchoredPosition;
