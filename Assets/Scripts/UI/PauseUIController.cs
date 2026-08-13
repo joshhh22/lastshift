@@ -20,6 +20,7 @@ public class PauseUIController : MonoBehaviour
     [Header("Keyboard Navigation (Opsional)")]
     [SerializeField] private TMP_Text resumeText;
     [SerializeField] private TMP_Text exitText;
+    [SerializeField] private TMP_Text hintText;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private bool isPaused = false;
@@ -212,5 +213,8 @@ public class PauseUIController : MonoBehaviour
 
         if (exitText != null)
             exitText.text = (currentIndex == 1) ? "> EXIT TO MAIN MENU" : "EXIT TO MAIN MENU";
+
+        if (hintText != null)
+            hintText.text = "[↑/↓] MOVE   [ENTER] CONFIRM   [ESC] RESUME";
     }
 }
