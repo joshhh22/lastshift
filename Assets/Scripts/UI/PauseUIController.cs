@@ -37,10 +37,35 @@ public class PauseUIController : MonoBehaviour
 
         Instance = this;
 
+        SetupRectTransform();
+
         if (pausePanel != null)
         {
             pausePanel.SetActive(false);
+        }
+    }
+
+    private void SetupRectTransform()
+    {
+        if (pausePanel != null)
+        {
             pausePanel.transform.localScale = Vector3.one;
+
+            RectTransform rect = pausePanel.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.one;
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.one;
+                rect.pivot = new Vector2(0.5f, 0.5f);
+                rect.localScale = Vector3.one;
+            }
+
+            foreach (Transform child in pausePanel.transform)
+            {
+                child.localScale = Vector3.one;
+            }
         }
     }
 
@@ -103,7 +128,13 @@ public class PauseUIController : MonoBehaviour
         if (pausePanel != null)
         {
             pausePanel.SetActive(true);
-            pausePanel.transform.localScale = Vector3.one;
+
+            SetupRectTransform();
+
+            foreach (Transform child in pausePanel.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
         }
 
         Cursor.lockState = CursorLockMode.None;
