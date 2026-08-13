@@ -137,8 +137,8 @@ public class PauseUIController : MonoBehaviour
             }
         }
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
         currentIndex = 0;
         RefreshMenu();
