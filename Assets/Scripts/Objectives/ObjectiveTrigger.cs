@@ -4,7 +4,22 @@ public class ObjectiveTrigger : MonoBehaviour
 {
     private bool triggered;
 
+    public void ResetTrigger()
+    {
+        triggered = false;
+    }
+
     private void OnTriggerEnter(Collider other)
+    {
+        TryTrigger(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        TryTrigger(other);
+    }
+
+    private void TryTrigger(Collider other)
     {
         if (triggered)
             return;
@@ -14,6 +29,9 @@ public class ObjectiveTrigger : MonoBehaviour
 
         triggered = true;
 
-        ObjectiveManager.Instance.CompleteObjective();
+        if (ObjectiveManager.Instance != null)
+        {
+            ObjectiveManager.Instance.CompleteObjective();
+        }
     }
 }

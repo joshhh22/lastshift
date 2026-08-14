@@ -80,6 +80,22 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -6874584590210671055, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.55146176
+      objectReference: {fileID: 0}
+    - target: {fileID: -6874584590210671055, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.31282935
+      objectReference: {fileID: 0}
+    - target: {fileID: -6874584590210671055, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.6724975
+      objectReference: {fileID: 0}
+    - target: {fileID: -6874584590210671055, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.38180485
+      objectReference: {fileID: 0}
     - target: {fileID: -6370085079684087283, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -203,7 +219,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 7adc5f6a6c58dc64a9b0fb2a8555cb3c, type: 2}
+      objectReference: {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
     - target: {fileID: 5866666021909216657, guid: 62cb701b0a74c1d448dbf4daaa528073, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -301,14 +317,23 @@ MonoBehaviour:
   canBeServed: 0
   passengerData:
     passengerName: 
+    gender: 0
     ticket:
       ticketID: 
       originStation: 
       destinationStation: 
       trainLine: 
+      seatClass: 0
       status: 0
     reason: 
     isReasonTrue: 0
+    isMonster: 0
+  locomotionVariants:
+  - {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
+  - {fileID: 22100000, guid: ce58613299320a642a3fb090a7594411, type: 2}
+  - {fileID: 22100000, guid: 15c139d0f07102a4d83fb76218117cc1, type: 2}
+  - {fileID: 22100000, guid: d75d1b3cac989cd4d86721732201596c, type: 2}
+  - {fileID: 22100000, guid: 95e8c052eb2544642b27330e0118991d, type: 2}
 --- !u!114 &-357245579043117825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,7 +346,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e7f418d9b0ca5d48845ea21c760c5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCIdentity
-  passengerName: Liam
   gender: 0
 --- !u!95 &5523170662106780023 stripped
 Animator:

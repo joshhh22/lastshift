@@ -11,7 +11,6 @@ public class NPCSpawner : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Transform runtimeParent;
 
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -65,11 +64,12 @@ public class NPCSpawner : MonoBehaviour
     {
         npc.SetState(NPCState.Idle);
 
-        yield return new WaitForSeconds(2f);
+        bool isLiarOrMonster = npc.passengerData.isMonster || (npc.passengerData.ticket != null && npc.passengerData.ticket.status != TicketStatus.Valid);
 
-        npc.PlayLookAround();
-
-        yield return new WaitForSeconds(3f);
+        // Jika pembohong/panik: langsung buru-buru turun (jeda singkat 0.5s)
+        // Jika penumpang normal: jeda natural 1.5s - 2.5s sebelum mulai jalan turun
+        float spawnWait = isLiarOrMonster ? 0.5f : Random.Range(1.5f, 2.5f);
+        yield return new WaitForSeconds(spawnWait);
 
         // Counter kosong → langsung ke counter
         if (!counterManager.IsOccupied() &&

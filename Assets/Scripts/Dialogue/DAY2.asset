@@ -17,11 +17,11 @@ MonoBehaviour:
     text: Kamu dengar beritanya lewat radio? Pipa uap bawah tanah di Stasiun Frostgate
       baru saja meledak karena beku.
   - speaker: Cleaning Staff
-    text: Pusat menyuruh kita menolak siapapun yang tiketnya menuju ke sana. Cawang
+    text: Pusat menyuruh kita menolak siapapun yang tiketnya menuju ke sana. Frostgate
       sudah menjadi makam es raksasa.
   - speaker: Cleaning Staff
     text: Pasti nanti banyak penumpang memohon masuk, mereka tidak tahu bahwa rumah
-      dan keluarga mereka di Cawang sudah membeku tak tersisa.
+      dan keluarga mereka di Frostgate sudah membeku tak tersisa.
   - speaker: Cleaning Staff
-    text: Jangan goyah, nak. Menerima tiket mereka ke Cawang sama saja mengirim mereka
-      ke peti mati es. Suruh mereka pulang, meski mereka menangis.
+    text: Jangan goyah, nak. Menerima tiket mereka ke Frostgate sama saja mengirim
+      mereka ke peti mati es. Suruh mereka pulang, meski mereka menangis.

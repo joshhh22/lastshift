@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -107,6 +107,17 @@ namespace StarterAssets
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
 
+			// Snap ke PlayerSpawnPoint di awal scene/game start
+			GameObject spawnPoint = GameObject.Find("PlayerSpawnPoint");
+			if (spawnPoint != null)
+			{
+				if (_controller != null) _controller.enabled = false;
+				Vector3 spawnPos = spawnPoint.transform.position;
+				spawnPos.y += 0.2f;
+				transform.SetPositionAndRotation(spawnPos, spawnPoint.transform.rotation);
+				if (_controller != null) _controller.enabled = true;
+			}
+
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
@@ -114,6 +125,20 @@ namespace StarterAssets
 
 		private void Update()
 		{
+			// Void protection: respawn jika player jatuh di bawah map
+			if (transform.position.y < -10f)
+			{
+				GameObject sp = GameObject.Find("PlayerSpawnPoint");
+				if (sp != null)
+				{
+					if (_controller != null) _controller.enabled = false;
+					Vector3 p = sp.transform.position;
+					p.y += 0.2f;
+					transform.SetPositionAndRotation(p, sp.transform.rotation);
+					_verticalVelocity = 0f;
+					if (_controller != null) _controller.enabled = true;
+				}
+			}
 			if (!CanControl)
 				return;
 
@@ -170,26 +195,22 @@ namespace StarterAssets
 			// if there is no input, set the target speed to 0
 			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-			// a reference to the players current horizontal velocity
-			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
 			float speedOffset = 0.1f;
 			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
-			// accelerate or decelerate to target speed
-			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
+			// accelerate or decelerate to target speed smoothly without physics collision stickiness
+			if (_speed < targetSpeed - speedOffset || _speed > targetSpeed + speedOffset)
 			{
-				// creates curved result rather than a linear one giving a more organic speed change
-				// note T in Lerp is clamped, so we don't need to clamp our speed
-				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-
-				// round speed to 3 decimal places
+				_speed = Mathf.Lerp(_speed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
 				_speed = Mathf.Round(_speed * 1000f) / 1000f;
 			}
 			else
 			{
 				_speed = targetSpeed;
 			}
+
+			// Clamp speed to prevent unintended physics impulse launching
+			_speed = Mathf.Clamp(_speed, 0f, SprintSpeed);
 
 			// normalise input direction
 			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;

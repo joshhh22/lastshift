@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: NPC_LookAround
+  m_Controller: {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: -203655887218126122, guid: 3fe150b4b2f80ed45ac216ebabb53622, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: de043205012566a4f81d94e7836a565a, type: 3}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: bff259ef1146cc14eaea688296d0f77f, type: 3}
+    m_OverrideClip: {fileID: 0}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: 57a10d2f90d5c12418c8d068e5aa53d4, type: 3}
+    m_OverrideClip: {fileID: 0}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: 500aae230d5af7a479fe95414160f0ea, type: 3}
+    m_OverrideClip: {fileID: 0}

@@ -4,6 +4,11 @@ public class ShiftEndController : MonoBehaviour
 {
     private bool completed = false;
 
+    public void ResetController()
+    {
+        completed = false;
+    }
+
     private void Update()
     {
         if (completed)

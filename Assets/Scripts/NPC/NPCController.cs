@@ -17,6 +17,10 @@ public class NPCController : MonoBehaviour
     [Header("Passenger Data")]
     public PassengerData passengerData = new PassengerData();
 
+    [Header("Locomotion Variants")]
+    [Tooltip("Daftar variasi gaya jalan (misal: NPC_Master, NPC_Texting, NPC_Phone, NPC_Runner)")]
+    [SerializeField] private RuntimeAnimatorController[] locomotionVariants;
+
     private void Awake()
     {
         if (agent == null)
@@ -24,6 +28,14 @@ public class NPCController : MonoBehaviour
 
         if (animator == null)
             animator = GetComponent<Animator>();
+    }
+
+    public void PlayAngryReaction()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Angry");
+        }
     }
 
     public void InitializePassenger()
@@ -54,44 +66,121 @@ public class NPCController : MonoBehaviour
             anomaly.ApplyAnomalyData();
         }
 
+        // Set variasi controller dan status curiga/gelisah
+        bool isSuspicious = passengerData.isMonster || (passengerData.ticket != null && passengerData.ticket.status != TicketStatus.Valid);
+
+        if (animator != null)
+        {
+            if (isSuspicious)
+            {
+                // Variasi Pembohong:
+                // 50% Pembohong Panik: Lari kencang & di loket tolah-toleh nervous
+                // 50% Pembohong Tenang: Menyamar sempurna dengan gaya jalan & idle acak (tanpa nervous tell)
+                bool isPanicked = Random.value < 0.5f;
+
+                if (isPanicked && locomotionVariants != null && locomotionVariants.Length >= 4)
+                {
+                    // Index 3 = NPC_Runner (Jalan = Lari kencang, Loket = Nervous)
+                    animator.runtimeAnimatorController = locomotionVariants[3];
+                    if (agent != null)
+                        agent.speed = 4.2f;
+
+                    animator.SetBool("IsSuspicious", true);
+                }
+                else
+                {
+                    // Pembohong Tenang: Pilih gaya acak agar pemain harus teliti cek tiket
+                    if (locomotionVariants != null && locomotionVariants.Length > 0)
+                    {
+                        int randIdx = Random.Range(0, locomotionVariants.Length);
+                        animator.runtimeAnimatorController = locomotionVariants[randIdx];
+                        if (agent != null)
+                        {
+                            agent.speed = (randIdx == 3) ? 3.8f : 2.5f;
+                        }
+                    }
+
+                    animator.SetBool("IsSuspicious", false);
+                }
+            }
+            else
+            {
+                // Penumpang normal: pilih variasi acak (Normal, Telepon, Texting, Runner, LookAround)
+                if (locomotionVariants != null && locomotionVariants.Length > 0)
+                {
+                    int randIdx = Random.Range(0, locomotionVariants.Length);
+                    animator.runtimeAnimatorController = locomotionVariants[randIdx];
+                    if (agent != null)
+                    {
+                        agent.speed = (randIdx == 3) ? 3.8f : 2.5f;
+                    }
+                }
+
+                animator.SetBool("IsSuspicious", false);
+            }
+        }
+
         Debug.Log(
             $"Passenger : {passengerData.passengerName} | " +
             $"{passengerData.ticket.originStation} -> " +
-            $"{passengerData.ticket.destinationStation}"
+            $"{passengerData.ticket.destinationStation} | Suspicious: {isSuspicious}"
         );
     }
 
     private void Update()
     {
-        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        // 1. Update Speed parameter untuk Animator
+        if (animator != null)
         {
-            animator.SetFloat("Speed", agent.velocity.magnitude);
-        }
-        else
-        {
-            animator.SetFloat("Speed", 0f);
-        }
-
-        if (State == NPCState.WalkingToCounter && HasReachedDestination())
-        {
-            agent.isStopped = true;
-
-            if (CounterManager.Instance.TryOccupy(this))
+            if (agent != null && agent.enabled && agent.isOnNavMesh && !agent.isStopped && State != NPCState.AtCounter && State != NPCState.Idle)
             {
-                SetState(NPCState.AtCounter);
-
-                canBeServed = true;
-
-                animator.SetFloat("Speed", 0);
+                animator.SetFloat("Speed", agent.velocity.magnitude);
+            }
+            else
+            {
+                animator.SetFloat("Speed", 0f);
             }
         }
 
+        // 2. Saat di antrean (InQueue) dan sudah sampai titik antrean -> Stop jalan
+        if (State == NPCState.InQueue && HasReachedDestination())
+        {
+            if (agent != null && agent.isOnNavMesh && !agent.isStopped)
+            {
+                agent.isStopped = true;
+                if (animator != null)
+                    animator.SetFloat("Speed", 0f);
+            }
+        }
+
+        // 3. Saat jalan ke loket (WalkingToCounter) dan sudah sampai -> Stop & Mulai Layani
+        if (State == NPCState.WalkingToCounter && HasReachedDestination())
+        {
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+            }
+
+            if (animator != null)
+            {
+                animator.SetFloat("Speed", 0f);
+            }
+
+            if (!CounterManager.Instance.IsOccupied() || CounterManager.Instance.GetCurrentNPC() == this)
+            {
+                if (CounterManager.Instance.TryOccupy(this))
+                {
+                    SetState(NPCState.AtCounter);
+                    canBeServed = true;
+                }
+            }
+        }
+
+        // 4. Saat jalan ke pintu keluar (WalkingToExit)
         if (State == NPCState.WalkingToExit && HasReachedDestination())
         {
             SetState(NPCState.Exited);
-
             Debug.Log(name + " keluar.");
-
             Destroy(gameObject);
         }
     }
@@ -115,15 +204,24 @@ public class NPCController : MonoBehaviour
 
     private IEnumerator MoveWhenReady(Transform target)
     {
-        // Tunggu maksimal 1 detik atau sampai agent berhasil berpijak di atas NavMesh
+        if (target == null)
+            yield break;
+
         float timeout = 1f;
-        while (!agent.isOnNavMesh && timeout > 0)
+        while ((agent == null || !agent.isOnNavMesh) && timeout > 0)
         {
+            if (agent != null && !agent.isOnNavMesh)
+            {
+                if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 5.0f, NavMesh.AllAreas))
+                {
+                    agent.Warp(hit.position);
+                }
+            }
             timeout -= Time.deltaTime;
             yield return null;
         }
 
-        if (agent.isOnNavMesh)
+        if (agent != null && agent.isOnNavMesh)
         {
             agent.isStopped = false;
             agent.SetDestination(target.position);
@@ -245,13 +343,16 @@ public class NPCController : MonoBehaviour
 
     public bool HasReachedDestination()
     {
-        if (!agent.isOnNavMesh)
+        if (agent == null || !agent.isOnNavMesh || !agent.enabled)
             return false;
 
         if (agent.pathPending)
             return false;
 
-        return agent.remainingDistance <= agent.stoppingDistance;
+        if (!agent.hasPath)
+            return false;
+
+        return agent.remainingDistance <= Mathf.Max(agent.stoppingDistance, 0.6f);
     }
 
     public void PlayLookAround()

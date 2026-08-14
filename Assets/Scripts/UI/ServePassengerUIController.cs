@@ -345,6 +345,12 @@ public class ServePassengerUIController : MonoBehaviour
         if (rejectText != null) rejectText.text = "";
         if (cancelDialogueText != null) cancelDialogueText.text = "";
 
+        // Mainkan animasi marah jika ditolak
+        if (!accepted && currentNPC != null)
+        {
+            currentNPC.PlayAngryReaction();
+        }
+
         string reaction = TicketGenerator.GetDecisionReaction(currentNPC != null ? currentNPC.passengerData : null, accepted);
 
         if (typewriter != null)

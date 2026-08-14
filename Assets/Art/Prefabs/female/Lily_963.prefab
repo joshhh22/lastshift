@@ -100,6 +100,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -5480977901411583989, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.00002358954
+      objectReference: {fileID: 0}
+    - target: {fileID: -5480977901411583989, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.09745998
+      objectReference: {fileID: 0}
     - target: {fileID: -5195048882033904264, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -164,6 +172,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 608321761475470972, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.3699449
+      objectReference: {fileID: 0}
+    - target: {fileID: 608321761475470972, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.3280551
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
       propertyPath: m_Name
       value: Lily_963
@@ -225,9 +241,13 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: 7855c3b5110cdcb41b4fb40aee5ec647, type: 3}
+    - target: {fileID: 5866666021909216657, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 6263ef30840d2194288d3b72920f660f, type: 2}
+      objectReference: {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
     - target: {fileID: 5866666021909216657, guid: 2446bf7cd6728124ebec16af854b6657, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -331,7 +351,14 @@ MonoBehaviour:
       originStation: 
       destinationStation: 
       trainLine: 
+      seatClass: 0
       status: 0
     reason: 
     isReasonTrue: 0
     isMonster: 0
+  locomotionVariants:
+  - {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
+  - {fileID: 22100000, guid: ce58613299320a642a3fb090a7594411, type: 2}
+  - {fileID: 22100000, guid: 15c139d0f07102a4d83fb76218117cc1, type: 2}
+  - {fileID: 22100000, guid: d75d1b3cac989cd4d86721732201596c, type: 2}
+  - {fileID: 22100000, guid: 95e8c052eb2544642b27330e0118991d, type: 2}

@@ -207,7 +207,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: ef1c1fc6fba8b3343a41552fade9b5dc, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 7adc5f6a6c58dc64a9b0fb2a8555cb3c, type: 2}
+      objectReference: {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
     - target: {fileID: 5866666021909216657, guid: ef1c1fc6fba8b3343a41552fade9b5dc, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -293,5 +293,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CleaningStaffController
   agent: {fileID: -146063237054313128}
-  patrolPoints:
-  - {fileID: 0}
+  animator: {fileID: 4859032561143615120}
+  waypointParent: {fileID: 0}
+  minWaitTime: 3
+  maxWaitTime: 6
+--- !u!95 &4859032561143615120 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: ef1c1fc6fba8b3343a41552fade9b5dc, type: 3}
+  m_PrefabInstance: {fileID: 1298257113088602881}
+  m_PrefabAsset: {fileID: 0}

@@ -10,6 +10,11 @@ public class SelfDialogueTrigger : MonoBehaviour, IInteractable
 
     private bool played;
 
+    public void ResetTrigger()
+    {
+        played = false;
+    }
+
     public string GetInteractionText()
     {
         if (played)

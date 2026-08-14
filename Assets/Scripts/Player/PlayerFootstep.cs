@@ -12,16 +12,38 @@ public class PlayerFootstep : MonoBehaviour
 
     private float timer;
 
+    private StarterAssetsInputs starterInputs;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         player = GetComponent<FirstPersonController>();
+        starterInputs = GetComponent<StarterAssetsInputs>();
+    }
+
+    private void OnDisable()
+    {
+        timer = 0f;
     }
 
     private void Update()
     {
+        // Jangan putar langkah kaki jika player sedang dinonaktifkan (misal: saat buka komputer atau UI)
+        if (player == null || !player.enabled || !player.CanControl)
+        {
+            timer = 0f;
+            return;
+        }
+
         if (!player.Grounded)
             return;
+
+        // Cek juga input player, jika tidak ada input gerak maka jangan putar langkah
+        if (starterInputs != null && starterInputs.move == Vector2.zero)
+        {
+            timer = 0f;
+            return;
+        }
 
         Vector3 horizontalVelocity =
             new Vector3(

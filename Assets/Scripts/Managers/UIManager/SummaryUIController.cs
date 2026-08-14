@@ -168,11 +168,38 @@ public class SummaryUIController : MonoBehaviour
         GameTimeManager.Instance.ResetTime();
         PassengerScheduleManager.Instance.ResetSchedules();
 
-        // Stop Cleaning Staff agar tidak langsung jalan-jalan di hari baru
+        // Reset semua trigger objective di scene (misal: trigger masuk ruangan kantor "Go To Office")
+        foreach (ObjectiveTrigger trigger in FindObjectsByType<ObjectiveTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (trigger != null)
+                trigger.ResetTrigger();
+        }
+
+        // Reset semua dialog staff & story trigger
+        foreach (CleaningStaffInteraction staff in FindObjectsByType<CleaningStaffInteraction>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (staff != null)
+                staff.ResetForNewDay();
+        }
+
+        foreach (SelfDialogueTrigger selfDiag in FindObjectsByType<SelfDialogueTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (selfDiag != null)
+                selfDiag.ResetTrigger();
+        }
+
+        // Reset controller shift end
+        foreach (ShiftEndController shiftEnd in FindObjectsByType<ShiftEndController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (shiftEnd != null)
+                shiftEnd.ResetController();
+        }
+
+        // Reset Cleaning Staff ke posisi spawn awal dan stop patrol
         // (akan mulai jalan lagi setelah dialogue selesai lewat CleaningStaffInteraction)
         CleaningStaffController cleaningStaff = FindFirstObjectByType<CleaningStaffController>();
         if (cleaningStaff != null)
-            cleaningStaff.StopPatrol();
+            cleaningStaff.ResetToInitialSpawn();
 
         // Reset jumpscare CCTV agar bisa trigger lagi di hari berikutnya
         foreach (CCTVScreamer screamer in FindObjectsByType<CCTVScreamer>(FindObjectsSortMode.None))

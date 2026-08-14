@@ -16,6 +16,11 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
     private bool hasTalked;
 
+    public void ResetForNewDay()
+    {
+        hasTalked = false;
+    }
+
     private void Awake()
     {
         cleaningStaff = GetComponent<CleaningStaffController>();

@@ -124,6 +124,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -2072040086291044643, guid: b025bc7d289fdf14289c0903e3f2de2f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.013426719
+      objectReference: {fileID: 0}
+    - target: {fileID: -2072040086291044643, guid: b025bc7d289fdf14289c0903e3f2de2f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.03769364
+      objectReference: {fileID: 0}
     - target: {fileID: -1781356600409242780, guid: b025bc7d289fdf14289c0903e3f2de2f, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -207,7 +215,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: b025bc7d289fdf14289c0903e3f2de2f, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 6263ef30840d2194288d3b72920f660f, type: 2}
+      objectReference: {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
     - target: {fileID: 5866666021909216657, guid: b025bc7d289fdf14289c0903e3f2de2f, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -299,7 +307,14 @@ MonoBehaviour:
       originStation: 
       destinationStation: 
       trainLine: 
+      seatClass: 0
       status: 0
     reason: 
     isReasonTrue: 0
     isMonster: 0
+  locomotionVariants:
+  - {fileID: 9100000, guid: 1f6c2f3c2a876c74c965e36754bcdbba, type: 2}
+  - {fileID: 22100000, guid: ce58613299320a642a3fb090a7594411, type: 2}
+  - {fileID: 22100000, guid: 15c139d0f07102a4d83fb76218117cc1, type: 2}
+  - {fileID: 22100000, guid: d75d1b3cac989cd4d86721732201596c, type: 2}
+  - {fileID: 22100000, guid: 95e8c052eb2544642b27330e0118991d, type: 2}

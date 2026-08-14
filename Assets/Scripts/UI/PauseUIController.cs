@@ -111,9 +111,17 @@ public class PauseUIController : MonoBehaviour
             if (ServePassengerUIController.Instance != null && ServePassengerUIController.Instance.IsOpen)
                 return;
 
-            // Jangan pause jika Computer UI sedang terbuka
-            ComputerUIController computer = FindFirstObjectByType<ComputerUIController>();
-            if (computer != null && computer.IsOpen)
+            // Jangan pause jika Computer UI sedang terbuka atau baru saja ditutup di frame ini
+            ComputerUIController computer = ComputerUIController.Instance != null ? ComputerUIController.Instance : FindFirstObjectByType<ComputerUIController>();
+            if (computer != null && (computer.IsOpen || computer.JustClosedThisFrame))
+                return;
+
+            // Jangan pause jika Phone UI sedang terbuka
+            if (PhoneManager.Instance != null && PhoneManager.Instance.IsOpen)
+                return;
+
+            // Jangan pause jika Dialogue sedang aktif
+            if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying())
                 return;
 
             if (isPaused)

@@ -25,6 +25,10 @@ public class TerminalMenu : MonoBehaviour
     [SerializeField] private GameObject cctvPage;
     [SerializeField] private GameObject logsPage;
 
+    [Header("Footer Displays")]
+    [SerializeField] private TextMeshProUGUI dayText;
+    [SerializeField] private TextMeshProUGUI timeText;
+
     private TextMeshProUGUI[] menuItems;
 
     private int currentIndex = 0;
@@ -58,12 +62,15 @@ public class TerminalMenu : MonoBehaviour
         CurrentPage = TerminalPage.MainMenu;
 
         RefreshMenu();
+        UpdateFooter();
     }
 
     private void Update()
     {
         if (!ComputerUIController.Instance.IsOpen)
             return;
+
+        UpdateFooter();
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -211,5 +218,29 @@ public class TerminalMenu : MonoBehaviour
 
         inSubPage = false;
         CurrentPage = TerminalPage.MainMenu;
+
+        UpdateFooter();
+    }
+
+    private void UpdateFooter()
+    {
+        string dayStr = DayManager.Instance != null ? $"DAY {(int)DayManager.Instance.CurrentDay}" : "DAY 1";
+        string timeStr = GameTimeManager.Instance != null ? GameTimeManager.Instance.GetCurrentTime() : "22:00";
+
+        if (dayText != null)
+            dayText.text = dayStr;
+
+        if (timeText != null)
+            timeText.text = timeStr;
+
+        // Auto-update all child TextMeshProUGUI with name "Day" or "Time"
+        foreach (TextMeshProUGUI tmp in GetComponentsInChildren<TextMeshProUGUI>(true))
+        {
+            if (tmp == null) continue;
+            if (tmp.gameObject.name == "Day")
+                tmp.text = dayStr;
+            else if (tmp.gameObject.name == "Time")
+                tmp.text = timeStr;
+        }
     }
 }

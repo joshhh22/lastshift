@@ -28,9 +28,10 @@ public class CCTVScreamer : MonoBehaviour
     {
         if (!hasTriggered && DayManager.Instance != null && (int)DayManager.Instance.CurrentDay >= targetDay)
         {
-            // Hanya trigger saat objective aktif adalah "Open CCTV"
+            // Hanya trigger saat objective aktif adalah "Check CCTV" (atau "Open CCTV")
             if (ObjectiveManager.Instance == null) return;
-            if (ObjectiveManager.Instance.GetCurrentObjective() != "Open CCTV") return;
+            string currentObj = ObjectiveManager.Instance.GetCurrentObjective();
+            if (currentObj != "Check CCTV" && currentObj != "Open CCTV") return;
 
             if (CCTVManager.Instance != null && CCTVManager.Instance.CurrentIndex == targetCameraIndex)
             {
