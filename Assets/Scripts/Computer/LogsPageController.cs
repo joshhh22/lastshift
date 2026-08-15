@@ -58,76 +58,69 @@ public class LogsPageController : MonoBehaviour
     private int fakeIndex = 0;
     private int honestIndex = 0;
 
-    // ── Isi teks panduan ──────────────────────────────────────
+    // ── Isi teks panduan (Frutiger Aero High-Tech Formatting) ─────────────────
     private const string InvalidContent =
-        "ALASAN BOHONG — TIKET TIDAK VALID\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-        "Penumpang dengan tiket INVALID sering menggunakan\n" +
-        "alasan berikut untuk mengelabui petugas:\n\n" +
-        "• \"My ticket disappeared.\"\n" +
-        "• \"The machine ate my ticket.\"\n" +
-        "• \"I left it at home.\"\n" +
-        "• \"My friend has my ticket.\"\n" +
-        "• \"The inspector already checked it.\"\n\n" +
-        "[!] Tidak ada satu pun alasan di atas yang valid.\n" +
-        "    Tolak dengan tegas menggunakan protokol standar.";
+        "<color=#FF5252><b>[SECURITY ALERT] TIKET TIDAK VALID (INVALID)</b></color>\n" +
+        "<color=#00F0FF>────────────────────────────────────────────</color>\n\n" +
+        "Penumpang dengan tiket <b>INVALID</b> sering menggunakan dalih berikut:\n\n" +
+        "  • <i>\"My ticket disappeared.\"</i>\n" +
+        "  • <i>\"The machine ate my ticket.\"</i>\n" +
+        "  • <i>\"I left it at home.\"</i>\n" +
+        "  • <i>\"My friend has my ticket.\"</i>\n" +
+        "  • <i>\"The inspector already checked it.\"</i>\n\n" +
+        "<color=#FFD600><b>[!] PROTOKOL KEAMANAN:</b></color>\n" +
+        "Tidak ada satu pun alasan di atas yang dapat diterima. Tolak tiket!";
 
     private const string ExpiredContent =
-        "ALASAN BOHONG — TIKET KEDALUWARSA\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-        "Penumpang dengan tiket EXPIRED sering berdalih:\n\n" +
-        "• \"The ticket machine expired it.\"\n" +
-        "• \"Your scanner is wrong.\"\n" +
-        "• \"The staff told me it was still valid.\"\n" +
-        "• \"The system made a mistake.\"\n" +
-        "• \"It expired by itself.\"\n\n" +
-        "[!] Sistem pemindai tidak pernah salah baca.\n" +
-        "    Tanggal kedaluwarsa tercetak di tiket. Cek manual.";
+        "<color=#FF5252><b>[SECURITY ALERT] TIKET KEDALUWARSA (EXPIRED)</b></color>\n" +
+        "<color=#00F0FF>────────────────────────────────────────────</color>\n\n" +
+        "Penumpang dengan tiket <b>EXPIRED</b> sering berdalih:\n\n" +
+        "  • <i>\"The ticket machine expired it.\"</i>\n" +
+        "  • <i>\"Your scanner is wrong.\"</i>\n" +
+        "  • <i>\"The staff told me it was still valid.\"</i>\n" +
+        "  • <i>\"The system made a mistake.\"</i>\n" +
+        "  • <i>\"It expired by itself.\"</i>\n\n" +
+        "<color=#FFD600><b>[!] PROTOKOL KEAMANAN:</b></color>\n" +
+        "Sistem pemindai tidak pernah salah. Tanggal tercetak di kartu. Tolak tiket!";
 
     private const string WrongDestContent =
-        "ALASAN BOHONG — TUJUAN SALAH\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-        "Penumpang dengan tujuan SALAH sering mengklaim:\n\n" +
-        "• \"The machine changed my destination.\"\n" +
-        "• \"Someone else bought this ticket.\"\n" +
-        "• \"I never selected this station.\"\n" +
-        "• \"The printer printed the wrong destination.\"\n" +
-        "• \"The system is broken.\"\n\n" +
-        "[!] Mesin tidak mengubah tujuan secara sepihak.\n" +
-        "    Penumpang bertanggung jawab atas tiket miliknya.";
+        "<color=#FF5252><b>[SECURITY ALERT] TUJUAN SALAH (WRONG DESTINATION)</b></color>\n" +
+        "<color=#00F0FF>────────────────────────────────────────────</color>\n\n" +
+        "Penumpang dengan rute <b>SALAH</b> sering mengklaim:\n\n" +
+        "  • <i>\"The machine changed my destination.\"</i>\n" +
+        "  • <i>\"Someone else bought this ticket.\"</i>\n" +
+        "  • <i>\"I never selected this station.\"</i>\n" +
+        "  • <i>\"The printer printed the wrong destination.\"</i>\n" +
+        "  • <i>\"The system is broken.\"</i>\n\n" +
+        "<color=#FFD600><b>[!] PROTOKOL KEAMANAN:</b></color>\n" +
+        "Mesin tidak mengubah rute sepihak. Tolak penumpang dengan rute tidak cocok.";
 
     private const string FakeReasonContent =
-        "ALASAN BOHONG — TIKET PALSU\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-        "Penumpang membawa tiket PALSU biasanya berkata:\n\n" +
-        "• \"I bought it online.\"\n" +
-        "• \"Someone sold me this ticket.\"\n" +
-        "• \"This is my real ticket.\"\n" +
-        "• \"I don't know why it looks different.\"\n" +
-        "• \"The previous station accepted it.\"\n\n" +
-        "[!] WASPADA: Beberapa entitas anomali juga membawa\n" +
-        "    tiket palsu. Periksa konsistensi data secara fisik.\n" +
-        "    Jika ada kejanggalan perilaku, aktifkan protokol 7.";
-
-    // ──────────────────────────────────────────────────────────
+        "<color=#FF1744><b>[CRITICAL WARNING] TIKET PALSU / ANOMALI</b></color>\n" +
+        "<color=#00F0FF>────────────────────────────────────────────</color>\n\n" +
+        "Penumpang atau <b>ENTITAS ANOMALI</b> dengan tiket palsu biasanya berkata:\n\n" +
+        "  • <i>\"I bought it online.\"</i>\n" +
+        "  • <i>\"Someone sold me this ticket.\"</i>\n" +
+        "  • <i>\"This is my real ticket.\"</i>\n" +
+        "  • <i>\"I don't know why it looks different.\"</i>\n" +
+        "  • <i>\"The previous station accepted it.\"</i>\n\n" +
+        "<color=#FF1744><b>[!] WASPADA TINGGI:</b></color>\n" +
+        "Beberapa anomali menyamar sebagai penumpang. Periksa fisik dan data log!";
 
     // Honest content (alasan jujur)
     private const string HonestInvalidContent =
-        "ALASAN JUJUR — TIKET TIDAK VALID\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-        "Penumpang dengan tiket INVALID bisa berkata jujur:\n\n" +
-        "• \"I forgot to renew my ticket.\"\n" +
-        "• \"I lost my wallet.\"\n" +
-        "• \"I bought the wrong ticket.\"\n" +
-        "• \"My train was delayed.\"\n" +
-        "• \"I really need to get home.\"\n\n" +
-        "[i] Alasan jujur tidak otomatis berarti tiketnya valid.\n" +
-        "    Tetap ikuti protokol — jika tiket tidak valid, TOLAK.";
+        "<color=#00E676><b>[VERIFIKASI] ALASAN JUJUR // TIKET TIDAK VALID</b></color>\n" +
+        "<color=#00F0FF>────────────────────────────────────────────</color>\n\n" +
+        "Penumpang yang jujur biasanya mengakui masalah secara langsung:\n\n" +
+        "  • <i>\"I forgot to renew my ticket.\"</i>\n" +
+        "  • <i>\"I lost my wallet.\"</i>\n" +
+        "  • <i>\"I didn't realize it expired.\"</i>\n" +
+        "  • <i>\"I made a mistake.\"</i>\n" +
+        "  • <i>\"I'm sorry, I bought the wrong pass.\"</i>\n\n" +
+        "<color=#00E676><b>[i] CATATAN PETUGAS:</b></color>\n" +
+        "Meskipun jujur, jika tiket tidak valid maka penumpang tetap tidak boleh masuk.";
 
     private const string HonestExpiredContent =
-        "ALASAN JUJUR — TIKET KEDALUWARSA\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-        "Penumpang dengan tiket EXPIRED bisa berkata:\n\n" +
         "• \"I forgot to renew it this morning.\"\n" +
         "• \"I thought my ticket was still valid.\"\n" +
         "• \"I was rushing to work.\"\n" +

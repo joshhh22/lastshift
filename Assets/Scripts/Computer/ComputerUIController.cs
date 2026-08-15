@@ -3,7 +3,19 @@ using StarterAssets;
 
 public class ComputerUIController : MonoBehaviour
 {
-    public static ComputerUIController Instance;
+    private static ComputerUIController _instance;
+    public static ComputerUIController Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = Object.FindFirstObjectByType<ComputerUIController>(FindObjectsInactive.Include);
+            }
+            return _instance;
+        }
+        private set => _instance = value;
+    }
 
     [Header("UI")]
     [SerializeField] private GameObject computerUI;
@@ -24,11 +36,10 @@ public class ComputerUIController : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("ComputerUIController Awake");
+        _instance = this;
 
-        Instance = this;
-
-        computerUI.SetActive(false);
+        if (computerUI != null && computerUI != gameObject)
+            computerUI.SetActive(false);
     }
 
     public void Open()
@@ -38,21 +49,28 @@ public class ComputerUIController : MonoBehaviour
 
         isOpen = true;
 
-        SetGameplayHUDVisible(false);
+        // Buka kunci cursor terlebih dahulu
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
-        computerUI.SetActive(true);
-        StartCoroutine(bootSequence.PlayBoot());
+        SetGameplayHUDVisible(false);
 
         if (playerController != null)
             playerController.enabled = false;
         if (playerInteractor != null)
             playerInteractor.enabled = false;
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         if (crosshair != null)
             crosshair.SetActive(false);
+
+        if (computerUI != null)
+            computerUI.SetActive(true);
+
+        if (FrutigerAeroComputerUI.Instance != null)
+        {
+            FrutigerAeroComputerUI.Instance.gameObject.SetActive(true);
+            FrutigerAeroComputerUI.Instance.CloseAllWindows();
+        }
     }
 
     public void Close()

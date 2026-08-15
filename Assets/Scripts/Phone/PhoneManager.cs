@@ -50,6 +50,34 @@ public class PhoneManager : MonoBehaviour
         {
             AudioManager.Instance.PlayPhoneNotification();
         }
+
+        string sender = "Pesan";
+        if (DayManager.Instance != null)
+        {
+            switch (DayManager.Instance.CurrentDay)
+            {
+                case GameDay.Day1:
+                case GameDay.Day7:
+                    sender = "Ibu";
+                    break;
+                case GameDay.Day2:
+                case GameDay.Day3:
+                    sender = "Info Pusat";
+                    break;
+                case GameDay.Day4:
+                case GameDay.Day5:
+                    sender = "Supervisor";
+                    break;
+                case GameDay.Day6:
+                    sender = "Nomor Tidak Dikenal";
+                    break;
+            }
+        }
+
+        if (PhoneToastNotification.Instance != null)
+        {
+            PhoneToastNotification.Instance.ShowNotification(sender, "");
+        }
     }
 
     public void OpenPhone()
@@ -59,15 +87,29 @@ public class PhoneManager : MonoBehaviour
 
         isOpen = true;
 
-        phoneUI.SetActive(true);
+        if (PhoneToastNotification.Instance != null)
+        {
+            PhoneToastNotification.Instance.HideImmediate();
+        }
 
-        PlayerLockManager.Instance.LockPlayer();
+        if (phoneUI != null)
+        {
+            phoneUI.SetActive(true);
+        }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (PlayerLockManager.Instance != null)
+        {
+            PlayerLockManager.Instance.LockPlayer();
+        }
 
         if (hasNotification)
         {
             hasNotification = false;
 
-            if (ObjectiveManager.Instance.GetCurrentObjective() == "Check Phone")
+            if (ObjectiveManager.Instance != null && ObjectiveManager.Instance.GetCurrentObjective() == "Check Phone")
             {
                 ObjectiveManager.Instance.CompleteObjective();
             }
@@ -81,8 +123,17 @@ public class PhoneManager : MonoBehaviour
 
         isOpen = false;
 
-        phoneUI.SetActive(false);
+        if (phoneUI != null)
+        {
+            phoneUI.SetActive(false);
+        }
 
-        PlayerLockManager.Instance.UnlockPlayer();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (PlayerLockManager.Instance != null)
+        {
+            PlayerLockManager.Instance.UnlockPlayer();
+        }
     }
 }

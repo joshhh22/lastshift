@@ -22,6 +22,9 @@ public class CCTVManager : MonoBehaviour
     private float switchCooldown = 0.15f;
     private float lastSwitchTime;
 
+    private RenderTexture cctvRenderTexture;
+    public RenderTexture CctvRenderTexture => cctvRenderTexture;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -31,39 +34,75 @@ public class CCTVManager : MonoBehaviour
         }
 
         Instance = this;
+
+        if (cctvRenderTexture == null)
+        {
+            cctvRenderTexture = new RenderTexture(1280, 720, 24);
+            cctvRenderTexture.name = "CCTV_LiveFeed_RT";
+        }
     }
 
     private void Start()
     {
         visited = new bool[cameras.Length];
+
+        if (cctvRenderTexture == null)
+        {
+            cctvRenderTexture = new RenderTexture(1280, 720, 24);
+            cctvRenderTexture.name = "CCTV_LiveFeed_RT";
+        }
+
+        foreach (Camera cam in cameras)
+        {
+            if (cam != null)
+            {
+                cam.targetTexture = cctvRenderTexture;
+            }
+        }
+
         CloseCCTV();
     }
 
     public void OpenCCTV()
     {
-        UIManager.Instance.ShowComputer();
+        if (UIManager.Instance != null)
+            UIManager.Instance.ShowComputer();
 
-        cctvUI.SetActive(true);
+        if (FrutigerAeroComputerUI.Instance == null && cctvUI != null)
+        {
+            cctvUI.SetActive(true);
+        }
+
+        if (FrutigerAeroComputerUI.Instance != null && FrutigerAeroComputerUI.Instance.cctvViewportRawImage != null)
+        {
+            FrutigerAeroComputerUI.Instance.cctvViewportRawImage.texture = cctvRenderTexture;
+        }
 
         currentIndex = 0;
-
         objectiveCompleted = false;
 
         visited = new bool[cameras.Length];
-        visited[0] = true;
+        if (visited.Length > 0) visited[0] = true;
 
-        recLabel.gameObject.SetActive(true);
+        if (recLabel != null) recLabel.gameObject.SetActive(true);
         UpdateCamera();
     }
 
     public void CloseCCTV()
     {
-        foreach (Camera cam in cameras)
+        if (cameras != null)
         {
-            cam.gameObject.SetActive(false);
+            foreach (Camera cam in cameras)
+            {
+                if (cam != null) cam.gameObject.SetActive(false);
+            }
         }
 
-        recLabel.gameObject.SetActive(false);
+        if (recLabel != null)
+            recLabel.gameObject.SetActive(false);
+
+        if (cctvUI != null && FrutigerAeroComputerUI.Instance == null)
+            cctvUI.SetActive(false);
     }
 
     public void NextCamera()
@@ -103,7 +142,7 @@ public class CCTVManager : MonoBehaviour
 
     private void Update()
     {
-        if (!recLabel.gameObject.activeSelf)
+        if (recLabel == null || !recLabel.gameObject.activeInHierarchy)
             return;
 
         blinkTimer += Time.deltaTime;
@@ -120,14 +159,30 @@ public class CCTVManager : MonoBehaviour
     {
         foreach (Camera cam in cameras)
         {
-            cam.gameObject.SetActive(false);
+            if (cam != null)
+            {
+                cam.targetTexture = cctvRenderTexture;
+                cam.gameObject.SetActive(false);
+            }
         }
 
-        if (cameras.Length > 0)
+        if (cameras.Length > 0 && currentIndex < cameras.Length)
         {
-            cameras[currentIndex].gameObject.SetActive(true);
+            if (cameras[currentIndex] != null)
+            {
+                cameras[currentIndex].gameObject.SetActive(true);
+            }
 
-            cameraLabel.text = $"CAM {currentIndex + 1:00}";
+            string[] camNames = new string[] { "CAM 01: LOBBY COUNTER", "CAM 02: STAIRS & PLATFORM", "CAM 03: BOOTH PERIMETER" };
+            string nameStr = currentIndex < camNames.Length ? camNames[currentIndex] : $"CAM {currentIndex + 1:00}";
+
+            if (cameraLabel != null)
+                cameraLabel.text = $"📍 <b>{nameStr}</b>";
+
+            if (FrutigerAeroComputerUI.Instance != null && FrutigerAeroComputerUI.Instance.cctvCameraLabel != null)
+            {
+                FrutigerAeroComputerUI.Instance.cctvCameraLabel.text = $"📍 <b>{nameStr}</b>";
+            }
         }
     }
 

@@ -53,24 +53,39 @@ public class TerminalMenu : MonoBehaviour
     {
         currentIndex = 0;
 
-        mainMenu.SetActive(true);
-        assignmentPage.SetActive(false);
-        cctvPage.SetActive(false);
-        logsPage.SetActive(false);
+        if (mainMenu != null)
+        {
+            if (FrutigerAeroComputerUI.Instance != null)
+                mainMenu.SetActive(false);
+            else
+                mainMenu.SetActive(true);
+        }
+
+        if (assignmentPage != null) assignmentPage.SetActive(false);
+        if (cctvPage != null) cctvPage.SetActive(false);
+        if (logsPage != null) logsPage.SetActive(false);
 
         inSubPage = false;
         CurrentPage = TerminalPage.MainMenu;
 
-        RefreshMenu();
+        if (FrutigerAeroComputerUI.Instance == null)
+        {
+            RefreshMenu();
+        }
+
         UpdateFooter();
     }
 
     private void Update()
     {
-        if (!ComputerUIController.Instance.IsOpen)
+        if (ComputerUIController.Instance == null || !ComputerUIController.Instance.IsOpen)
             return;
 
         UpdateFooter();
+
+        // Jika FrutigerAeroComputerUI aktif, serahkan seluruh kontrol input keyboard ke FrutigerAeroComputerUI
+        if (FrutigerAeroComputerUI.Instance != null)
+            return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -100,7 +115,7 @@ public class TerminalMenu : MonoBehaviour
         {
             currentIndex++;
 
-            if (currentIndex >= menuItems.Length)
+            if (menuItems != null && currentIndex >= menuItems.Length)
                 currentIndex = 0;
 
             RefreshMenu();
@@ -110,7 +125,7 @@ public class TerminalMenu : MonoBehaviour
         {
             currentIndex--;
 
-            if (currentIndex < 0)
+            if (menuItems != null && currentIndex < 0)
                 currentIndex = menuItems.Length - 1;
 
             RefreshMenu();
@@ -155,10 +170,14 @@ public class TerminalMenu : MonoBehaviour
         }
     }
 
-    void RefreshMenu()
+    public void RefreshMenu()
     {
+        if (menuItems == null) return;
+
         for (int i = 0; i < menuItems.Length; i++)
         {
+            if (menuItems[i] == null) continue;
+
             if (i == currentIndex)
             {
                 menuItems[i].text = "► " + RemoveArrow(menuItems[i].text);
@@ -172,32 +191,45 @@ public class TerminalMenu : MonoBehaviour
 
     string RemoveArrow(string text)
     {
+        if (string.IsNullOrEmpty(text)) return "";
         return text.Replace("► ", "");
     }
 
     void OpenCurrentPage()
     {
-        mainMenu.SetActive(false);
+        if (FrutigerAeroComputerUI.Instance != null)
+        {
+            switch (currentIndex)
+            {
+                case 0: FrutigerAeroComputerUI.Instance.OpenApp(TerminalPage.Assignment); break;
+                case 1: FrutigerAeroComputerUI.Instance.OpenApp(TerminalPage.CCTV); break;
+                case 2: FrutigerAeroComputerUI.Instance.OpenApp(TerminalPage.Logs); break;
+            }
+            return;
+        }
+
+        if (mainMenu != null) mainMenu.SetActive(false);
 
         inSubPage = true;
 
         switch (currentIndex)
         {
             case 0:
-                assignmentPage.SetActive(true);
+                if (assignmentPage != null) assignmentPage.SetActive(true);
                 CurrentPage = TerminalPage.Assignment;
                 break;
 
             case 1:
-                cctvPage.SetActive(true);
+                if (cctvPage != null) cctvPage.SetActive(true);
                 CurrentPage = TerminalPage.CCTV;
 
-                CCTVManager.Instance.OpenCCTV();
+                if (CCTVManager.Instance != null)
+                    CCTVManager.Instance.OpenCCTV();
 
                 break;
 
             case 2:
-                logsPage.SetActive(true);
+                if (logsPage != null) logsPage.SetActive(true);
                 CurrentPage = TerminalPage.Logs;
                 break;
         }
@@ -205,16 +237,24 @@ public class TerminalMenu : MonoBehaviour
 
     void BackToMainMenu()
     {
-        if (CurrentPage == TerminalPage.CCTV)
+        if (FrutigerAeroComputerUI.Instance != null)
+        {
+            FrutigerAeroComputerUI.Instance.CloseAllWindows();
+        }
+
+        if (CurrentPage == TerminalPage.CCTV && CCTVManager.Instance != null)
         {
             CCTVManager.Instance.CloseCCTV();
         }
 
-        assignmentPage.SetActive(false);
-        cctvPage.SetActive(false);
-        logsPage.SetActive(false);
+        if (assignmentPage != null) assignmentPage.SetActive(false);
+        if (cctvPage != null) cctvPage.SetActive(false);
+        if (logsPage != null) logsPage.SetActive(false);
 
-        mainMenu.SetActive(true);
+        if (FrutigerAeroComputerUI.Instance == null && mainMenu != null)
+        {
+            mainMenu.SetActive(true);
+        }
 
         inSubPage = false;
         CurrentPage = TerminalPage.MainMenu;

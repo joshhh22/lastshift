@@ -41,11 +41,25 @@ public class UIManager : MonoBehaviour
 
     public void ShowComputer()
     {
-        computerUI.SetActive(true);
+        if (ComputerUIController.Instance != null)
+        {
+            ComputerUIController.Instance.gameObject.SetActive(true);
+        }
+        else if (computerUI != null)
+        {
+            computerUI.SetActive(true);
+        }
     }
 
     public void HideComputer()
     {
-        computerUI.SetActive(false);
+        if (ComputerUIController.Instance != null)
+        {
+            ComputerUIController.Instance.gameObject.SetActive(false);
+        }
+        else if (computerUI != null)
+        {
+            computerUI.SetActive(false);
+        }
     }
 }

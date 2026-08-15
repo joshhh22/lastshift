@@ -11,7 +11,17 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        var controller = ComputerUIController.Instance;
+        if (controller != null)
+        {
+            if (!controller.gameObject.activeSelf)
+                controller.gameObject.SetActive(true);
 
-        ComputerUIController.Instance.Open();
+            controller.Open();
+        }
+        else
+        {
+            Debug.LogError("[ComputerInteractable] ComputerUIController tidak ditemukan di scene!");
+        }
     }
 }
