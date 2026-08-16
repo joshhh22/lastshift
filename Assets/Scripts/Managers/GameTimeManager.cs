@@ -18,6 +18,7 @@ public class GameTimeManager : MonoBehaviour
     public int Hour { get; private set; }
     public int Minute { get; private set; }
     public bool IsShiftEnded { get; private set; }
+    public string FormattedTime => $"{Hour:00}:{Minute:00}";
 
     private float timer;
 

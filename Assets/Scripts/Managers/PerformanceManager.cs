@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PerformanceManager : MonoBehaviour
@@ -12,6 +13,10 @@ public class PerformanceManager : MonoBehaviour
     public int CorrectDecisions { get; private set; }
     public int WrongDecisions { get; private set; }
     public int PassengersServed { get; private set; }
+
+    [Header("Failure / Violation Log")]
+    private readonly List<string> dayViolations = new List<string>();
+    public IReadOnlyList<string> DayViolations => dayViolations;
 
     private void Awake()
     {
@@ -33,8 +38,22 @@ public class PerformanceManager : MonoBehaviour
 
         CorrectDecisions = 0;
         WrongDecisions = 0;
-
         PassengersServed = 0;
+
+        dayViolations.Clear();
+    }
+
+    public void AddViolation(string violation)
+    {
+        string timeStamp = GameTimeManager.Instance != null ? GameTimeManager.Instance.FormattedTime : "00:00";
+        dayViolations.Add($"[{timeStamp}] {violation}");
+    }
+
+    public void RecordCCTVAnomalyFailure(string camName)
+    {
+        AddViolation($"🚨 KEGAGALAN SISTEM: Terlambat Mengunci / Mengabaikan Anomali di {camName}!");
+        AddPerformance(-20);
+        AddWrongDecision();
     }
 
     public void EvaluateDecision(bool accepted, PassengerData data)
@@ -48,8 +67,9 @@ public class PerformanceManager : MonoBehaviour
             {
                 // Katastrofi jika membiarkan Anomali masuk!
                 AddPerformance(-50);
-                AddHumanity(-10); // Menyelundupkan monster membahayakan penghuni kereta
+                AddHumanity(-10);
                 AddWrongDecision();
+                AddViolation($"🚨 KELALAIAN FATAL: Mengizinkan Entitas Monster / Anomali Masuk ke Stasiun!");
             }
             else
             {
@@ -67,20 +87,31 @@ public class PerformanceManager : MonoBehaviour
         if (accepted)
         {
             if (data.isReasonTrue)
+            {
                 result = DecisionResult.Merciful;
+            }
             else
+            {
                 result = DecisionResult.Gullible;
+                string pName = !string.IsNullOrEmpty(data.passengerName) ? data.passengerName : "Penumpang Anonim";
+                AddViolation($"❌ Meloloskan Penumpang Berdokumen/Alasan Palsu ({pName})");
+            }
         }
         else
         {
             if (data.isReasonTrue)
+            {
                 result = DecisionResult.Heartless;
+                string pName = !string.IsNullOrEmpty(data.passengerName) ? data.passengerName : "Penumpang Anonim";
+                AddViolation($"❌ Menolak Penumpang Sah dengan Tiket Valid ({pName})");
+            }
             else
+            {
                 result = DecisionResult.Correct;
+            }
         }
 
         ApplyResult(result);
-
         AddPassengerServed();
     }
 
@@ -89,27 +120,22 @@ public class PerformanceManager : MonoBehaviour
         switch (result)
         {
             case DecisionResult.Correct:
-                // Kerja bagus = performance naik tipis. Bekerja benar itu sebuah kewajiban.
                 AddPerformance(+2); 
                 AddCorrectDecision();
                 break;
 
             case DecisionResult.Merciful:
-                // Kasihan pada penumpang = Melanggar aturan. Humanity naik, Performance turun.
                 AddPerformance(-5);
                 AddHumanity(+5);
                 AddWrongDecision();
                 break;
 
             case DecisionResult.Gullible:
-                // Ketipu penumpang = Performance anjlok.
                 AddPerformance(-10);
                 AddWrongDecision();
                 break;
 
             case DecisionResult.Heartless:
-                // Menolak penumpang yang jujur dengan kasar = Humanity turun.
-                // Tapi secara teknis kamu ngikutin alat (tiket salah wajar ditolak).
                 AddPerformance(+1);
                 AddHumanity(-10);
                 AddWrongDecision();
@@ -130,20 +156,17 @@ public class PerformanceManager : MonoBehaviour
     }
 
     public void AddCorrectDecision()
-{
-    CorrectDecisions++;
+    {
+        CorrectDecisions++;
+    }
 
-}
+    public void AddWrongDecision()
+    {
+        WrongDecisions++;
+    }
 
-public void AddWrongDecision()
-{
-    WrongDecisions++;
-
-}
-
-public void AddPassengerServed()
-{
-    PassengersServed++;
-
-}
+    public void AddPassengerServed()
+    {
+        PassengersServed++;
+    }
 }

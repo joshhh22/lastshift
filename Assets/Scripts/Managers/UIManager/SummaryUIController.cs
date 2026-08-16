@@ -1,24 +1,53 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SummaryUIController : MonoBehaviour
 {
     public static SummaryUIController Instance;
 
+    [Header("Root & Spawn")]
     [SerializeField] private GameObject root;
     [SerializeField] private Transform playerSpawnPoint;
 
+    [Header("Header & Info")]
+    [SerializeField] private TMP_Text shiftReportTitleText;
     [SerializeField] private TMP_Text dayText;
+    [SerializeField] private TMP_Text stationInfoText;
+
+    [Header("Evaluation Badge & Memo")]
+    [SerializeField] private GameObject evaluationBadgeContainer;
+    [SerializeField] private TMP_Text evaluationBadgeText;
+    [SerializeField] private Image evaluationBadgeBg;
+    [SerializeField] private TMP_Text supervisorMemoText;
+
+    [Header("Statistics Metrics")]
     [SerializeField] private TMP_Text performanceText;
+    [SerializeField] private Image performanceFillBar;
     [SerializeField] private TMP_Text humanityText;
+    [SerializeField] private Image humanityFillBar;
     [SerializeField] private TMP_Text correctText;
     [SerializeField] private TMP_Text wrongText;
     [SerializeField] private TMP_Text servedText;
 
+    [Header("Failure / Violation Logs Container")]
+    [SerializeField] private GameObject failureLogsContainer;
+    [SerializeField] private TMP_Text failureLogsTitleText;
+    [SerializeField] private TMP_Text failureLogsContentText;
+
+    [Header("Footer & Prompt")]
     [SerializeField] private TMP_Text continueText;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip reportOpenSfx;
+    [SerializeField] private AudioClip stampSfx;
+
     private bool opened;
+    private Coroutine activeDisplayRoutine;
 
     private void Awake()
     {
@@ -30,7 +59,11 @@ public class SummaryUIController : MonoBehaviour
 
         Instance = this;
 
-        root.SetActive(false);
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+
+        if (root != null)
+            root.SetActive(false);
     }
 
     private void Update()
@@ -38,7 +71,7 @@ public class SummaryUIController : MonoBehaviour
         if (!opened)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
         {
             NextDay();
         }
@@ -48,39 +81,142 @@ public class SummaryUIController : MonoBehaviour
     {
         opened = true;
 
-        root.SetActive(true);
+        if (root != null)
+            root.SetActive(true);
 
         HideOtherUI(true);
 
+        if (activeDisplayRoutine != null) StopCoroutine(activeDisplayRoutine);
+        activeDisplayRoutine = StartCoroutine(DisplaySummarySequence());
+    }
+
+    private IEnumerator DisplaySummarySequence()
+    {
         PerformanceManager p = PerformanceManager.Instance;
+        int dayNum = DayManager.Instance != null ? DayManager.Instance.CurrentDayNumber : 1;
 
-        dayText.text =
-            $"DAY {DayManager.Instance.CurrentDayNumber} COMPLETE";
+        if (reportOpenSfx != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(reportOpenSfx, 0.8f);
+        }
 
-        performanceText.text =
-            $"Performance : {p.Performance}";
+        // 1. Setup Header Info
+        if (shiftReportTitleText != null)
+            shiftReportTitleText.text = "METRO TRANSIT AUTHORITY // DAILY SHIFT REPORT";
 
-        humanityText.text =
-            $"Humanity : {p.Humanity}";
+        if (dayText != null)
+            dayText.text = $"DAY {dayNum:D2} COMPLETE";
 
-        correctText.text =
-            $"Correct : {p.CorrectDecisions}";
+        if (stationInfoText != null)
+            stationInfoText.text = $"SECTOR 04 SUBWAY // SHIFT: 00:00 - 04:00 AM // OPERATOR ID: #4092-A";
 
-        wrongText.text =
-            $"Wrong : {p.WrongDecisions}";
+        // 2. Metrics & Scores
+        int perf = p != null ? p.Performance : 50;
+        int hum = p != null ? p.Humanity : 50;
+        int corr = p != null ? p.CorrectDecisions : 0;
+        int wrg = p != null ? p.WrongDecisions : 0;
+        int srv = p != null ? p.PassengersServed : 0;
 
-        servedText.text =
-            $"Served : {p.PassengersServed}";
+        if (performanceText != null)
+            performanceText.text = $"PERFORMANCE INDEX : {perf}%";
+
+        if (performanceFillBar != null)
+            performanceFillBar.fillAmount = Mathf.Clamp01(perf / 100f);
+
+        if (humanityText != null)
+            humanityText.text = $"HUMANITY INDEX    : {hum}%";
+
+        if (humanityFillBar != null)
+            humanityFillBar.fillAmount = Mathf.Clamp01(hum / 100f);
+
+        if (correctText != null)
+            correctText.text = $"ACCURATE INSPECTIONS : {corr}";
+
+        if (wrongText != null)
+            wrongText.text = $"PROTOCOL VIOLATIONS  : {wrg}";
+
+        if (servedText != null)
+            servedText.text = $"PASSENGERS PROCESSED : {srv}";
+
+        // 3. Render Failure / Incident Violations Log ("Alasan Kegagalan Hari Itu")
+        IReadOnlyList<string> violations = p != null ? p.DayViolations : null;
+        StringBuilder sb = new StringBuilder();
+
+        if (violations != null && violations.Count > 0)
+        {
+            foreach (string v in violations)
+            {
+                sb.AppendLine($"<color=#FF4D4D>• {v}</color>");
+            }
+        }
+        else
+        {
+            sb.AppendLine("<color=#00FF99>• [04:00] Tidak ada pelanggaran protokol hari ini. Shift berjalan sempurna tanpa insiden.</color>");
+        }
+
+        if (failureLogsContentText != null)
+            failureLogsContentText.text = sb.ToString();
+
+        // 4. Evaluation Badge & Supervisor Psychological Memo
+        string grade;
+        string memo;
+        Color badgeColor;
+
+        if (perf >= 80 && wrg == 0)
+        {
+            grade = "[ EVALUATION: EXCELLARY / SATISFACTORY ]";
+            memo = "\"Pengawas stasiun puas dengan ketelitianmu. Protokol dipatuhi tanpa cela. Jangan lengah di shift berikutnya.\"";
+            badgeColor = new Color(0f, 0.9f, 0.4f, 1f);
+        }
+        else if (perf >= 40)
+        {
+            grade = "[ EVALUATION: WARNING / SUB-OPTIMAL ]";
+            memo = "\"Ada beberapa ketidaktelitian selama shift berlangsung. Pastikan kamu selalu memeriksa CCTV dan dokumen penumpang dengan teliti.\"";
+            badgeColor = new Color(1f, 0.75f, 0.1f, 1f);
+        }
+        else
+        {
+            grade = "[ EVALUATION: CRITICAL RISK / PENALIZED ]";
+            memo = "\"Performa stasiun berada di zona merah bahaya. Sesuatu yang ganjil menyelinap di antara bayangan. Hati-hati saat menutup pintu stasiun.\"";
+            badgeColor = new Color(1f, 0.2f, 0.2f, 1f);
+        }
+
+        if (evaluationBadgeText != null)
+        {
+            evaluationBadgeText.text = grade;
+            evaluationBadgeText.color = badgeColor;
+        }
+
+        if (evaluationBadgeBg != null)
+        {
+            evaluationBadgeBg.color = new Color(badgeColor.r, badgeColor.g, badgeColor.b, 0.2f);
+        }
+
+        if (supervisorMemoText != null)
+        {
+            supervisorMemoText.text = memo;
+        }
+
+        if (stampSfx != null && audioSource != null)
+        {
+            yield return new WaitForSeconds(0.4f);
+            audioSource.PlayOneShot(stampSfx, 0.9f);
+        }
+
+        // 5. Blinking Continue Prompt
+        if (continueText != null)
+        {
+            continueText.text = ">> TEKAN [ENTER / SPASI] UNTUK MEMULAI SHIFT BERIKUTNYA <<";
+        }
     }
 
     void NextDay()
     {
-        // Jika sudah Day 7, trigger ending bukan ganti hari
         if (DayManager.Instance.CurrentDay == GameDay.Day7)
         {
             if (EndingManager.Instance != null)
             {
-                root.SetActive(false);
+                if (root != null) root.SetActive(false);
                 opened = false;
                 HideOtherUI(true);
                 EndingManager.Instance.TriggerEnding();
@@ -97,7 +233,7 @@ public class SummaryUIController : MonoBehaviour
         yield return FadeController.Instance.FadeOut();
 
         // Tutup summary
-        root.SetActive(false);
+        if (root != null) root.SetActive(false);
         opened = false;
 
         // Teleport player
@@ -110,10 +246,6 @@ public class SummaryUIController : MonoBehaviour
             {
                 playerSpawnPoint = sp.transform;
             }
-            else
-            {
-                Debug.LogWarning("PlayerSpawnPoint GameObject not found in scene!");
-            }
         }
 
         if (player != null && playerSpawnPoint != null)
@@ -121,46 +253,27 @@ public class SummaryUIController : MonoBehaviour
             CharacterController cc = player.GetComponent<CharacterController>();
             var fpc = player.GetComponent<StarterAssets.FirstPersonController>();
 
-            if (cc != null)
-                cc.enabled = false;
-            
-            if (fpc != null)
-                fpc.enabled = false;
+            if (cc != null) cc.enabled = false;
+            if (fpc != null) fpc.enabled = false;
 
-            // Naikkan posisi sedikit biar tidak clip/nembus collider lantai
             Vector3 spawnPos = playerSpawnPoint.position;
             spawnPos.y += 0.2f;
 
-            player.transform.SetPositionAndRotation(
-                spawnPos,
-                playerSpawnPoint.rotation);
+            player.transform.SetPositionAndRotation(spawnPos, playerSpawnPoint.rotation);
 
-            // Tunggu 1 frame agar physics engine Unity mensinkronisasi koordinat baru
             yield return null;
 
-            if (cc != null)
-                cc.enabled = true;
-
-            if (fpc != null)
-                fpc.enabled = true;
+            if (cc != null) cc.enabled = true;
+            if (fpc != null) fpc.enabled = true;
         }
 
         // Ganti hari
         DayManager.Instance.NextDay();
 
         // Bersihkan remaining NPCs dan counter status
-        if (NPCSpawner.Instance != null)
-        {
-            NPCSpawner.Instance.ClearRuntimeNPCs();
-        }
-        if (CounterManager.Instance != null)
-        {
-            CounterManager.Instance.ReleaseCounter();
-        }
-        if (NPCDatabase.Instance != null)
-        {
-            NPCDatabase.Instance.ResetDayNPCs();
-        }
+        if (NPCSpawner.Instance != null) NPCSpawner.Instance.ClearRuntimeNPCs();
+        if (CounterManager.Instance != null) CounterManager.Instance.ReleaseCounter();
+        if (NPCDatabase.Instance != null) NPCDatabase.Instance.ResetDayNPCs();
 
         // Reset semua manager
         ObjectiveManager.Instance.ResetObjectives();
@@ -168,78 +281,56 @@ public class SummaryUIController : MonoBehaviour
         GameTimeManager.Instance.ResetTime();
         PassengerScheduleManager.Instance.ResetSchedules();
 
-        // Reset semua trigger objective di scene (misal: trigger masuk ruangan kantor "Go To Office")
         foreach (ObjectiveTrigger trigger in FindObjectsByType<ObjectiveTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (trigger != null)
-                trigger.ResetTrigger();
+            if (trigger != null) trigger.ResetTrigger();
         }
 
-        // Reset semua dialog staff & story trigger
         foreach (CleaningStaffInteraction staff in FindObjectsByType<CleaningStaffInteraction>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (staff != null)
-                staff.ResetForNewDay();
+            if (staff != null) staff.ResetForNewDay();
         }
 
         foreach (SelfDialogueTrigger selfDiag in FindObjectsByType<SelfDialogueTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (selfDiag != null)
-                selfDiag.ResetTrigger();
+            if (selfDiag != null) selfDiag.ResetTrigger();
         }
 
-        // Reset controller shift end
         foreach (ShiftEndController shiftEnd in FindObjectsByType<ShiftEndController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (shiftEnd != null)
-                shiftEnd.ResetController();
+            if (shiftEnd != null) shiftEnd.ResetController();
         }
 
-        // Reset Cleaning Staff ke posisi spawn awal dan stop patrol
-        // (akan mulai jalan lagi setelah dialogue selesai lewat CleaningStaffInteraction)
         CleaningStaffController cleaningStaff = FindFirstObjectByType<CleaningStaffController>();
-        if (cleaningStaff != null)
-            cleaningStaff.ResetToInitialSpawn();
+        if (cleaningStaff != null) cleaningStaff.ResetToInitialSpawn();
 
-        // Reset jumpscare CCTV agar bisa trigger lagi di hari berikutnya
         foreach (CCTVScreamer screamer in FindObjectsByType<CCTVScreamer>(FindObjectsSortMode.None))
             screamer.ResetForNewDay();
 
-        // Fade masuk lagi
         yield return FadeController.Instance.FadeIn();
 
-        // Kembalikan UI Objective dan Markers untuk hari baru
         HideOtherUI(false);
     }
 
     private void HideOtherUI(bool hide)
     {
-        // 1. Sembunyikan/tampilkan ObjectiveUI
         ObjectiveUI objUI = FindFirstObjectByType<ObjectiveUI>(FindObjectsInactive.Include);
-        if (objUI != null)
-            objUI.gameObject.SetActive(!hide);
+        if (objUI != null) objUI.gameObject.SetActive(!hide);
 
-        // 2. Sembunyikan/tampilkan InteractionUI
         if (InteractionUI.Instance != null)
         {
-            if (hide)
-                InteractionUI.Instance.Hide();
-            else
-                InteractionUI.Instance.gameObject.SetActive(true);
+            if (hide) InteractionUI.Instance.Hide();
+            else InteractionUI.Instance.gameObject.SetActive(true);
         }
 
-        // 3. Sembunyikan/tampilkan semua ObjectiveMarkerHUD / marker UI
         foreach (ObjectiveMarkerHUD marker in FindObjectsByType<ObjectiveMarkerHUD>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (marker != null)
-                marker.gameObject.SetActive(!hide);
+            if (marker != null) marker.gameObject.SetActive(!hide);
         }
 
-        // 4. Sembunyikan/tampilkan ObjectiveHighlight
         foreach (ObjectiveHighlight highlight in FindObjectsByType<ObjectiveHighlight>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (highlight != null)
-                highlight.gameObject.SetActive(!hide);
+            if (highlight != null) highlight.gameObject.SetActive(!hide);
         }
     }
 }

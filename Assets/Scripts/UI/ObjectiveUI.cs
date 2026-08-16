@@ -8,7 +8,12 @@ public class ObjectiveUI : MonoBehaviour
 
     public void UpdateUI(int day, string objective)
     {
-        dayText.text = $"DAY {day}";
-        objectiveText.text = objective;
+        if (dayText != null) dayText.text = $"DAY {day}";
+        if (objectiveText != null) objectiveText.text = objective;
+    }
+
+    public void UpdateObjectiveDisplay(string objective)
+    {
+        if (objectiveText != null) objectiveText.text = objective;
     }
 }
