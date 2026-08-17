@@ -19997,7 +19997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75cb88f01529097489468e26e68e9bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DayManager
-  startingDay: 3
+  startingDay: 1
 --- !u!1 &1025172688
 GameObject:
   m_ObjectHideFlags: 0

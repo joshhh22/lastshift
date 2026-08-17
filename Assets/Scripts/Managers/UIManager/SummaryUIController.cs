@@ -46,7 +46,8 @@ public class SummaryUIController : MonoBehaviour
     [SerializeField] private AudioClip reportOpenSfx;
     [SerializeField] private AudioClip stampSfx;
 
-    private bool opened;
+    private bool opened = false;
+    private bool isTransitioning = false;
     private Coroutine activeDisplayRoutine;
 
     private void Awake()
@@ -68,7 +69,7 @@ public class SummaryUIController : MonoBehaviour
 
     private void Update()
     {
-        if (!opened)
+        if (!opened || isTransitioning)
             return;
 
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
@@ -80,6 +81,7 @@ public class SummaryUIController : MonoBehaviour
     public void Open()
     {
         opened = true;
+        isTransitioning = false;
 
         if (root != null)
             root.SetActive(true);
@@ -212,12 +214,15 @@ public class SummaryUIController : MonoBehaviour
 
     void NextDay()
     {
-        if (DayManager.Instance.CurrentDay == GameDay.Day7)
+        if (isTransitioning) return;
+        isTransitioning = true;
+        opened = false;
+
+        if (DayManager.Instance != null && DayManager.Instance.CurrentDay == GameDay.Day7)
         {
             if (EndingManager.Instance != null)
             {
                 if (root != null) root.SetActive(false);
-                opened = false;
                 HideOtherUI(true);
                 EndingManager.Instance.TriggerEnding();
             }
@@ -234,7 +239,6 @@ public class SummaryUIController : MonoBehaviour
 
         // Tutup summary
         if (root != null) root.SetActive(false);
-        opened = false;
 
         // Teleport player
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -267,8 +271,11 @@ public class SummaryUIController : MonoBehaviour
             if (fpc != null) fpc.enabled = true;
         }
 
-        // Ganti hari
-        DayManager.Instance.NextDay();
+        // Ganti hari tepat 1 kali
+        if (DayManager.Instance != null)
+        {
+            DayManager.Instance.NextDay();
+        }
 
         // Bersihkan remaining NPCs dan counter status
         if (NPCSpawner.Instance != null) NPCSpawner.Instance.ClearRuntimeNPCs();
@@ -276,10 +283,10 @@ public class SummaryUIController : MonoBehaviour
         if (NPCDatabase.Instance != null) NPCDatabase.Instance.ResetDayNPCs();
 
         // Reset semua manager
-        ObjectiveManager.Instance.ResetObjectives();
-        PerformanceManager.Instance.ResetDay();
-        GameTimeManager.Instance.ResetTime();
-        PassengerScheduleManager.Instance.ResetSchedules();
+        if (ObjectiveManager.Instance != null) ObjectiveManager.Instance.ResetObjectives();
+        if (PerformanceManager.Instance != null) PerformanceManager.Instance.ResetDay();
+        if (GameTimeManager.Instance != null) GameTimeManager.Instance.ResetTime();
+        if (PassengerScheduleManager.Instance != null) PassengerScheduleManager.Instance.ResetSchedules();
 
         foreach (ObjectiveTrigger trigger in FindObjectsByType<ObjectiveTrigger>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
@@ -310,6 +317,7 @@ public class SummaryUIController : MonoBehaviour
         yield return FadeController.Instance.FadeIn();
 
         HideOtherUI(false);
+        isTransitioning = false;
     }
 
     private void HideOtherUI(bool hide)

@@ -134,6 +134,11 @@ public class ObjectiveManager : MonoBehaviour
         OnObjectiveChanged?.Invoke(obj.title);
     }
 
+    public void RefreshCurrentObjective()
+    {
+        ShowCurrentObjective();
+    }
+
     public string GetCurrentObjective()
     {
         if (currentObjectiveIndex >= objectives.Count)

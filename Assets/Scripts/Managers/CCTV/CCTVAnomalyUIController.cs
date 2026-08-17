@@ -19,7 +19,7 @@ public class CCTVAnomalyUIController : MonoBehaviour
     [SerializeField] private RectTransform qteGreenZone;
     [SerializeField] private RectTransform qtePointer;
     [SerializeField] private TMP_Text qteStatusText;
-    [SerializeField] private float qtePointerSpeed = 2.8f;
+    [SerializeField] private float qtePointerSpeed = 3.6f;
 
     [Header("Monster 2: Glitch Stare & Hold Lockdown")]
     [SerializeField] private GameObject glitchStaticOverlay;
@@ -36,14 +36,17 @@ public class CCTVAnomalyUIController : MonoBehaviour
     [SerializeField] private AudioClip qteFailSfx;
     [SerializeField] private AudioClip gateCloseSfx;
 
-    // Monster 1 QTE State
+    // Monster 1 QTE State (Anti-Spam & Harder Timing)
     private bool isMonster1Active = false;
     private bool isQTEActive = false;
     private bool isQTEPassed = false;
     private bool hasTriggeredCrawl = false;
     private float qteTimer = 0f;
     private float barHalfWidth = 140f;
-    private float greenZoneHalfWidth = 38f;
+    private float greenZoneHalfWidth = 22f; // Zona hijau lebih sempit (~44px)
+    private float currentGreenZoneX = 0f;
+    private float dynamicPointerSpeed = 3.6f;
+    private float missLockoutTimer = 0f;
 
     // Monster 2 Stare 3s State
     private bool isStarePhaseActive = false;
@@ -116,10 +119,20 @@ public class CCTVAnomalyUIController : MonoBehaviour
             }
         }
 
-        // QTE Minigame Logic
+        // QTE Minigame Logic (Anti-Spam & Harder Timing)
         if (isQTEActive && !isQTEPassed && isLookingAtTargetCam)
         {
-            qteTimer += Time.deltaTime * qtePointerSpeed;
+            if (missLockoutTimer > 0f)
+            {
+                missLockoutTimer -= Time.deltaTime;
+                if (missLockoutTimer <= 0f && qteStatusText != null)
+                {
+                    qteStatusText.text = "TEKAN <b>[SPASI]</b> SAAT JARUM DI ZONA HIJAU!";
+                    qteStatusText.color = Color.white;
+                }
+            }
+
+            qteTimer += Time.deltaTime * dynamicPointerSpeed;
             float pingPongX = Mathf.Sin(qteTimer * Mathf.PI) * barHalfWidth;
             if (qtePointer != null)
             {
@@ -279,6 +292,16 @@ public class CCTVAnomalyUIController : MonoBehaviour
         isQTEActive = true;
         isQTEPassed = false;
         qteTimer = 0f;
+        missLockoutTimer = 0f;
+        dynamicPointerSpeed = qtePointerSpeed > 0 ? qtePointerSpeed : 3.6f;
+
+        // Posisi Zona Hijau Diacak agar pemain tidak bisa menghafal posisi
+        currentGreenZoneX = Random.Range(-90f, 90f);
+        if (qteGreenZone != null)
+        {
+            qteGreenZone.anchoredPosition = new Vector2(currentGreenZoneX, 0);
+            qteGreenZone.sizeDelta = new Vector2(greenZoneHalfWidth * 2f, qteGreenZone.sizeDelta.y);
+        }
 
         if (qteStatusText != null)
         {
@@ -289,7 +312,12 @@ public class CCTVAnomalyUIController : MonoBehaviour
 
     private void CheckQTEHit(float pointerX)
     {
-        if (Mathf.Abs(pointerX) <= greenZoneHalfWidth)
+        // Anti-Spam: Abaikan input jika masih terkena penalti miss lockout
+        if (missLockoutTimer > 0f) return;
+
+        float distance = Mathf.Abs(pointerX - currentGreenZoneX);
+
+        if (distance <= greenZoneHalfWidth)
         {
             isQTEPassed = true;
             isQTEActive = false;
@@ -307,10 +335,21 @@ public class CCTVAnomalyUIController : MonoBehaviour
         }
         else
         {
+            // Penalti Anti-Spam: Kunci input selama 0.45s, acak ulang posisi zona hijau, dan percepat jarum!
+            missLockoutTimer = 0.45f;
+            dynamicPointerSpeed += 0.35f;
+
+            currentGreenZoneX = Random.Range(-90f, 90f);
+            if (qteGreenZone != null)
+            {
+                qteGreenZone.anchoredPosition = new Vector2(currentGreenZoneX, 0);
+            }
+
             if (qteStatusText != null)
             {
-                qteStatusText.text = "<color=#FF3333><b>MISS! COBA LAGI!</b></color>";
+                qteStatusText.text = "<color=#FF3333><b>MISS! INPUT TERKUNCI 0.5s!</b></color>";
             }
+
             PlaySound(qteFailSfx);
             StartCoroutine(ShakeQTEBar());
         }
@@ -345,8 +384,8 @@ public class CCTVAnomalyUIController : MonoBehaviour
         Vector2 origPos = qteBarBase.anchoredPosition;
         for (int i = 0; i < 6; i++)
         {
-            qteBarBase.anchoredPosition = origPos + new Vector2(Random.Range(-8f, 8f), 0);
-            yield return new WaitForSeconds(0.04f);
+            qteBarBase.anchoredPosition = origPos + new Vector2(Random.Range(-10f, 10f), 0);
+            yield return new WaitForSeconds(0.035f);
         }
         qteBarBase.anchoredPosition = origPos;
     }
@@ -373,6 +412,7 @@ public class CCTVAnomalyUIController : MonoBehaviour
         isStarePhaseActive = false;
         isHoldLockdownActive = false;
         hasTriggeredCrawl = false;
+        missLockoutTimer = 0f;
 
         if (warningBanner != null) warningBanner.SetActive(false);
         if (emergencyLockdownBtn != null) emergencyLockdownBtn.gameObject.SetActive(false);

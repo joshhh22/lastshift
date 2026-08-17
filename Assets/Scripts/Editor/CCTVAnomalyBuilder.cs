@@ -220,14 +220,14 @@ public class CCTVAnomalyBuilder
         Image bbImg = barBase.AddComponent<Image>();
         bbImg.color = new Color(0.12f, 0.14f, 0.18f, 1f);
 
-        // QTE Green Zone
+        // QTE Green Zone (Zona Hijau Lebih Sempit ~44px untuk Tantangan Presisi)
         GameObject greenZone = CreateUIObject("GreenZone", barBase.transform);
         RectTransform gzRt = greenZone.GetComponent<RectTransform>();
         gzRt.anchorMin = new Vector2(0.5f, 0.5f);
         gzRt.anchorMax = new Vector2(0.5f, 0.5f);
         gzRt.pivot = new Vector2(0.5f, 0.5f);
         gzRt.anchoredPosition = Vector2.zero;
-        gzRt.sizeDelta = new Vector2(76, 18);
+        gzRt.sizeDelta = new Vector2(44, 18);
 
         Image gzImg = greenZone.AddComponent<Image>();
         gzImg.color = new Color(0f, 0.9f, 0.35f, 1f);
@@ -246,8 +246,6 @@ public class CCTVAnomalyBuilder
         pTxt.fontSize = 16;
         pTxt.fontStyle = FontStyles.Bold;
         pTxt.alignment = TextAlignmentOptions.Center;
-        pTxt.color = new Color(1f, 0.35f, 0.1f, 1f);
-        pTxt.text = "▲";
         pTxt.color = new Color(1f, 0.35f, 0.1f, 1f);
         pTxt.text = "▲";
 

@@ -99,6 +99,12 @@ public class CCTVAnomalyManager : MonoBehaviour
             }
         }
 
+        if (activeCountdownRoutine != null)
+        {
+            StopCoroutine(activeCountdownRoutine);
+            activeCountdownRoutine = null;
+        }
+
         if (alarmAudioSource != null && alarmAudioSource.isPlaying)
         {
             alarmAudioSource.Stop();
@@ -107,11 +113,17 @@ public class CCTVAnomalyManager : MonoBehaviour
         if (currentSpawnedMonster != null)
         {
             Destroy(currentSpawnedMonster.gameObject);
+            currentSpawnedMonster = null;
         }
 
         if (CCTVAnomalyUIController.Instance != null)
         {
             CCTVAnomalyUIController.Instance.HideAllAnomalyUI();
+        }
+
+        if (ObjectiveManager.Instance != null)
+        {
+            ObjectiveManager.Instance.RefreshCurrentObjective();
         }
     }
 
@@ -409,14 +421,10 @@ public class CCTVAnomalyManager : MonoBehaviour
             CCTVAnomalyUIController.Instance.HideAllAnomalyUI();
         }
 
-        // Kembalikan teks objective ke semula
+        // Kembalikan teks objective ke semula sesuai ObjectiveManager
         if (ObjectiveManager.Instance != null)
         {
-            ObjectiveUI ui = FindFirstObjectByType<ObjectiveUI>();
-            if (ui != null)
-            {
-                ui.UpdateObjectiveDisplay("Continue Working Until Shift Ends");
-            }
+            ObjectiveManager.Instance.RefreshCurrentObjective();
         }
 
         if (success && PerformanceManager.Instance != null)

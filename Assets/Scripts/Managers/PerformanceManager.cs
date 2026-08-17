@@ -58,6 +58,8 @@ public class PerformanceManager : MonoBehaviour
 
     public void EvaluateDecision(bool accepted, PassengerData data)
     {
+        string pName = !string.IsNullOrEmpty(data.passengerName) ? data.passengerName : "Penumpang Anonim";
+
         // =====================================
         // PENGECEKAN KHUSUS MONSTER ANOMALI
         // =====================================
@@ -69,7 +71,7 @@ public class PerformanceManager : MonoBehaviour
                 AddPerformance(-50);
                 AddHumanity(-10);
                 AddWrongDecision();
-                AddViolation($"🚨 KELALAIAN FATAL: Mengizinkan Entitas Monster / Anomali Masuk ke Stasiun!");
+                AddViolation($"🚨 KELALAIAN FATAL: Mengizinkan Entitas Monster / Anomali Masuk ke Stasiun! ({pName})");
             }
             else
             {
@@ -89,11 +91,11 @@ public class PerformanceManager : MonoBehaviour
             if (data.isReasonTrue)
             {
                 result = DecisionResult.Merciful;
+                AddViolation($"⚠️ Meloloskan Penumpang Tanpa Prosedur Standar / Izin Khusus ({pName})");
             }
             else
             {
                 result = DecisionResult.Gullible;
-                string pName = !string.IsNullOrEmpty(data.passengerName) ? data.passengerName : "Penumpang Anonim";
                 AddViolation($"❌ Meloloskan Penumpang Berdokumen/Alasan Palsu ({pName})");
             }
         }
@@ -102,7 +104,6 @@ public class PerformanceManager : MonoBehaviour
             if (data.isReasonTrue)
             {
                 result = DecisionResult.Heartless;
-                string pName = !string.IsNullOrEmpty(data.passengerName) ? data.passengerName : "Penumpang Anonim";
                 AddViolation($"❌ Menolak Penumpang Sah dengan Tiket Valid ({pName})");
             }
             else
