@@ -129,13 +129,15 @@ public class CCTVAnomalyManager : MonoBehaviour
 
     private void Update()
     {
-        // Debug Key [F9] untuk memicu event secara instan saat testing
+#if UNITY_EDITOR
+        // Debug Key [F9] untuk memicu event secara instan saat testing di Editor
         if (Input.GetKeyDown(KeyCode.F9))
         {
             Debug.Log("<color=yellow>[CCTVAnomalyManager]</color> Force Trigger Anomaly Event (F9)");
             TriggerAnomalyEvent();
             return;
         }
+#endif
 
         // Pastikan reset saat ganti hari
         if (DayManager.Instance != null && (int)DayManager.Instance.CurrentDay != currentTrackingDay)

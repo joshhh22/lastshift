@@ -21,14 +21,16 @@ public class NPCSpawner : MonoBehaviour
         Instance = this;
     }
 
+#if UNITY_EDITOR
     private void Update()
     {
-        // DEBUG
+        // Debug Key [P] hanya aktif saat Play di Editor
         if (Input.GetKeyDown(KeyCode.P))
         {
             SpawnNPC();
         }
     }
+#endif
 
     public void SpawnNPC()
     {
