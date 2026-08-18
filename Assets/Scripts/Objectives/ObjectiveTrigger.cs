@@ -28,6 +28,10 @@ public class ObjectiveTrigger : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
+        // JANGAN trigger jika pemain sedang monolog awal atau terkunci di awal game
+        if (PlayerLockManager.Instance != null && PlayerLockManager.Instance.IsLocked)
+            return;
+
         if (ObjectiveManager.Instance == null)
             return;
 

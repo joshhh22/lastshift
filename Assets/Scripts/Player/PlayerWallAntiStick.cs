@@ -9,6 +9,7 @@ public class PlayerWallAntiStick : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        SnapToFloorAndFaceForward();
     }
 
     private void Start()
@@ -66,6 +67,7 @@ public class PlayerWallAntiStick : MonoBehaviour
             }
         }
 
+        Physics.SyncTransforms();
         if (wasEnabled) controller.enabled = true;
     }
 

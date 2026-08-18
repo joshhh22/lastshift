@@ -236,11 +236,42 @@ public class GameplayPolisher
             Debug.Log("<color=green>[GameplayPolisher]</color> Passenger Service UI berhasil dipercantik dengan tema Retro VHS.");
         }
 
+        // =========================================================================
+        // 5. PASANG OBJECTIVE OUTLINE MANAGER & FIX MODEL READ/WRITE
+        // =========================================================================
+        ObjectiveOutlineManager outlineMgr = Object.FindObjectOfType<ObjectiveOutlineManager>(true);
+        if (outlineMgr == null)
+        {
+            GameObject outlineObj = new GameObject("ObjectiveOutlineManager");
+            outlineMgr = outlineObj.AddComponent<ObjectiveOutlineManager>();
+            EditorUtility.SetDirty(outlineObj);
+            Debug.Log("<color=green>[GameplayPolisher]</color> ObjectiveOutlineManager berhasil dipasang.");
+        }
+
+        // Fix Read/Write Enabled on 3D Model Assets agar QuickOutline mulus tanpa error
+        string[] modelGuids = AssetDatabase.FindAssets("t:Model", new[] { "Assets/Art" });
+        int fixedCount = 0;
+        foreach (string guid in modelGuids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            ModelImporter importer = AssetImporter.GetAtPath(path) as ModelImporter;
+            if (importer != null && !importer.isReadable)
+            {
+                importer.isReadable = true;
+                importer.SaveAndReimport();
+                fixedCount++;
+            }
+        }
+        if (fixedCount > 0)
+        {
+            Debug.Log($"<color=green>[GameplayPolisher]</color> Diaktifkan Read/Write pada {fixedCount} model 3D.");
+        }
+
         // Simpan Scene
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
 
-        EditorUtility.DisplayDialog("Sukses!", "Polesan Gameplay Berhasil Diterapkan:\n\n1. Sudut Kamera: TopClamp 85 & BottomClamp -85 (Nengok atas/bawah bebas & tidak kaku).\n2. Crosshair: Dikecilkan menjadi titik 5x5 pixel yang minimalis & elegan.\n3. Dialog Internal (Monologue): Dialog batin naratif otomatis memandu objektif player.\n4. UI Passenger Service: Dipercantik dengan gaya Retro Analog Horror.\n5. AFK Protection: Jam & Shift End tidak akan desync jika player AFK.", "Luar Biasa!");
+        EditorUtility.DisplayDialog("Sukses!", "Polesan Gameplay Berhasil Diterapkan:\n\n1. Sudut Kamera: TopClamp 85 & BottomClamp -85 (Nengok atas/bawah bebas & tidak kaku).\n2. Crosshair: Dikecilkan menjadi titik 5x5 pixel yang minimalis & elegan.\n3. Dialog Internal (Monologue): Dialog batin naratif otomatis memandu objektif player.\n4. QuickOutline: Outline aktif presisi pada CardReader & Computer saat objektif terkait.\n5. Model 3D Read/Write: Diperbaiki agar tidak ada error get_vertices di console.", "Luar Biasa!");
     }
 }
 #endif
