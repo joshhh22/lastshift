@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PhoneManager : MonoBehaviour
 {
-    public static PhoneManager Instance;
+    public static PhoneManager Instance { get; private set; }
 
     [Header("UI")]
     [SerializeField] private GameObject phoneUI;

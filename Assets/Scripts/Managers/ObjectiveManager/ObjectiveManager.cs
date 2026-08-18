@@ -13,6 +13,7 @@ public class ObjectiveManager : MonoBehaviour
     [SerializeField] private List<Objective> objectives = new();
 
     private int currentObjectiveIndex = 0;
+    private AssignmentPage cachedAssignmentPage;
 
     [Header("Objective Events")]
     [SerializeField] private UnityEvent[] objectiveEvents;
@@ -33,6 +34,9 @@ public class ObjectiveManager : MonoBehaviour
 
     private void Start()
     {
+        if (cachedAssignmentPage == null)
+            cachedAssignmentPage = FindFirstObjectByType<AssignmentPage>(FindObjectsInactive.Include);
+
         ShowCurrentObjective();
     }
 
@@ -55,28 +59,26 @@ public class ObjectiveManager : MonoBehaviour
 
         currentObjectiveIndex++;
 
+        RefreshAssignmentPageUI();
+
         if (currentObjectiveIndex >= objectives.Count)
         {
             Debug.Log("All Objectives Completed");
-
-            AssignmentPage assignmentPage = FindFirstObjectByType<AssignmentPage>();
-
-            if (assignmentPage != null)
-            {
-                assignmentPage.RefreshObjectives();
-            }
-
             return;
         }
 
-        AssignmentPage assignmentPageAfter = FindFirstObjectByType<AssignmentPage>();
-
-        if (assignmentPageAfter != null)
-        {
-            assignmentPageAfter.RefreshObjectives();
-        }
-
         ShowCurrentObjective();
+    }
+
+    private void RefreshAssignmentPageUI()
+    {
+        if (cachedAssignmentPage == null)
+            cachedAssignmentPage = FindFirstObjectByType<AssignmentPage>(FindObjectsInactive.Include);
+
+        if (cachedAssignmentPage != null)
+        {
+            cachedAssignmentPage.RefreshObjectives();
+        }
     }
 
     public void AddProgress(int amount = 1)

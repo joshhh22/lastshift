@@ -12,7 +12,7 @@ using StarterAssets;
 [RequireComponent(typeof(Camera))]
 public class CameraHeadBob : MonoBehaviour
 {
-    public static CameraHeadBob Instance;
+    public static CameraHeadBob Instance { get; private set; }
 
     [Header("References")]
     [SerializeField] private CharacterController characterController;

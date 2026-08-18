@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameTimeManager : MonoBehaviour
 {
-    public static GameTimeManager Instance;
+    public static GameTimeManager Instance { get; private set; }
 
     [Header("Start Time (22:00 - 04:00 AM Shift)")]
     [SerializeField] private int startHour = 22;

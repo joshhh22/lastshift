@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class FadeController : MonoBehaviour
 {
-    public static FadeController Instance;
+    public static FadeController Instance { get; private set; }
 
     [SerializeField] private Image fadeImage;
     [SerializeField] private float fadeDuration = 1.0f;

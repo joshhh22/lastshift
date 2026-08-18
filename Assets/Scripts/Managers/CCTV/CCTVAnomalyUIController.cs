@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class CCTVAnomalyUIController : MonoBehaviour
 {
-    public static CCTVAnomalyUIController Instance;
+    public static CCTVAnomalyUIController Instance { get; private set; }
 
     [Header("Warning & Header UI")]
     [SerializeField] private GameObject warningBanner;

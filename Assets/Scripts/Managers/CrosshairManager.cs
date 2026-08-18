@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class CrosshairManager : MonoBehaviour
 {
-    public static CrosshairManager Instance;
+    public static CrosshairManager Instance { get; private set; }
 
     [SerializeField] private GameObject crosshairRoot;
 

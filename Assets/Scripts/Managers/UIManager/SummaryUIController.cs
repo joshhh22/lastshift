@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class SummaryUIController : MonoBehaviour
 {
-    public static SummaryUIController Instance;
+    public static SummaryUIController Instance { get; private set; }
 
     [Header("Root & Spawn")]
     [SerializeField] private GameObject root;

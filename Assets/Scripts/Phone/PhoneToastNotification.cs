@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PhoneToastNotification : MonoBehaviour
 {
-    public static PhoneToastNotification Instance;
+    public static PhoneToastNotification Instance { get; private set; }
 
     [Header("UI References")]
     [SerializeField] private CanvasGroup canvasGroup;

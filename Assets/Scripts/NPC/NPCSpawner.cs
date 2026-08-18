@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NPCSpawner : MonoBehaviour
 {
-    public static NPCSpawner Instance;
+    public static NPCSpawner Instance { get; private set; }
 
     [Header("References")]
     [SerializeField] private CounterManager counterManager;

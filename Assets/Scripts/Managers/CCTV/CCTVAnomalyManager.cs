@@ -9,7 +9,7 @@ public enum AnomalyMonsterType
 
 public class CCTVAnomalyManager : MonoBehaviour
 {
-    public static CCTVAnomalyManager Instance;
+    public static CCTVAnomalyManager Instance { get; private set; }
 
     [Header("Prefabs")]
     [SerializeField] private GameObject monster1Prefab;

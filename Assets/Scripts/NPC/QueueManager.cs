@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class QueueManager : MonoBehaviour
 {
-    public static QueueManager Instance;
+    public static QueueManager Instance { get; private set; }
 
     [Header("Queue Points")]
     [SerializeField] private Transform[] queuePoints;

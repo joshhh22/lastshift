@@ -15,7 +15,7 @@ public struct ChatMessageItem
 
 public class PhoneChatController : MonoBehaviour
 {
-    public static PhoneChatController Instance;
+    public static PhoneChatController Instance { get; private set; }
 
     [Header("Header UI")]
     [SerializeField] private TMP_Text contactTitleText;

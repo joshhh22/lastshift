@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NPCDatabase : MonoBehaviour
 {
-    public static NPCDatabase Instance;
+    public static NPCDatabase Instance { get; private set; }
 
     [Header("Male NPC")]
     [SerializeField] private List<NPCController> malePrefabs = new();

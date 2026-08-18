@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class PlayerMonologueManager : MonoBehaviour
 {
-    public static PlayerMonologueManager Instance;
+    public static PlayerMonologueManager Instance { get; private set; }
 
     [Header("Objective Thought Subtitle UI (No Background Box)")]
     [SerializeField] private GameObject thoughtContainer;

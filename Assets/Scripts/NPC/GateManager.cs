@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GateManager : MonoBehaviour
 {
-    public static GateManager Instance;
+    public static GateManager Instance { get; private set; }
 
     [SerializeField] private TicketGate gate;
 

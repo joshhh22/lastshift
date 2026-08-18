@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PassengerScheduleManager : MonoBehaviour
 {
-    public static PassengerScheduleManager Instance;
+    public static PassengerScheduleManager Instance { get; private set; }
 
     [Header("Schedules")]
     [SerializeField] private List<PassengerSchedule> schedules = new();
@@ -21,6 +21,9 @@ public class PassengerScheduleManager : MonoBehaviour
 
     private void Update()
     {
+        if (schedules == null || schedules.Count == 0)
+            return;
+
         if (ObjectiveManager.Instance == null)
             return;
 

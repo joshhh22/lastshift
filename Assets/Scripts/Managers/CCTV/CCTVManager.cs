@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CCTVManager : MonoBehaviour
 {
-    public static CCTVManager Instance;
+    public static CCTVManager Instance { get; private set; }
 
     [Header("CCTV Cameras")]
     [SerializeField] private Camera[] cameras;

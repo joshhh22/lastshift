@@ -3,7 +3,7 @@ using StarterAssets;
 
 public class PlayerLockManager : MonoBehaviour
 {
-    public static PlayerLockManager Instance;
+    public static PlayerLockManager Instance { get; private set; }
 
     [SerializeField] private StarterAssetsInputs starterInput;
     [SerializeField] private StarterAssets.FirstPersonController controller;
