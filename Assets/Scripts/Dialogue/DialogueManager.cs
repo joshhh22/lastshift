@@ -169,11 +169,17 @@ public class DialogueManager : MonoBehaviour
         if (PlayerLockManager.Instance != null)
             PlayerLockManager.Instance.UnlockPlayer();
 
-        onDialogueFinished?.Invoke();
-
         Action callback = currentOnFinishedCallback;
         currentOnFinishedCallback = null;
-        callback?.Invoke();
+
+        if (callback != null)
+        {
+            callback.Invoke();
+        }
+        else
+        {
+            onDialogueFinished?.Invoke();
+        }
     }
 
     public bool IsPlaying()

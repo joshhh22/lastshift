@@ -142,6 +142,19 @@ public class GameplayPolisher
                 }
                 EditorUtility.SetDirty(dt.gameObject);
             }
+
+            // Hapus listener CompleteObjective global yang salah dari DialogueManager.onDialogueFinished agar monolog tidak lompat objektif
+            int count = diagMgr.onDialogueFinished.GetPersistentEventCount();
+            for (int i = count - 1; i >= 0; i--)
+            {
+                if (diagMgr.onDialogueFinished.GetPersistentMethodName(i) == "CompleteObjective")
+                {
+                    UnityEditor.Events.UnityEventTools.RemovePersistentListener(diagMgr.onDialogueFinished, i);
+                    EditorUtility.SetDirty(diagMgr);
+                    Debug.Log("<color=green>[GameplayPolisher]</color> Dihapus CompleteObjective dari DialogueManager.onDialogueFinished.");
+                }
+            }
+
             Debug.Log("<color=green>[GameplayPolisher]</color> Dialogue UI diposisikan di bawah dengan background hitam 70% opacity.");
         }
 
