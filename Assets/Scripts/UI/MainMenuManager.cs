@@ -31,22 +31,30 @@ public class MainMenuManager : MonoBehaviour
     [Header("Prologue UI")]
     public GameObject prologueCanvas;
     public TMP_Text prologueText;
+    public TMP_Text prologuePromptText; // Petunjuk [E / SPASI] LANJUT
 
     public TypewriterEffect typewriterEffect;
 
+    [Header("Fade UI")]
+    [SerializeField] private Image fadeOverlay;
+
     [Header("Settings")]
     public string gameSceneName = "Gameplay";
-    public float textStayDuration = 2f;
-    public float fadeDuration = 1.0f;
+    public float textStayDuration = 3f;
+    public float fadeDuration = 0.6f;
 
     [TextArea(2, 5)]
     public string[] prologueLines;
 
     public static MainMenuManager Instance { get; private set; }
 
+    private bool isTransitioning = false;
+
     private void Awake()
     {
         Instance = this;
+
+        CreateFadeOverlayIfMissing();
     }
 
     private void Start()
@@ -72,6 +80,36 @@ public class MainMenuManager : MonoBehaviour
         // Pasang listener tombol Guide sub-menu
         if (hintsButton != null) hintsButton.onClick.AddListener(OpenHints);
         if (swipeMechanicButton != null) swipeMechanicButton.onClick.AddListener(OpenSwipeMechanic);
+
+        // Smooth fade-in saat pertama kali masuk Main Menu
+        if (fadeOverlay != null)
+        {
+            StartCoroutine(FadeScreen(1f, 0f, 0.8f));
+        }
+    }
+
+    private void CreateFadeOverlayIfMissing()
+    {
+        if (fadeOverlay != null) return;
+
+        Canvas canvas = GetComponentInChildren<Canvas>(true);
+        if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null) return;
+
+        GameObject fadeObj = new GameObject("ScreenFadeOverlay", typeof(RectTransform));
+        fadeObj.transform.SetParent(canvas.transform, false);
+        fadeObj.transform.SetAsLastSibling();
+
+        RectTransform rt = fadeObj.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.one;
+
+        Image img = fadeObj.AddComponent<Image>();
+        img.color = Color.black;
+        img.raycastTarget = false;
+        fadeOverlay = img;
     }
 
     private void Update()
@@ -108,7 +146,6 @@ public class MainMenuManager : MonoBehaviour
     {
         float scrollDelta = Input.GetAxis("Mouse ScrollWheel");
 
-        // Jika menggunakan ScrollRect standar Unity UI
         if (swipeScrollRect != null)
         {
             if (scrollDelta != 0f)
@@ -127,7 +164,6 @@ public class MainMenuManager : MonoBehaviour
                 swipeScrollRect.verticalNormalizedPosition = Mathf.Clamp01(swipeScrollRect.verticalNormalizedPosition);
             }
         }
-        // Jika menggunakan pergeseran posisi RectTransform teks langsung
         else if (swipeTextRect != null)
         {
             Vector2 pos = swipeTextRect.anchoredPosition;
@@ -175,7 +211,6 @@ public class MainMenuManager : MonoBehaviour
 
         if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(true);
 
-        // Reset scroll ke paling atas
         if (swipeScrollRect != null)
         {
             swipeScrollRect.verticalNormalizedPosition = 1f;
@@ -216,63 +251,132 @@ public class MainMenuManager : MonoBehaviour
 
     public void StartPrologue()
     {
-        // Hilangkan menu utama
-        mainMenuCanvas.SetActive(false);
-        // Tampilkan layar hitam prologue
-        prologueCanvas.SetActive(true);
-        // Teks awal jadikan putih penuh (alpha 1) karena akan diketik satu per satu
-        SetTextAlpha(1);
-        prologueText.text = "";
+        if (isTransitioning) return;
+        StartCoroutine(StartPrologueWithFadeRoutine());
+    }
 
-        StartCoroutine(PrologueRoutine());
+    private IEnumerator StartPrologueWithFadeRoutine()
+    {
+        isTransitioning = true;
+
+        // 1. Fade out Main Menu ke hitam
+        yield return FadeScreen(0f, 1f, 0.5f);
+
+        if (mainMenuCanvas != null) mainMenuCanvas.SetActive(false);
+        if (prologueCanvas != null) prologueCanvas.SetActive(true);
+        if (prologueText != null) prologueText.text = "";
+
+        // 2. Fade in ke Prologue Screen
+        yield return FadeScreen(1f, 0f, 0.5f);
+
+        // 3. Mainkan Prologue baris demi baris
+        yield return StartCoroutine(PrologueRoutine());
     }
 
     private IEnumerator PrologueRoutine()
     {
-        // Jeda bentar sebelum teks pertama muncul (biar dramatis)
-        yield return new WaitForSeconds(1f);
-
-        // Putar semua kalimat prologue satu per satu
-        foreach (string line in prologueLines)
+        if (prologueLines == null || prologueLines.Length == 0)
         {
-            // Mulai ngetik
-            SetTextAlpha(1); 
-            typewriterEffect.StartTyping(prologueText, line);
+            yield return StartCoroutine(FinishPrologueAndLoadGame());
+            yield break;
+        }
 
-            // Tunggu sampai typewriter selesai ngetik huruf terakhir
-            while (typewriterEffect.IsTyping)
+        for (int i = 0; i < prologueLines.Length; i++)
+        {
+            string line = prologueLines[i];
+
+            SetTextAlpha(1);
+            if (typewriterEffect != null && prologueText != null)
             {
+                typewriterEffect.StartTyping(prologueText, line);
+            }
+            else if (prologueText != null)
+            {
+                prologueText.text = line;
+            }
+
+            // Tunggu ngetik sambil bisa ditekan [E/Spasi/Enter/Klik] untuk selesaikan ngetik baris ini
+            while (typewriterEffect != null && typewriterEffect.IsTyping)
+            {
+                if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                {
+                    typewriterEffect.CompleteTyping();
+                    break;
+                }
                 yield return null;
             }
 
-            // Tunggu orang baca setelah selesai ngetik
-            yield return new WaitForSeconds(textStayDuration);
+            // Tunggu input pemain untuk lanjut ke kalimat berikutnya ATAU tunggu durasi stay
+            float elapsed = 0f;
+            yield return null; // Jeda 1 frame agar input ketik tidak tembus ke skip baris
 
-            // Fade Out (Menghilang perlahan)
-            if (line != prologueLines[prologueLines.Length - 1]) // Kecuali kalimat terakhir
+            while (elapsed < textStayDuration)
             {
-                yield return FadeText(1f, 0f, fadeDuration);
-                prologueText.text = ""; // Bersihkan text biar siap ngetik kalimat baru
-                yield return new WaitForSeconds(0.5f);
+                if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                {
+                    break; // Skip ke baris berikutnya
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            // Fade Out baris sebelum berganti ke baris selanjutnya
+            if (i < prologueLines.Length - 1)
+            {
+                yield return FadeText(1f, 0f, 0.35f);
+                if (prologueText != null) prologueText.text = "";
+                yield return new WaitForSeconds(0.2f);
             }
         }
 
-        // Tahan kalimat terakhir agak lama
-        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(FinishPrologueAndLoadGame());
+    }
 
-        // Tunggu transisi masuk ke gameplay perlahan
-        prologueText.text = "Loading...";
-        
-        // Sembunyikan dan kunci cursor sebelum masuk ke dalam game
+    private IEnumerator FinishPrologueAndLoadGame()
+    {
+        // Fade out Prologue ke hitam sebelum loading scene gameplay
+        yield return FadeScreen(0f, 1f, 0.7f);
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        // Pindah Scene
         SceneManager.LoadScene(gameSceneName);
+    }
+
+    public IEnumerator FadeScreen(float startAlpha, float endAlpha, float duration)
+    {
+        if (fadeOverlay == null)
+        {
+            CreateFadeOverlayIfMissing();
+        }
+
+        if (fadeOverlay == null) yield break;
+
+        fadeOverlay.gameObject.SetActive(true);
+        Color c = Color.black;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            c.a = Mathf.Lerp(startAlpha, endAlpha, elapsed / duration);
+            fadeOverlay.color = c;
+            yield return null;
+        }
+
+        c.a = endAlpha;
+        fadeOverlay.color = c;
+
+        if (endAlpha <= 0f)
+        {
+            fadeOverlay.gameObject.SetActive(false);
+        }
     }
 
     private IEnumerator FadeText(float startAlpha, float endAlpha, float duration)
     {
+        if (prologueText == null) yield break;
+
         float time = 0;
         Color c = prologueText.color;
         c.a = startAlpha;
@@ -292,6 +396,7 @@ public class MainMenuManager : MonoBehaviour
 
     private void SetTextAlpha(float alpha)
     {
+        if (prologueText == null) return;
         Color c = prologueText.color;
         c.a = alpha;
         prologueText.color = c;
