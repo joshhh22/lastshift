@@ -248,14 +248,15 @@ public class GameplayPolisher
             Debug.Log("<color=green>[GameplayPolisher]</color> ObjectiveOutlineManager berhasil dipasang.");
         }
 
-        // Fix Read/Write Enabled on 3D Model Assets agar QuickOutline mulus tanpa error
+        // Fix Read/Write Enabled HANYA pada Model 3D Prop statis (bukan Rig karakter / animasi)
         string[] modelGuids = AssetDatabase.FindAssets("t:Model", new[] { "Assets/Art" });
         int fixedCount = 0;
         foreach (string guid in modelGuids)
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             ModelImporter importer = AssetImporter.GetAtPath(path) as ModelImporter;
-            if (importer != null && !importer.isReadable)
+            // Hanya proses model statis non-animasi agar tidak memicu validasi Avatar Humanoid Rig
+            if (importer != null && importer.animationType == ModelImporterAnimationType.None && !importer.isReadable)
             {
                 importer.isReadable = true;
                 importer.SaveAndReimport();
@@ -264,7 +265,7 @@ public class GameplayPolisher
         }
         if (fixedCount > 0)
         {
-            Debug.Log($"<color=green>[GameplayPolisher]</color> Diaktifkan Read/Write pada {fixedCount} model 3D.");
+            Debug.Log($"<color=green>[GameplayPolisher]</color> Diaktifkan Read/Write pada {fixedCount} model 3D prop statis.");
         }
 
         // Simpan Scene

@@ -42337,6 +42337,7 @@ MonoBehaviour:
   computerTarget: {fileID: 883160641}
   outlineColor: {r: 0, g: 1, b: 0.10499692, a: 1}
   outlineWidth: 25
+  outlineMode: 1
 --- !u!1 &2036988385
 GameObject:
   m_ObjectHideFlags: 0
