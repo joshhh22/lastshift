@@ -42,7 +42,9 @@ public class PlayerInteractor : MonoBehaviour
             layerMask,
             QueryTriggerInteraction.Collide))
         {
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (interactable == null)
+                interactable = hit.collider.GetComponent<IInteractable>();
 
             if (interactable != null)
             {
@@ -52,11 +54,21 @@ public class PlayerInteractor : MonoBehaviour
                 {
                     currentInteractable = interactable;
                     interactionUI.Show(text);
+
+                    if (ObjectiveOutlineManager.Instance != null)
+                    {
+                        ObjectiveOutlineManager.Instance.OnHoverInteractable(hit.collider.gameObject);
+                    }
                     return;
                 }
             }
         }
 
         interactionUI.Hide();
+
+        if (ObjectiveOutlineManager.Instance != null)
+        {
+            ObjectiveOutlineManager.Instance.OnHoverInteractable(null);
+        }
     }
 }
