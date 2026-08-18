@@ -35,6 +35,10 @@ public class MainMenuManager : MonoBehaviour
 
     public TypewriterEffect typewriterEffect;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip clickSfx;
+    private AudioSource audioSource;
+
     [Header("Fade UI")]
     [SerializeField] private Image fadeOverlay;
 
@@ -54,12 +58,23 @@ public class MainMenuManager : MonoBehaviour
     {
         Instance = this;
 
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+
+#if UNITY_EDITOR
+        if (clickSfx == null)
+        {
+            clickSfx = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Art/Audio/click.mp3");
+        }
+#endif
+
         CreateFadeOverlayIfMissing();
     }
 
     private void Start()
     {
-        // Pastikan Cursor aktif di MainMenu
+        // Pastikan Cursor aktif dan bebas di MainMenu
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
@@ -81,10 +96,27 @@ public class MainMenuManager : MonoBehaviour
         if (hintsButton != null) hintsButton.onClick.AddListener(OpenHints);
         if (swipeMechanicButton != null) swipeMechanicButton.onClick.AddListener(OpenSwipeMechanic);
 
+        // Pasang audio click.mp3 ke SEMUA tombol di scene secara otomatis
+        foreach (Button btn in FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (btn != null)
+            {
+                btn.onClick.AddListener(PlayClickSound);
+            }
+        }
+
         // Smooth fade-in saat pertama kali masuk Main Menu
         if (fadeOverlay != null)
         {
             StartCoroutine(FadeScreen(1f, 0f, 0.8f));
+        }
+    }
+
+    public void PlayClickSound()
+    {
+        if (audioSource != null && clickSfx != null)
+        {
+            audioSource.PlayOneShot(clickSfx, 0.85f);
         }
     }
 

@@ -47,10 +47,9 @@ public class FrutigerAeroComputerUI : MonoBehaviour
     public Button shortcutLogsBtn;
     public GameObject[] shortcutSelectionGlows;
 
-    [Header("CCTV Live Controls")]
-    public TMP_Text cctvCameraLabel;
-    public TMP_Text cctvRecLabel;
-    public RawImage cctvViewportRawImage;
+    [Header("Audio")]
+    [SerializeField] private AudioClip clickSfx;
+    private AudioSource audioSource;
 
     private TerminalPage currentActivePage = TerminalPage.MainMenu;
     private int selectedShortcutIndex = 0;
@@ -58,6 +57,17 @@ public class FrutigerAeroComputerUI : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+
+#if UNITY_EDITOR
+        if (clickSfx == null)
+        {
+            clickSfx = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Art/Audio/click.mp3");
+        }
+#endif
 
         if (startOrbButton != null)
             startOrbButton.onClick.AddListener(ToggleStartMenu);
@@ -82,10 +92,31 @@ public class FrutigerAeroComputerUI : MonoBehaviour
             cctvCloseBtn.onClick.AddListener(() => CloseApp(TerminalPage.CCTV));
         if (logsCloseBtn != null)
             logsCloseBtn.onClick.AddListener(() => CloseApp(TerminalPage.Logs));
+
+        // Pasang sound click ke SEMUA tombol di dalam UI Komputer
+        foreach (Button btn in GetComponentsInChildren<Button>(true))
+        {
+            if (btn != null)
+            {
+                btn.onClick.AddListener(PlayClickSound);
+            }
+        }
+    }
+
+    public void PlayClickSound()
+    {
+        if (audioSource != null && clickSfx != null)
+        {
+            audioSource.PlayOneShot(clickSfx, 0.85f);
+        }
     }
 
     private void OnEnable()
     {
+        // Pastikan mouse cursor aktif dan bebas bergerak
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
         if (startMenuPopup != null)
             startMenuPopup.SetActive(false);
 

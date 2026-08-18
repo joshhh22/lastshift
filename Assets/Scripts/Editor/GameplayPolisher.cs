@@ -56,7 +56,12 @@ public class GameplayPolisher
             if (camTarget != null) camTarget.localRotation = Quaternion.identity;
 
             Camera mainCam = player.GetComponentInChildren<Camera>();
-            if (mainCam != null) mainCam.transform.localRotation = Quaternion.identity;
+            if (mainCam != null)
+            {
+                mainCam.transform.localRotation = Quaternion.identity;
+                mainCam.fieldOfView = 71.2f;
+                EditorUtility.SetDirty(mainCam);
+            }
 
             // Pastikan posisi player menapak di lantai (tidak jatuh dari atas) dan menghadap ke bawah tangga (135 derajat)
             if (Physics.Raycast(player.transform.position + Vector3.up * 1f, Vector3.down, out RaycastHit hit, 10f))

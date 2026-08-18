@@ -65,6 +65,13 @@ public class PlayerWallAntiStick : MonoBehaviour
                     camTarget.transform.rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
                 }
             }
+
+            Camera cam = GetComponentInChildren<Camera>();
+            if (cam == null) cam = Camera.main;
+            if (cam != null)
+            {
+                cam.fieldOfView = 71.2f;
+            }
         }
 
         Physics.SyncTransforms();

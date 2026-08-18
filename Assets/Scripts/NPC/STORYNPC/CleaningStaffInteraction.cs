@@ -21,7 +21,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
     private bool hasTalked;
 
     private Camera playerCam;
-    private float defaultFOV = 60f;
+    private float defaultFOV = 71.2f;
     private Quaternion originalCamRotation;
     private Coroutine cinematicCoroutine;
 
@@ -119,7 +119,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
         if (playerCam != null && defaultFOV <= 0f)
         {
-            defaultFOV = playerCam.fieldOfView > 0 ? playerCam.fieldOfView : 60f;
+            defaultFOV = playerCam.fieldOfView > 0 ? playerCam.fieldOfView : 71.2f;
         }
 
         if (playerCam == null) return;
