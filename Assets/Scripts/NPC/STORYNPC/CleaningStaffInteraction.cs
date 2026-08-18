@@ -106,7 +106,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
         if (dialogueToPlay != null && DialogueManager.Instance != null)
         {
-            DialogueManager.Instance.StartDialogue(dialogueToPlay);
+            DialogueManager.Instance.StartDialogue(dialogueToPlay, OnDialogueFinished);
         }
     }
 
@@ -115,8 +115,11 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         if (playerCam == null)
         {
             playerCam = Camera.main;
-            if (playerCam != null)
-                defaultFOV = playerCam.fieldOfView;
+        }
+
+        if (playerCam != null && defaultFOV <= 0f)
+        {
+            defaultFOV = playerCam.fieldOfView > 0 ? playerCam.fieldOfView : 60f;
         }
 
         if (playerCam == null) return;
@@ -131,7 +134,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
     {
         if (playerCam == null) yield break;
 
-        float targetFOV = focusIn ? zoomFOV : defaultFOV;
+        float targetFOV = focusIn ? zoomFOV : (defaultFOV > 0 ? defaultFOV : 60f);
         float startFOV = playerCam.fieldOfView;
 
         Vector3 targetLookPos = transform.position + Vector3.up * 1.52f; // Fokus ke area wajah/dada
@@ -139,7 +142,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         Quaternion startRotation = playerCam.transform.rotation;
 
         float elapsed = 0f;
-        float duration = 0.6f;
+        float duration = 0.55f;
 
         while (elapsed < duration)
         {
@@ -162,28 +165,28 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
     private void OnDialogueFinished()
     {
-        if (hasTalked && cleaningStaff != null)
+        // Kembalikan zoom kamera & aktifkan kembali bobbing dan crosshair
+        StartCinematicCamera(false);
+
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(false);
+
+        CrosshairManager.ShowCrosshair(true);
+
+        if (cleaningStaff != null)
         {
-            // Kembalikan zoom kamera & aktifkan kembali bobbing dan crosshair
-            StartCinematicCamera(false);
-
-            if (CameraHeadBob.Instance != null)
-                CameraHeadBob.Instance.SetBobbingDisabled(false);
-
-            CrosshairManager.ShowCrosshair(true);
-
             // Buka patroli bebas ke seluruh stasiun
             cleaningStaff.UnlockFullPatrol();
             cleaningStaff.StartPatrol();
+        }
 
-            // Selesaikan objektif 'Talk To Cleaning Staff'
-            if (ObjectiveManager.Instance != null)
+        // Selesaikan objektif 'Talk To Cleaning Staff'
+        if (ObjectiveManager.Instance != null)
+        {
+            string curObj = ObjectiveManager.Instance.GetCurrentObjective();
+            if (!string.IsNullOrEmpty(curObj) && (curObj.ToLower().Contains("cleaning") || curObj.ToLower().Contains("staff")))
             {
-                string curObj = ObjectiveManager.Instance.GetCurrentObjective();
-                if (!string.IsNullOrEmpty(curObj) && curObj.ToLower().Contains("cleaning"))
-                {
-                    ObjectiveManager.Instance.CompleteObjective();
-                }
+                ObjectiveManager.Instance.CompleteObjective();
             }
         }
     }

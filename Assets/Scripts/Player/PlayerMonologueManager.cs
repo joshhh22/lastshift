@@ -277,33 +277,41 @@ public class PlayerMonologueManager : MonoBehaviour
 
         if (lower.Contains("office") || lower.Contains("go to"))
         {
-            return "Aku harus segera menuju ke ruang loket untuk memulai tugas.";
+            return "Aku harus segera berjalan menuju ke ruang loket stasiun.";
         }
-        if (lower.Contains("phone"))
+        if (lower.Contains("clock in"))
         {
-            return "Ponselku bergetar... Sebaiknya kuperiksa pesan masuk sekarang [Tekan TAB].";
+            return "Aku perlu menempelkan kartu identitasku ke mesin pembaca untuk memulai absensi shift malam ini.";
         }
-        if (lower.Contains("pc") || lower.Contains("computer") || lower.Contains("turn on"))
+        if (lower.Contains("pc") || lower.Contains("computer") || lower.Contains("open computer") || lower.Contains("turn on"))
         {
-            return "Aku perlu menyalakan komputer dan memeriksa database tiket serta CCTV stasiun.";
+            return "Waktunya menyalakan terminal komputer untuk memeriksa sistem loket dan database stasiun.";
         }
         if (lower.Contains("serve") || lower.Contains("passenger"))
         {
-            return "Penumpang sudah tiba di loket. Periksa tiket dan identitas mereka dengan teliti.";
+            return "Penumpang mulai berdatangan di depan loket. Aku harus memeriksa tiket dan identitas mereka dengan sangat teliti.";
         }
-        if (lower.Contains("cctv") || lower.Contains("check cctv"))
+        if (lower.Contains("cleaning") || lower.Contains("staff") || lower.Contains("talk"))
         {
-            return "Alarm sensor keamanan berbunyi! Segera periksa feed CCTV di komputer stasiun!";
+            return "Petugas kebersihan tampak sedang menyapu di sekitar peron. Sebaiknya aku menyapanya dan menanyakan situasi terkini di stasiun.";
+        }
+        if (lower.Contains("phone"))
+        {
+            return "Ponselku bergetar... Sepertinya ada pesan penting yang masuk. Sebaiknya segera kuperiksa [Tekan TAB].";
+        }
+        if (lower.Contains("cctv") || lower.Contains("camera"))
+        {
+            return "Sensor keamanan mendeteksi kejanggalan di area stasiun! Aku harus segera memeriksa feed kamera CCTV di monitor!";
         }
         if (lower.Contains("continue") || lower.Contains("working"))
         {
-            return "Shift masih berjalan. Tetap fokus melayani penumpang dan pantau CCTV bila ada yang ganjil.";
+            return "Malam semakin larut... Aku harus tetap fokus melayani penumpang dan selalu waspada terhadap hal-hal yang mencurigakan.";
         }
         if (lower.Contains("clock out") || lower.Contains("end shift") || lower.Contains("finish"))
         {
-            return "Semua penumpang malam ini sudah terlayani. Waktunya mencatat laporan shift di terminal.";
+            return "Semua jadwal penumpang malam ini telah selesai. Waktunya menempelkan kartu pulang di mesin pembaca dan menyelesaikan laporan shift.";
         }
 
-        return $"Tugasku: {objectiveTitle}.";
+        return "Aku harus menyelesaikan tugasku berikutnya dengan baik dan teliti.";
     }
 }
