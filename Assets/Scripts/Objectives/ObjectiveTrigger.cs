@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ObjectiveTrigger : MonoBehaviour
 {
+    [SerializeField] private string targetObjectiveKeyword = "office";
     private bool triggered;
 
     public void ResetTrigger()
@@ -27,11 +28,21 @@ public class ObjectiveTrigger : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
+        if (ObjectiveManager.Instance == null)
+            return;
+
+        string curObj = ObjectiveManager.Instance.GetCurrentObjective();
+        if (string.IsNullOrEmpty(curObj))
+            return;
+
+        // PASTIKAN HANYA MENYELESAIKAN JIKA OBJECTIVE SEKARANG ADALAH "Go To Office"!
+        // JANGAN pernah menyelesaikan "Clock In", "Open Computer", atau objektif lain lewat trigger lorong!
+        if (!curObj.ToLower().Contains(targetObjectiveKeyword.ToLower()) && !curObj.ToLower().Contains("go to"))
+            return;
+
         triggered = true;
 
-        if (ObjectiveManager.Instance != null)
-        {
-            ObjectiveManager.Instance.CompleteObjective();
-        }
+        Debug.Log("<color=green>[ObjectiveTrigger]</color> Selesai: 'Go To Office'. Objektif berikutnya: 'Clock In'.");
+        ObjectiveManager.Instance.CompleteObjective();
     }
 }

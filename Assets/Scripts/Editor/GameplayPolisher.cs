@@ -58,11 +58,12 @@ public class GameplayPolisher
             Camera mainCam = player.GetComponentInChildren<Camera>();
             if (mainCam != null) mainCam.transform.localRotation = Quaternion.identity;
 
-            // Pastikan posisi player menapak di lantai (tidak jatuh dari atas)
+            // Pastikan posisi player menapak di lantai (tidak jatuh dari atas) dan menghadap ke bawah tangga (135 derajat)
             if (Physics.Raycast(player.transform.position + Vector3.up * 1f, Vector3.down, out RaycastHit hit, 10f))
             {
                 player.transform.position = hit.point + Vector3.up * 0.05f;
             }
+            player.transform.rotation = Quaternion.Euler(0, 135f, 0);
 
             CharacterController cc = player.GetComponent<CharacterController>();
             if (cc != null)
@@ -80,7 +81,7 @@ public class GameplayPolisher
             }
         }
 
-        // Pastikan PlayerSpawnPoint juga menapak lantai & menghadap ke depan tangga
+        // Pastikan PlayerSpawnPoint juga menapak lantai & menghadap ke depan tangga (135 derajat)
         GameObject spawnObj = GameObject.Find("PlayerSpawnPoint");
         if (spawnObj != null)
         {
@@ -88,7 +89,7 @@ public class GameplayPolisher
             {
                 spawnObj.transform.position = hitSp.point + Vector3.up * 0.05f;
             }
-            spawnObj.transform.rotation = Quaternion.Euler(0, 0, 0);
+            spawnObj.transform.rotation = Quaternion.Euler(0, 135f, 0);
             EditorUtility.SetDirty(spawnObj);
         }
 
