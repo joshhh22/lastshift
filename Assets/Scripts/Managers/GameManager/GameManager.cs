@@ -13,6 +13,14 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public GameState CurrentState { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void DisableDebugLoggingInBuild()
+    {
+#if !UNITY_EDITOR
+        Debug.unityLogger.logEnabled = false;
+#endif
+    }
+
     private void Awake()
     {
         // Singleton
@@ -25,6 +33,10 @@ public class GameManager : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
+
+#if !UNITY_EDITOR
+        Debug.unityLogger.logEnabled = false;
+#endif
     }
 
     private void Start()

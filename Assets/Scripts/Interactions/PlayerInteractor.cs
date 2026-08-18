@@ -16,11 +16,6 @@ public class PlayerInteractor : MonoBehaviour
     {
         CheckInteraction();
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Debug.Log("E DITEKAN");
-        }
-
         if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null)
         {
             currentInteractable.Interact();
