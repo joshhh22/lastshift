@@ -8,9 +8,23 @@ public class PlayerLockManager : MonoBehaviour
     [SerializeField] private StarterAssetsInputs starterInput;
     [SerializeField] private StarterAssets.FirstPersonController controller;
 
+    public bool IsLocked { get; private set; } = false;
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
+
+        if (controller == null)
+            controller = FindFirstObjectByType<StarterAssets.FirstPersonController>();
+
+        if (starterInput == null && controller != null)
+            starterInput = controller.GetComponent<StarterAssetsInputs>();
     }
 
     private void Start()
@@ -39,10 +53,13 @@ public class PlayerLockManager : MonoBehaviour
 
     public void EnterUIMode()
     {
+        IsLocked = true;
+
         if (controller != null)
             controller.CanControl = false;
 
-        starterInput.cursorInputForLook = false;
+        if (starterInput != null)
+            starterInput.cursorInputForLook = false;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -50,10 +67,13 @@ public class PlayerLockManager : MonoBehaviour
 
     public void ExitUIMode()
     {
+        IsLocked = false;
+
         if (controller != null)
             controller.CanControl = true;
 
-        starterInput.cursorInputForLook = true;
+        if (starterInput != null)
+            starterInput.cursorInputForLook = true;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
