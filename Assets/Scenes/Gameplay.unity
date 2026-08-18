@@ -42335,8 +42335,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectiveOutlineManager
   cardReaderTarget: {fileID: 103902293}
   computerTarget: {fileID: 883160641}
-  outlineColor: {r: 0, g: 1, b: 0.10499692, a: 1}
-  outlineWidth: 25
+  maxAimDistance: 4.5
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 10
   outlineMode: 1
 --- !u!1 &2036988385
 GameObject:
