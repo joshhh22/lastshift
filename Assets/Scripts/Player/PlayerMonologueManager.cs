@@ -66,7 +66,8 @@ public class PlayerMonologueManager : MonoBehaviour
 
     private IEnumerator DelayedInitialDayMonologue()
     {
-        yield return new WaitForSeconds(0.3f);
+        // Tunggu fade-in selesai sebelum monolog dimulai (~1s fade + 1.5s breathing room)
+        yield return new WaitForSeconds(2.5f);
 
         GameDay day = DayManager.Instance != null ? DayManager.Instance.CurrentDay : GameDay.Day1;
         currentTrackedDay = (int)day;
