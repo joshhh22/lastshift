@@ -86,9 +86,9 @@ public class ObjectiveOutlineManager : MonoBehaviour
                 // Cari dari ObjectiveMarkerHUD
                 foreach (ObjectiveMarkerHUD hud in FindObjectsByType<ObjectiveMarkerHUD>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 {
-                    if (hud != null && (hud.targetObjectiveTitle == "Clock In" || hud.targetObjectiveTitle == "Clock Out") && hud.targetObject != null)
+                    if (hud != null && (hud.TargetObjectiveTitle == "Clock In" || hud.TargetObjectiveTitle == "Clock Out") && hud.TargetObject != null)
                     {
-                        cardReaderTarget = hud.targetObject;
+                        cardReaderTarget = hud.TargetObject.gameObject;
                         break;
                     }
                 }
@@ -108,9 +108,9 @@ public class ObjectiveOutlineManager : MonoBehaviour
                 // Cari dari ObjectiveMarkerHUD
                 foreach (ObjectiveMarkerHUD hud in FindObjectsByType<ObjectiveMarkerHUD>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 {
-                    if (hud != null && hud.targetObjectiveTitle == "Open Computer" && hud.targetObject != null)
+                    if (hud != null && hud.TargetObjectiveTitle == "Open Computer" && hud.TargetObject != null)
                     {
-                        computerTarget = hud.targetObject;
+                        computerTarget = hud.TargetObject.gameObject;
                         break;
                     }
                 }

@@ -10,6 +10,9 @@ public class ObjectiveMarkerHUD : MonoBehaviour
     [Tooltip("Titik tengah benda yang ingin ditandai")]
     [SerializeField] private Transform targetObject;
 
+    public string TargetObjectiveTitle => targetObjectiveTitle;
+    public Transform TargetObject => targetObject;
+
     [Header("UI Element")]
     [Tooltip("Text atau Image UI di Canvas yang jadi bordernya")]
     [SerializeField] private RectTransform markerUI;

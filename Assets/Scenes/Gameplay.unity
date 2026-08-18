@@ -8802,6 +8802,7 @@ GameObject:
   - component: {fileID: 499036233}
   - component: {fileID: 499036232}
   - component: {fileID: 499036231}
+  - component: {fileID: 499036234}
   m_Layer: 5
   m_Name: DialogueUI
   m_TagString: Untagged
@@ -8894,6 +8895,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &499036234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499036229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb8c5deafa93d7488936e3ab0d19b42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrosshairManager
+  crosshairRoot: {fileID: 0}
 --- !u!1 &500036035
 GameObject:
   m_ObjectHideFlags: 0
@@ -17720,6 +17734,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e3f02bb4696fb1c4b8e77f1e5636ef9e, type: 2}
   fallbackDialogue: {fileID: 11400000, guid: 208bea0e6866e444398a6f5e0585974c, type: 2}
   requiredObjectiveIndex: 4
+  zoomFOV: 44
+  focusSpeed: 3.5
 --- !u!114 &936075022 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3727638186329336027, guid: 8ec8f3d9fffcf0541bbbe0f91c2170ec, type: 3}
@@ -33540,6 +33556,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1639267508}
   - component: {fileID: 1639267509}
+  - component: {fileID: 1639267511}
+  - component: {fileID: 1639267510}
   m_Layer: 0
   m_Name: DialogueManager
   m_TagString: Untagged
@@ -33547,14 +33565,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1639267508
-Transform:
+--- !u!224 &1639267508
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1639267507}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -33562,6 +33579,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1360128345}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 40}
+  m_SizeDelta: {x: 920, y: 115}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1639267509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33605,6 +33627,44 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   typewriter: {fileID: 1013945662}
+--- !u!114 &1639267510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639267507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.7}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1639267511
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639267507}
+  m_CullTransparentMesh: 1
 --- !u!1 &1642540758
 GameObject:
   m_ObjectHideFlags: 0
@@ -42226,6 +42286,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2033262791}
   - component: {fileID: 2033262792}
+  - component: {fileID: 2033262793}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -42260,6 +42321,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54262d95dc0075c42a8b86b76f66832d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+--- !u!114 &2033262793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033262790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35309cd176308e340a757faefbc33665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectiveOutlineManager
+  cardReaderTarget: {fileID: 103902293}
+  computerTarget: {fileID: 883160641}
+  outlineColor: {r: 0, g: 1, b: 0.10499692, a: 1}
+  outlineWidth: 25
 --- !u!1 &2036988385
 GameObject:
   m_ObjectHideFlags: 0
