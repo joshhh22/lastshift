@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,10 +18,10 @@ public class DialogueManager : MonoBehaviour
 
     [SerializeField] private TypewriterEffect typewriter;
 
-    private DialogueData currentDialogue;
+    private List<DialogueLine> activeLines = new List<DialogueLine>();
     private int currentIndex;
-
     private bool isPlaying;
+    private Action currentOnFinishedCallback;
 
     private void Awake()
     {
@@ -31,18 +33,21 @@ public class DialogueManager : MonoBehaviour
 
         Instance = this;
 
-        UIManager.Instance.HideDialogue();
+        if (UIManager.Instance != null)
+            UIManager.Instance.HideDialogue();
+        else if (dialogueUI != null)
+            dialogueUI.SetActive(false);
     }
-
 
     private void Update()
     {
         if (!isPlaying)
             return;
 
-        if (Input.GetKeyDown(KeyCode.E))
+        // Mendukung [E], [Spasi], [Enter], dan Klik Kiri Mouse untuk lanjut
+        if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
         {
-            if (typewriter.IsTyping)
+            if (typewriter != null && typewriter.IsTyping)
             {
                 typewriter.CompleteTyping();
             }
@@ -59,18 +64,45 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueData dialogue)
     {
-        if (dialogue == null)
+        if (dialogue == null || dialogue.lines == null || dialogue.lines.Count == 0)
             return;
 
-        Debug.Log("Start Dialogue");
+        StartDialogue(dialogue.lines, null);
+    }
 
-        PlayerLockManager.Instance.LockPlayer();
+    public void StartDialogue(DialogueData dialogue, Action onFinished)
+    {
+        if (dialogue == null || dialogue.lines == null || dialogue.lines.Count == 0)
+        {
+            onFinished?.Invoke();
+            return;
+        }
 
-        currentDialogue = dialogue;
+        StartDialogue(dialogue.lines, onFinished);
+    }
+
+    public void StartDialogue(List<DialogueLine> lines, Action onFinished = null)
+    {
+        if (lines == null || lines.Count == 0)
+        {
+            onFinished?.Invoke();
+            return;
+        }
+
+        Debug.Log("<color=cyan>[DialogueManager]</color> Start Dialogue (" + lines.Count + " lines)");
+
+        if (PlayerLockManager.Instance != null)
+            PlayerLockManager.Instance.LockPlayer();
+
+        activeLines = new List<DialogueLine>(lines);
         currentIndex = 0;
         isPlaying = true;
+        currentOnFinishedCallback = onFinished;
 
-        UIManager.Instance.ShowDialogue();
+        if (UIManager.Instance != null)
+            UIManager.Instance.ShowDialogue();
+        else if (dialogueUI != null)
+            dialogueUI.SetActive(true);
 
         ShowLine();
     }
@@ -81,12 +113,25 @@ public class DialogueManager : MonoBehaviour
 
     private void ShowLine()
     {
-        DialogueLine line = currentDialogue.lines[currentIndex];
+        if (currentIndex < 0 || currentIndex >= activeLines.Count)
+        {
+            EndDialogue();
+            return;
+        }
 
-        speakerText.text = line.speaker;
+        DialogueLine line = activeLines[currentIndex];
 
-        Debug.Log(currentDialogue.lines[currentIndex].text);
-        typewriter.StartTyping(dialogueText, line.text);
+        if (speakerText != null)
+            speakerText.text = line.speaker;
+
+        if (typewriter != null && dialogueText != null)
+        {
+            typewriter.StartTyping(dialogueText, line.text);
+        }
+        else if (dialogueText != null)
+        {
+            dialogueText.text = line.text;
+        }
     }
 
     // =========================
@@ -97,7 +142,7 @@ public class DialogueManager : MonoBehaviour
     {
         currentIndex++;
 
-        if (currentIndex >= currentDialogue.lines.Count)
+        if (currentIndex >= activeLines.Count)
         {
             EndDialogue();
             return;
@@ -114,13 +159,21 @@ public class DialogueManager : MonoBehaviour
     {
         isPlaying = false;
 
-        UIManager.Instance.HideDialogue();
+        if (UIManager.Instance != null)
+            UIManager.Instance.HideDialogue();
+        else if (dialogueUI != null)
+            dialogueUI.SetActive(false);
 
-        currentDialogue = null;
+        activeLines.Clear();
 
-        PlayerLockManager.Instance.UnlockPlayer();
+        if (PlayerLockManager.Instance != null)
+            PlayerLockManager.Instance.UnlockPlayer();
 
         onDialogueFinished?.Invoke();
+
+        Action callback = currentOnFinishedCallback;
+        currentOnFinishedCallback = null;
+        callback?.Invoke();
     }
 
     public bool IsPlaying()

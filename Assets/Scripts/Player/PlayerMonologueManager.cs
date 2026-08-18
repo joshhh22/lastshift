@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,17 +8,16 @@ public class PlayerMonologueManager : MonoBehaviour
 {
     public static PlayerMonologueManager Instance;
 
-    [Header("UI References")]
-    [SerializeField] private GameObject monologueContainer;
-    [SerializeField] private TMP_Text monologueText;
-    [SerializeField] private Image monologueBackground;
+    [Header("Objective Thought Subtitle UI (No Background Box)")]
+    [SerializeField] private GameObject thoughtContainer;
+    [SerializeField] private TMP_Text thoughtText;
 
     [Header("Settings")]
-    [SerializeField] private float displayDuration = 5.0f;
-    [SerializeField] private float typingSpeed = 0.03f;
+    [SerializeField] private float thoughtDisplayDuration = 4.5f;
+    [SerializeField] private float typingSpeed = 0.025f;
 
-    private Coroutine activeMonologueRoutine;
-    private TMP_FontAsset regularFont;
+    private Coroutine activeThoughtRoutine;
+    private int currentTrackedDay = -1;
 
     private void Awake()
     {
@@ -29,25 +29,19 @@ public class PlayerMonologueManager : MonoBehaviour
 
         Instance = this;
 
-        if (monologueContainer == null)
-        {
-            CreateMonologueUI();
-        }
-        else
-        {
-            monologueContainer.SetActive(false);
-        }
+        CreateThoughtUI();
     }
 
     private void Start()
     {
-        // Listen to ObjectiveManager changes
+        // Listen to Objective updates
         if (ObjectiveManager.Instance != null)
         {
             ObjectiveManager.Instance.OnObjectiveChanged += OnObjectiveUpdated;
-            // Pemicu awal saat start
-            OnObjectiveUpdated(ObjectiveManager.Instance.GetCurrentObjective());
         }
+
+        // Jalankan monolog pembuka harian saat game mulai
+        StartCoroutine(DelayedInitialDayMonologue());
     }
 
     private void OnDestroy()
@@ -58,52 +52,160 @@ public class PlayerMonologueManager : MonoBehaviour
         }
     }
 
-    private void CreateMonologueUI()
+    private void Update()
+    {
+        // Deteksi pergantian hari untuk memicu monolog harian baru
+        if (DayManager.Instance != null && (int)DayManager.Instance.CurrentDay != currentTrackedDay)
+        {
+            currentTrackedDay = (int)DayManager.Instance.CurrentDay;
+            TriggerDayOpeningMonologue(DayManager.Instance.CurrentDay);
+        }
+    }
+
+    private IEnumerator DelayedInitialDayMonologue()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        GameDay day = DayManager.Instance != null ? DayManager.Instance.CurrentDay : GameDay.Day1;
+        currentTrackedDay = (int)day;
+        TriggerDayOpeningMonologue(day);
+    }
+
+    private void CreateThoughtUI()
     {
         Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null) return;
 
-        GameObject container = new GameObject("PlayerMonologuePanel", typeof(RectTransform));
+        // Cari atau buat container tanpa background box
+        Transform existing = canvas.transform.Find("PlayerObjectiveThought");
+        if (existing != null)
+        {
+            thoughtContainer = existing.gameObject;
+            thoughtText = thoughtContainer.GetComponentInChildren<TMP_Text>(true);
+            return;
+        }
+
+        GameObject container = new GameObject("PlayerObjectiveThought", typeof(RectTransform));
         container.transform.SetParent(canvas.transform, false);
 
         RectTransform rt = container.GetComponent<RectTransform>();
         rt.anchorMin = new Vector2(0.5f, 0f);
         rt.anchorMax = new Vector2(0.5f, 0f);
         rt.pivot = new Vector2(0.5f, 0f);
-        rt.anchoredPosition = new Vector2(0, 55);
-        rt.sizeDelta = new Vector2(850, 50);
+        rt.anchoredPosition = new Vector2(0, 45);
+        rt.sizeDelta = new Vector2(950, 45);
 
-        Image bg = container.AddComponent<Image>();
-        bg.color = new Color(0.02f, 0.03f, 0.05f, 0.85f);
-        monologueBackground = bg;
-
-        GameObject txtObj = new GameObject("MonologueText", typeof(RectTransform));
+        // Tanpa background box — Tampilan subtitle bersih transparan
+        GameObject txtObj = new GameObject("ThoughtText", typeof(RectTransform));
         txtObj.transform.SetParent(container.transform, false);
 
         RectTransform txtRt = txtObj.GetComponent<RectTransform>();
         txtRt.anchorMin = Vector2.zero;
         txtRt.anchorMax = Vector2.one;
-        txtRt.sizeDelta = new Vector2(-30, 0);
+        txtRt.sizeDelta = Vector2.zero;
 
         TextMeshProUGUI tmp = txtObj.AddComponent<TextMeshProUGUI>();
         tmp.fontSize = 17;
         tmp.fontStyle = FontStyles.Italic;
         tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = new Color(1f, 0.92f, 0.65f, 1f); // Warm retro yellow/amber
+        tmp.color = new Color(1f, 0.92f, 0.65f, 1f); // Warm amber yellow
 
 #if UNITY_EDITOR
         TMP_FontAsset font = UnityEditor.AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/OpenType (.otf)/HomeVideo-Regular SDF.asset");
         if (font != null) tmp.font = font;
 #endif
 
-        monologueText = tmp;
-        monologueContainer = container;
-        monologueContainer.SetActive(false);
+        thoughtText = tmp;
+        thoughtContainer = container;
+        thoughtContainer.SetActive(false);
     }
+
+    // =========================================================================
+    // 1. MONOLOG PEMBUKA HARIAN (Player Terkunci saat membaca cerita pembuka)
+    // =========================================================================
+
+    public void TriggerDayOpeningMonologue(GameDay day)
+    {
+        List<DialogueLine> lines = GetDayOpeningLines(day);
+
+        if (DialogueManager.Instance != null)
+        {
+            // Player akan terkunci otomatis oleh DialogueManager
+            DialogueManager.Instance.StartDialogue(lines, () =>
+            {
+                // Setelah monolog pembuka selesai -> Player bisa bergerak, lalu tampilkan pemikiran objektif
+                if (ObjectiveManager.Instance != null)
+                {
+                    OnObjectiveUpdated(ObjectiveManager.Instance.GetCurrentObjective());
+                }
+            });
+        }
+    }
+
+    private List<DialogueLine> GetDayOpeningLines(GameDay day)
+    {
+        List<DialogueLine> lines = new List<DialogueLine>();
+
+        switch (day)
+        {
+            case GameDay.Day1:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Shift pertamaku sebagai pemeriksa tiket di Stasiun Sektor 04..." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Udara terowongan bawah tanah ini selalu terasa dingin dan pengap." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Ibu berpesan agar aku selalu teliti memeriksa tiket dan tidak ceroboh." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Baiklah, waktunya masuk ke ruang loket dan memulai shift pertamaku." });
+                break;
+
+            case GameDay.Day2:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Malam kedua... Kemarin malam shift berjalan lancar, tapi stasiun ini terasa terlalu sunyi." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Manajemen pusat mengirim peringatan tentang pemalsuan dokumen yang kian marak." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Aku harus lebih waspada memeriksa kecocokan data setiap penumpang hari ini." });
+                break;
+
+            case GameDay.Day3:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Malam ketiga. Ada desas-desus aneh tentang gangguan teknis di jalur rel terowongan." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Petugas keamanan mengatakan sistem CCTV sempat menangkap gerakan yang ganjil." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Semoga malam ini tidak terjadi gangguan yang membahayakan stasiun." });
+                break;
+
+            case GameDay.Day4:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Malam keempat... Lampu lorong stasiun mulai berkedip-kedip tidak menentu." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Pesan masuk dari supervisor terasa semakin dingin dan menekan." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Aku tidak boleh lengah sedikitpun dalam mengambil keputusan." });
+                break;
+
+            case GameDay.Day5:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Malam kelima. Stasiun ini terasa semakin mencekam... Ada suara gesekan di lorong gelap." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Bukan hanya pemalsu tiket biasa yang berkeliaran, ada sesuatu yang mencoba menyusup." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Aku harus tetap berada di ruang loket dan memastikan semua pintu terkunci." });
+                break;
+
+            case GameDay.Day6:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Malam keenam... Tinggal sedikit lagi sebelum minggu kerja pertamaku selesai." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Ketegangan di stasiun ini semakin memuncak. Penumpang yang datang tampak mencurigakan." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Fokus... Cocokkan nomor ID, rute stasiun, dan alasan perjalanan mereka." });
+                break;
+
+            case GameDay.Day7:
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Malam ketujuh... Malam terakhir shift di Stasiun Sektor 04." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Semua keputusan dan evaluasi kerjaku selama seminggu ini akan dinilai malam ini." });
+                lines.Add(new DialogueLine { speaker = "Aku", text = "Apapun yang terjadi di luar sana, aku harus bertahan sampai pukul 04:00 pagi." });
+                break;
+        }
+
+        return lines;
+    }
+
+    // =========================================================================
+    // 2. MONOLOG PIKIRAN OBJEKTIF (Player BISA BERGERAK bebas sambil membaca)
+    // =========================================================================
 
     public void OnObjectiveUpdated(string objectiveTitle)
     {
         if (string.IsNullOrEmpty(objectiveTitle)) return;
+
+        // Jangan tampilkan jika dialog penuh sedang berjalan
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying())
+            return;
 
         string thought = GetContextualThought(objectiveTitle);
         if (!string.IsNullOrEmpty(thought))
@@ -112,39 +214,39 @@ public class PlayerMonologueManager : MonoBehaviour
         }
     }
 
-    public void ShowThought(string text, float customDuration = -1f)
+    public void ShowThought(string text, float duration = -1f)
     {
-        if (activeMonologueRoutine != null)
+        if (activeThoughtRoutine != null)
         {
-            StopCoroutine(activeMonologueRoutine);
+            StopCoroutine(activeThoughtRoutine);
         }
-        activeMonologueRoutine = StartCoroutine(DisplayThoughtRoutine(text, customDuration > 0 ? customDuration : displayDuration));
+        activeThoughtRoutine = StartCoroutine(DisplayThoughtRoutine(text, duration > 0 ? duration : thoughtDisplayDuration));
     }
 
     private IEnumerator DisplayThoughtRoutine(string text, float duration)
     {
-        if (monologueContainer != null) monologueContainer.SetActive(true);
+        if (thoughtContainer != null) thoughtContainer.SetActive(true);
 
-        if (monologueText != null)
+        if (thoughtText != null)
         {
-            monologueText.text = "";
+            thoughtText.text = "";
             string formatted = $"\"{text}\"";
 
             for (int i = 0; i <= formatted.Length; i++)
             {
-                monologueText.text = formatted.Substring(0, i);
+                thoughtText.text = formatted.Substring(0, i);
                 yield return new WaitForSeconds(typingSpeed);
             }
         }
 
         yield return new WaitForSeconds(duration);
 
-        if (monologueContainer != null)
+        if (thoughtContainer != null)
         {
-            monologueContainer.SetActive(false);
+            thoughtContainer.SetActive(false);
         }
 
-        activeMonologueRoutine = null;
+        activeThoughtRoutine = null;
     }
 
     private string GetContextualThought(string objectiveTitle)
@@ -153,7 +255,7 @@ public class PlayerMonologueManager : MonoBehaviour
 
         if (lower.Contains("office") || lower.Contains("go to"))
         {
-            return "Shift malam dimulai... Aku harus segera menuju ke ruang loket untuk memulai tugas.";
+            return "Aku harus segera menuju ke ruang loket untuk memulai tugas.";
         }
         if (lower.Contains("phone"))
         {
@@ -165,11 +267,11 @@ public class PlayerMonologueManager : MonoBehaviour
         }
         if (lower.Contains("serve") || lower.Contains("passenger"))
         {
-            return "Penumpang sudah tiba di loket. Periksa tiket dan dokumen mereka dengan teliti.";
+            return "Penumpang sudah tiba di loket. Periksa tiket dan identitas mereka dengan teliti.";
         }
         if (lower.Contains("cctv") || lower.Contains("check cctv"))
         {
-            return "Ada sinyal aneh di sistem keamanan! Segera periksa feed CCTV di komputer!";
+            return "Alarm sensor keamanan berbunyi! Segera periksa feed CCTV di komputer stasiun!";
         }
         if (lower.Contains("continue") || lower.Contains("working"))
         {
@@ -180,6 +282,6 @@ public class PlayerMonologueManager : MonoBehaviour
             return "Semua penumpang malam ini sudah terlayani. Waktunya mencatat laporan shift di terminal.";
         }
 
-        return $"Tugasku sekarang: {objectiveTitle}.";
+        return $"Tugasku: {objectiveTitle}.";
     }
 }
