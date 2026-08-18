@@ -10,8 +10,11 @@ public class PhoneManager : MonoBehaviour
     private bool isOpen;
     private bool phoneUnlocked;
     private bool hasNotification;
+    private float lastCloseTime;
+    private int lastCloseFrame;
 
     public bool IsOpen => isOpen;
+    public bool JustClosedThisFrame => Time.frameCount == lastCloseFrame || (Time.unscaledTime - lastCloseTime < 0.15f);
     public bool HasNotification => hasNotification;
 
     private void Awake()
@@ -38,6 +41,10 @@ public class PhoneManager : MonoBehaviour
                 ClosePhone();
             else
                 OpenPhone();
+        }
+        else if (isOpen && Input.GetKeyDown(KeyCode.Escape))
+        {
+            ClosePhone();
         }
     }
 
@@ -122,6 +129,8 @@ public class PhoneManager : MonoBehaviour
             return;
 
         isOpen = false;
+        lastCloseFrame = Time.frameCount;
+        lastCloseTime = Time.unscaledTime;
 
         if (phoneUI != null)
         {

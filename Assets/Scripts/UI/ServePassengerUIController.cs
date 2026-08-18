@@ -44,8 +44,11 @@ public class ServePassengerUIController : MonoBehaviour
     private bool inDialoguePanel;
 
     private int dialogueIndex;
+    private float lastCloseTime;
+    private int lastCloseFrame;
 
     public bool IsOpen => isOpen;
+    public bool JustClosedThisFrame => Time.frameCount == lastCloseFrame || (Time.unscaledTime - lastCloseTime < 0.15f);
 
     private void Awake()
     {
@@ -158,6 +161,9 @@ public class ServePassengerUIController : MonoBehaviour
         isOpen = false;
         inSwipePanel = false;
         inDialoguePanel = false;
+
+        lastCloseFrame = Time.frameCount;
+        lastCloseTime = Time.unscaledTime;
 
         currentNPC = null;
 

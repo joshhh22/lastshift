@@ -107,8 +107,9 @@ public class PauseUIController : MonoBehaviour
         // Tekan Escape untuk Toggle Pause
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Jangan pause jika UI dialog / serve passenger sedang terbuka (sudah dihandle oleh UI tersebut)
-            if (ServePassengerUIController.Instance != null && ServePassengerUIController.Instance.IsOpen)
+            // Jangan pause jika UI dialog / serve passenger sedang terbuka atau baru saja ditutup di frame ini
+            ServePassengerUIController serveUI = ServePassengerUIController.Instance != null ? ServePassengerUIController.Instance : FindFirstObjectByType<ServePassengerUIController>();
+            if (serveUI != null && (serveUI.IsOpen || serveUI.JustClosedThisFrame))
                 return;
 
             // Jangan pause jika Computer UI sedang terbuka atau baru saja ditutup di frame ini
@@ -116,8 +117,14 @@ public class PauseUIController : MonoBehaviour
             if (computer != null && (computer.IsOpen || computer.JustClosedThisFrame))
                 return;
 
-            // Jangan pause jika Phone UI sedang terbuka
-            if (PhoneManager.Instance != null && PhoneManager.Instance.IsOpen)
+            // Jangan pause jika Phone UI sedang terbuka atau baru saja ditutup di frame ini
+            PhoneManager phone = PhoneManager.Instance != null ? PhoneManager.Instance : FindFirstObjectByType<PhoneManager>();
+            if (phone != null && (phone.IsOpen || phone.JustClosedThisFrame))
+                return;
+
+            // Jangan pause jika Summary Panel sedang terbuka
+            SummaryUIController summary = SummaryUIController.Instance != null ? SummaryUIController.Instance : FindFirstObjectByType<SummaryUIController>();
+            if (summary != null && summary.gameObject.activeInHierarchy)
                 return;
 
             // Jangan pause jika Dialogue sedang aktif
