@@ -261,9 +261,20 @@ public class SummaryUIController : MonoBehaviour
             if (fpc != null) fpc.enabled = false;
 
             Vector3 spawnPos = playerSpawnPoint.position;
-            spawnPos.y += 0.2f;
+            // Snapping presisi ke lantai agar tidak ada sensasi jatuh dari atas
+            if (Physics.Raycast(spawnPos + Vector3.up * 1f, Vector3.down, out RaycastHit hit, 5f))
+            {
+                spawnPos = hit.point + Vector3.up * 0.05f;
+            }
 
             player.transform.SetPositionAndRotation(spawnPos, playerSpawnPoint.rotation);
+
+            // Reset camera pitch agar hadap lurus ke depan (tidak nengok ke atas)
+            Transform camTarget = player.transform.Find("CinemachineCameraTarget");
+            if (camTarget != null) camTarget.localRotation = Quaternion.identity;
+
+            Camera mainCam = player.GetComponentInChildren<Camera>();
+            if (mainCam != null) mainCam.transform.localRotation = Quaternion.identity;
 
             yield return null;
 

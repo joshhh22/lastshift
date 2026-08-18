@@ -51,6 +51,19 @@ public class GameplayPolisher
                 Debug.Log("<color=green>[GameplayPolisher]</color> Kamera Pitch diatur: TopClamp 85, BottomClamp -85 (Sangat mulus & luas).");
             }
 
+            // Reset rotasi kamera pitch agar lurus menghadap depan
+            Transform camTarget = player.transform.Find("CinemachineCameraTarget");
+            if (camTarget != null) camTarget.localRotation = Quaternion.identity;
+
+            Camera mainCam = player.GetComponentInChildren<Camera>();
+            if (mainCam != null) mainCam.transform.localRotation = Quaternion.identity;
+
+            // Pastikan posisi player menapak di lantai (tidak jatuh dari atas)
+            if (Physics.Raycast(player.transform.position + Vector3.up * 1f, Vector3.down, out RaycastHit hit, 10f))
+            {
+                player.transform.position = hit.point + Vector3.up * 0.05f;
+            }
+
             CharacterController cc = player.GetComponent<CharacterController>();
             if (cc != null)
             {
@@ -64,6 +77,41 @@ public class GameplayPolisher
             {
                 player.AddComponent<PlayerWallAntiStick>();
                 EditorUtility.SetDirty(player);
+            }
+        }
+
+        // Pastikan PlayerSpawnPoint juga menapak lantai & menghadap ke depan tangga
+        GameObject spawnObj = GameObject.Find("PlayerSpawnPoint");
+        if (spawnObj != null)
+        {
+            if (Physics.Raycast(spawnObj.transform.position + Vector3.up * 1f, Vector3.down, out RaycastHit hitSp, 10f))
+            {
+                spawnObj.transform.position = hitSp.point + Vector3.up * 0.05f;
+            }
+            spawnObj.transform.rotation = Quaternion.Euler(0, 0, 0);
+            EditorUtility.SetDirty(spawnObj);
+        }
+
+        // =========================================================================
+        // 1.5. POLISH DIALOGUE UI (Teks Dialogue / Monolog Bersih Tanpa Box)
+        // =========================================================================
+        DialogueManager diagMgr = Object.FindObjectOfType<DialogueManager>(true);
+        if (diagMgr != null)
+        {
+            TMP_Text[] diagTexts = diagMgr.GetComponentsInChildren<TMP_Text>(true);
+            foreach (TMP_Text dt in diagTexts)
+            {
+                if (fontRegular != null) dt.font = fontRegular;
+                if (dt.gameObject.name.ToLower().Contains("speaker"))
+                {
+                    dt.color = new Color(1f, 0.8f, 0.2f, 1f); // Kuning amber
+                    dt.fontSize = 18;
+                }
+                else
+                {
+                    dt.color = Color.white;
+                    dt.fontSize = 17;
+                }
             }
         }
 

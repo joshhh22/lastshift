@@ -18,6 +18,7 @@ public class PlayerMonologueManager : MonoBehaviour
 
     private Coroutine activeThoughtRoutine;
     private int currentTrackedDay = -1;
+    private bool isOpeningMonologueActive = false;
 
     private void Awake()
     {
@@ -64,7 +65,7 @@ public class PlayerMonologueManager : MonoBehaviour
 
     private IEnumerator DelayedInitialDayMonologue()
     {
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.3f);
 
         GameDay day = DayManager.Instance != null ? DayManager.Instance.CurrentDay : GameDay.Day1;
         currentTrackedDay = (int)day;
@@ -130,9 +131,14 @@ public class PlayerMonologueManager : MonoBehaviour
 
         if (DialogueManager.Instance != null)
         {
+            isOpeningMonologueActive = true;
+            // Sembunyikan pemikiran objektif jika sempat muncul
+            if (thoughtContainer != null) thoughtContainer.SetActive(false);
+
             // Player akan terkunci otomatis oleh DialogueManager
             DialogueManager.Instance.StartDialogue(lines, () =>
             {
+                isOpeningMonologueActive = false;
                 // Setelah monolog pembuka selesai -> Player bisa bergerak, lalu tampilkan pemikiran objektif
                 if (ObjectiveManager.Instance != null)
                 {
@@ -203,8 +209,8 @@ public class PlayerMonologueManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(objectiveTitle)) return;
 
-        // Jangan tampilkan jika dialog penuh sedang berjalan
-        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying())
+        // Jangan tampilkan pemikiran objektif jika monolog pembuka atau dialog lain sedang berjalan
+        if (isOpeningMonologueActive || (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying()))
             return;
 
         string thought = GetContextualThought(objectiveTitle);
