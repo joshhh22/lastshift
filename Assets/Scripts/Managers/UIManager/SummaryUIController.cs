@@ -50,6 +50,8 @@ public class SummaryUIController : MonoBehaviour
     private bool isTransitioning = false;
     private Coroutine activeDisplayRoutine;
 
+    public bool IsOpen => opened || (root != null && root.activeSelf);
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

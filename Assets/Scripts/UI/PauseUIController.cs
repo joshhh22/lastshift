@@ -124,7 +124,7 @@ public class PauseUIController : MonoBehaviour
 
             // Jangan pause jika Summary Panel sedang terbuka
             SummaryUIController summary = SummaryUIController.Instance != null ? SummaryUIController.Instance : FindFirstObjectByType<SummaryUIController>();
-            if (summary != null && summary.gameObject.activeInHierarchy)
+            if (summary != null && summary.IsOpen)
                 return;
 
             // Jangan pause jika Dialogue sedang aktif
