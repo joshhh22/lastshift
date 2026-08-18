@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,7 +14,10 @@ public class CleaningStaffController : MonoBehaviour
     [SerializeField] private float minWaitTime = 3f;
     [SerializeField] private float maxWaitTime = 6f;
 
-    private Transform[] patrolPoints;
+    private List<Transform> allPatrolPoints = new List<Transform>();
+    private List<Transform> restrictedPatrolPoints = new List<Transform>();
+
+    public bool HasTalked { get; private set; } = false;
 
     private int currentIndex;
     private bool isPatrolling;
@@ -34,21 +38,52 @@ public class CleaningStaffController : MonoBehaviour
         if (animator == null)
             animator = GetComponent<Animator>();
 
+        InitializeWaypoints();
+    }
+
+    private void InitializeWaypoints()
+    {
+        allPatrolPoints.Clear();
+        restrictedPatrolPoints.Clear();
+
         if (waypointParent != null)
         {
-            patrolPoints = new Transform[waypointParent.childCount];
-
             for (int i = 0; i < waypointParent.childCount; i++)
             {
-                patrolPoints[i] = waypointParent.GetChild(i);
+                Transform wp = waypointParent.GetChild(i);
+                allPatrolPoints.Add(wp);
+
+                string wpName = wp.name.ToLower().Trim();
+                // Filter waypoint restricted: Coffee, Counter, Stair, 1, 2
+                if (wpName == "coffee" || wpName.Contains("coffee") ||
+                    wpName == "counter" || wpName.Contains("counter") ||
+                    wpName == "stair" || wpName.Contains("stair") ||
+                    wpName == "1" || wpName == "2")
+                {
+                    restrictedPatrolPoints.Add(wp);
+                }
             }
         }
+
+        if (restrictedPatrolPoints.Count == 0 && allPatrolPoints.Count > 0)
+        {
+            restrictedPatrolPoints.AddRange(allPatrolPoints);
+        }
+
+        Debug.Log($"<color=cyan>[CleaningStaff]</color> Waypoints Loaded: Total = {allPatrolPoints.Count}, Restricted (Pre-talk) = {restrictedPatrolPoints.Count}");
+    }
+
+    public void UnlockFullPatrol()
+    {
+        HasTalked = true;
+        Debug.Log("<color=green>[CleaningStaff]</color> Full Patrol Unlocked! Cleaning Staff sekarang bebas menjelajah ke seluruh stasiun.");
     }
 
     public void ResetToInitialSpawn()
     {
         StopPatrol();
 
+        HasTalked = false;
         currentIndex = 0;
 
         if (agent != null)
@@ -69,12 +104,25 @@ public class CleaningStaffController : MonoBehaviour
         }
     }
 
+    private List<Transform> GetCurrentPatrolPool()
+    {
+        // Sebelum bicara -> HANYA Coffee, Counter, Stair, 1, 2
+        // Setelah bicara -> BEBAS ke semua waypoint (Coffee, Counter, Stair, 1-7, dll)
+        if (!HasTalked && restrictedPatrolPoints.Count > 0)
+        {
+            return restrictedPatrolPoints;
+        }
+
+        return allPatrolPoints.Count > 0 ? allPatrolPoints : restrictedPatrolPoints;
+    }
+
     public void StartPatrol()
     {
         if (agent == null)
             return;
 
-        if (patrolPoints == null || patrolPoints.Length == 0)
+        var pool = GetCurrentPatrolPool();
+        if (pool == null || pool.Count == 0)
         {
             Debug.LogWarning("Cleaning Staff : Patrol Points belum diisi.");
             return;
@@ -90,7 +138,10 @@ public class CleaningStaffController : MonoBehaviour
         isPatrolling = true;
         agent.isStopped = false;
 
-        agent.SetDestination(patrolPoints[currentIndex].position);
+        if (currentIndex >= pool.Count)
+            currentIndex = 0;
+
+        agent.SetDestination(pool[currentIndex].position);
     }
 
     public void StopPatrol()
@@ -130,7 +181,7 @@ public class CleaningStaffController : MonoBehaviour
     {
         if (isPatrolling && !isWaitingAtWaypoint && agent != null && agent.isOnNavMesh)
         {
-            if (!agent.pathPending && agent.remainingDistance <= 0.3f)
+            if (!agent.pathPending && agent.remainingDistance <= 0.35f)
             {
                 waitCoroutine = StartCoroutine(WaitAtWaypointRoutine());
             }
@@ -166,17 +217,26 @@ public class CleaningStaffController : MonoBehaviour
         float waitDuration = Random.Range(minWaitTime, maxWaitTime);
         yield return new WaitForSeconds(waitDuration);
 
-        // Lanjut ke waypoint berikutnya
-        currentIndex++;
-        if (currentIndex >= patrolPoints.Length)
-            currentIndex = 0;
-
-        if (patrolPoints != null && patrolPoints.Length > 0 && patrolPoints[currentIndex] != null)
+        var pool = GetCurrentPatrolPool();
+        if (pool != null && pool.Count > 0)
         {
-            if (agent != null && agent.isOnNavMesh)
+            if (HasTalked)
+            {
+                // Setelah bicara: bisa pilih waypoint secara acak atau lanjut
+                currentIndex = Random.Range(0, pool.Count);
+            }
+            else
+            {
+                // Sebelum bicara: berputar teratur di antara (Coffee, Counter, Stair, 1, 2)
+                currentIndex++;
+                if (currentIndex >= pool.Count)
+                    currentIndex = 0;
+            }
+
+            if (pool[currentIndex] != null && agent != null && agent.isOnNavMesh)
             {
                 agent.isStopped = false;
-                agent.SetDestination(patrolPoints[currentIndex].position);
+                agent.SetDestination(pool[currentIndex].position);
             }
         }
 

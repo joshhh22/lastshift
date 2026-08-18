@@ -19,6 +19,7 @@ public class PlayerMonologueManager : MonoBehaviour
     private Coroutine activeThoughtRoutine;
     private int currentTrackedDay = -1;
     private bool isOpeningMonologueActive = false;
+    private string lastThoughtObjectiveTitle = "";
 
     private void Awake()
     {
@@ -209,11 +210,25 @@ public class PlayerMonologueManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(objectiveTitle)) return;
 
+        // Ambil nama dasar objektif (abaikan angka progress seperti " (1/5)")
+        string baseTitle = objectiveTitle;
+        int parenIndex = baseTitle.IndexOf('(');
+        if (parenIndex > 0)
+        {
+            baseTitle = baseTitle.Substring(0, parenIndex).Trim();
+        }
+
+        // Jangan tampilkan pemikiran yang sama berulang kali (misal saat tiap penumpang selesai 1/5, 2/5, dst)
+        if (baseTitle.Equals(lastThoughtObjectiveTitle, System.StringComparison.OrdinalIgnoreCase))
+            return;
+
         // Jangan tampilkan pemikiran objektif jika monolog pembuka atau dialog lain sedang berjalan
         if (isOpeningMonologueActive || (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying()))
             return;
 
-        string thought = GetContextualThought(objectiveTitle);
+        lastThoughtObjectiveTitle = baseTitle;
+
+        string thought = GetContextualThought(baseTitle);
         if (!string.IsNullOrEmpty(thought))
         {
             ShowThought(thought);

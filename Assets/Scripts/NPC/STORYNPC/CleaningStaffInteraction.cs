@@ -40,8 +40,12 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         if (hasTalked)
             return "";
 
-        if (ObjectiveManager.Instance.GetCurrentIndex() != requiredObjectiveIndex)
-            return "";
+        if (ObjectiveManager.Instance != null && ObjectiveManager.Instance.GetCurrentIndex() != requiredObjectiveIndex)
+        {
+            string curObj = ObjectiveManager.Instance.GetCurrentObjective();
+            if (string.IsNullOrEmpty(curObj) || !curObj.ToLower().Contains("cleaning"))
+                return "";
+        }
 
         return "Talk";
     }
@@ -51,16 +55,25 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         if (hasTalked)
             return;
 
-        if (ObjectiveManager.Instance.GetCurrentIndex() != requiredObjectiveIndex)
-            return;
+        if (ObjectiveManager.Instance != null && ObjectiveManager.Instance.GetCurrentIndex() != requiredObjectiveIndex)
+        {
+            string curObj = ObjectiveManager.Instance.GetCurrentObjective();
+            if (string.IsNullOrEmpty(curObj) || !curObj.ToLower().Contains("cleaning"))
+                return;
+        }
 
         hasTalked = true;
 
-        cleaningStaff.StopPatrol();
+        if (cleaningStaff != null)
+        {
+            cleaningStaff.StopPatrol();
 
-        Transform player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        cleaningStaff.FacePlayer(player);
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                cleaningStaff.FacePlayer(playerObj.transform);
+            }
+        }
 
         DialogueData dialogueToPlay = fallbackDialogue;
 
@@ -73,7 +86,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
             }
         }
 
-        if (dialogueToPlay != null)
+        if (dialogueToPlay != null && DialogueManager.Instance != null)
         {
             DialogueManager.Instance.StartDialogue(dialogueToPlay);
         }
@@ -81,7 +94,21 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
     private void OnDialogueFinished()
     {
-        if (cleaningStaff != null)
+        if (hasTalked && cleaningStaff != null)
+        {
+            // Buka patroli bebas ke seluruh stasiun
+            cleaningStaff.UnlockFullPatrol();
             cleaningStaff.StartPatrol();
+
+            // Selesaikan objektif 'Talk To Cleaning Staff'
+            if (ObjectiveManager.Instance != null)
+            {
+                string curObj = ObjectiveManager.Instance.GetCurrentObjective();
+                if (!string.IsNullOrEmpty(curObj) && curObj.ToLower().Contains("cleaning"))
+                {
+                    ObjectiveManager.Instance.CompleteObjective();
+                }
+            }
+        }
     }
 }
