@@ -47,6 +47,11 @@ public class FrutigerAeroComputerUI : MonoBehaviour
     public Button shortcutLogsBtn;
     public GameObject[] shortcutSelectionGlows;
 
+    [Header("CCTV Live Controls")]
+    public TMP_Text cctvCameraLabel;
+    public TMP_Text cctvRecLabel;
+    public RawImage cctvViewportRawImage;
+
     [Header("Audio")]
     [SerializeField] private AudioClip clickSfx;
     private AudioSource audioSource;
