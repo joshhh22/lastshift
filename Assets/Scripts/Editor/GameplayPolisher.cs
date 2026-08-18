@@ -94,34 +94,68 @@ public class GameplayPolisher
         }
 
         // =========================================================================
-        // 1.5. POLISH DIALOGUE UI (Teks Dialogue / Monolog Bersih Tanpa Box)
+        // 1.5. POLISH DIALOGUE UI (Teks Dialogue di Bawah + Background Hitam Opacity 70%)
         // =========================================================================
         DialogueManager diagMgr = Object.FindObjectOfType<DialogueManager>(true);
         if (diagMgr != null)
         {
+            RectTransform diagRt = diagMgr.GetComponent<RectTransform>();
+            if (diagRt != null)
+            {
+                diagRt.anchorMin = new Vector2(0.5f, 0f);
+                diagRt.anchorMax = new Vector2(0.5f, 0f);
+                diagRt.pivot = new Vector2(0.5f, 0f);
+                diagRt.anchoredPosition = new Vector2(0, 40);
+                diagRt.sizeDelta = new Vector2(920, 115);
+            }
+
+            Image diagBg = diagMgr.GetComponent<Image>();
+            if (diagBg == null)
+            {
+                diagBg = diagMgr.gameObject.AddComponent<Image>();
+            }
+            diagBg.color = new Color(0f, 0f, 0f, 0.70f); // Hitam dengan Opacity 70%
+            EditorUtility.SetDirty(diagMgr.gameObject);
+
             TMP_Text[] diagTexts = diagMgr.GetComponentsInChildren<TMP_Text>(true);
             foreach (TMP_Text dt in diagTexts)
             {
                 if (fontRegular != null) dt.font = fontRegular;
-                if (dt.gameObject.name.ToLower().Contains("speaker"))
+                string dtName = dt.gameObject.name.ToLower();
+                if (dtName.Contains("speaker"))
                 {
-                    dt.color = new Color(1f, 0.8f, 0.2f, 1f); // Kuning amber
-                    dt.fontSize = 18;
+                    dt.color = new Color(1f, 0.85f, 0.2f, 1f); // Kuning amber
+                    dt.fontSize = 17;
+                    dt.rectTransform.anchoredPosition = new Vector2(25, -16);
+                }
+                else if (dtName.Contains("dialogue") || dtName.Contains("text"))
+                {
+                    dt.color = Color.white;
+                    dt.fontSize = 16;
+                    dt.rectTransform.anchoredPosition = new Vector2(25, -45);
+                    dt.rectTransform.sizeDelta = new Vector2(-50, -55);
                 }
                 else
                 {
-                    dt.color = Color.white;
-                    dt.fontSize = 17;
+                    dt.color = new Color(0.8f, 0.8f, 0.8f, 0.85f);
+                    dt.fontSize = 13;
                 }
+                EditorUtility.SetDirty(dt.gameObject);
             }
+            Debug.Log("<color=green>[GameplayPolisher]</color> Dialogue UI diposisikan di bawah dengan background hitam 70% opacity.");
         }
 
         // =========================================================================
-        // 2. ATUR UKURAN CROSSHAIR MENJADI TITIK MINIMALIS ELEGAN
+        // 2. ATUR UKURAN CROSSHAIR & DAFTARKAN CROSSHAIR MANAGER
         // =========================================================================
         Canvas canvas = Object.FindObjectOfType<Canvas>(true);
         if (canvas != null)
         {
+            if (Object.FindObjectOfType<CrosshairManager>(true) == null)
+            {
+                canvas.gameObject.AddComponent<CrosshairManager>();
+            }
+
             // Cari semua komponen crosshair / pointer / dot di canvas
             foreach (Image img in canvas.GetComponentsInChildren<Image>(true))
             {

@@ -12,6 +12,8 @@ using StarterAssets;
 [RequireComponent(typeof(Camera))]
 public class CameraHeadBob : MonoBehaviour
 {
+    public static CameraHeadBob Instance;
+
     [Header("References")]
     [SerializeField] private CharacterController characterController;
     [SerializeField] private FirstPersonController fpsController;
@@ -43,8 +45,12 @@ public class CameraHeadBob : MonoBehaviour
     private float landingPunchVelocity;
     private bool wasGrounded;
 
+    public bool IsBobbingDisabled { get; set; } = false;
+
     private void Awake()
     {
+        Instance = this;
+
         // Cari References otomatis jika belum diassign di Inspector
         if (characterController == null)
             characterController = GetComponentInParent<CharacterController>();
@@ -54,8 +60,33 @@ public class CameraHeadBob : MonoBehaviour
         originalLocalPos = transform.localPosition;
     }
 
+    public void SetBobbingDisabled(bool disabled)
+    {
+        IsBobbingDisabled = disabled;
+        if (disabled)
+        {
+            bobTimer = 0f;
+            currentTilt = 0f;
+            targetTilt = 0f;
+            landingPunchOffset = 0f;
+            transform.localPosition = originalLocalPos;
+            transform.localRotation = Quaternion.identity;
+        }
+    }
+
     private void Update()
     {
+        // ── CEK APAKAH BOBBING DI-DISABLE ATAU PLAYER SEDANG TERKUNCI/DI MENU ──────
+        bool locked = (PlayerLockManager.Instance != null && PlayerLockManager.Instance.IsLocked);
+        if (IsBobbingDisabled || locked || (characterController != null && !characterController.enabled))
+        {
+            // Kembalikan posisi dan rotasi kamera secara halus ke posisi default (tenang & stabil)
+            transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPos, Time.deltaTime * 10f);
+            transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.identity, Time.deltaTime * 10f);
+            bobTimer = 0f;
+            return;
+        }
+
         // ── LANDING PUNCH ──────────────────────────────────────────
         bool grounded = fpsController != null && fpsController.Grounded;
         if (!wasGrounded && grounded)
@@ -71,12 +102,14 @@ public class CameraHeadBob : MonoBehaviour
             ref landingPunchVelocity, 1f / landingPunchSpeed);
 
         // ── PERGERAKAN ─────────────────────────────────────────────
-        Vector3 flatVel = new(
-            characterController.velocity.x, 0,
-            characterController.velocity.z);
-        float speed = flatVel.magnitude;
+        float speed = 0f;
+        if (characterController != null)
+        {
+            Vector3 flatVel = new(characterController.velocity.x, 0, characterController.velocity.z);
+            speed = flatVel.magnitude;
+        }
 
-        bool isMoving   = speed > 0.1f;
+        bool isMoving   = speed > 0.15f;
         bool isSprinting = fpsController != null &&
                            speed > (fpsController.MoveSpeed + fpsController.SprintSpeed) * 0.5f;
 
@@ -99,7 +132,6 @@ public class CameraHeadBob : MonoBehaviour
         float bobX = Mathf.Cos(bobTimer * 0.5f) * bobAmp * 0.5f; // sedikit horizontal sway
 
         // ── TILT saat berbelok ──────────────────────────────────────
-        // Ambil input horizontal dari StarterAssetsInputs
         float horizontalInput = 0f;
         if (fpsController != null)
         {

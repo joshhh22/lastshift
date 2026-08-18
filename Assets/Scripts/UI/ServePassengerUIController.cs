@@ -149,11 +149,18 @@ public class ServePassengerUIController : MonoBehaviour
 
         menuPanel.SetActive(true);
         swipePanel.SetActive(false);
-        dialoguePanel.SetActive(false);   // <-- TAMBAHKAN
+        dialoguePanel.SetActive(false);
 
         RefreshMenu();
 
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(true);
+
+        CrosshairManager.ShowCrosshair(false);
+
         PlayerLockManager.Instance.EnterUIMode();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void Close()
@@ -173,7 +180,14 @@ public class ServePassengerUIController : MonoBehaviour
 
         rootUI.SetActive(false);
 
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(false);
+
+        CrosshairManager.ShowCrosshair(true);
+
         PlayerLockManager.Instance.ExitUIMode();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void OpenSwipePanel()

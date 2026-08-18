@@ -62,6 +62,10 @@ public class ComputerUIController : MonoBehaviour
 
         if (crosshair != null)
             crosshair.SetActive(false);
+        CrosshairManager.ShowCrosshair(false);
+
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(true);
 
         if (computerUI != null)
             computerUI.SetActive(true);
@@ -96,6 +100,10 @@ public class ComputerUIController : MonoBehaviour
 
         if (crosshair != null)
             crosshair.SetActive(true);
+        CrosshairManager.ShowCrosshair(true);
+
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(false);
     }
 
     private void SetGameplayHUDVisible(bool visible)

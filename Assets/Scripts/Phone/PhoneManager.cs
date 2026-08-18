@@ -107,6 +107,10 @@ public class PhoneManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        CrosshairManager.ShowCrosshair(false);
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(true);
+
         if (PlayerLockManager.Instance != null)
         {
             PlayerLockManager.Instance.LockPlayer();
@@ -139,6 +143,10 @@ public class PhoneManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        CrosshairManager.ShowCrosshair(true);
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(false);
 
         if (PlayerLockManager.Instance != null)
         {

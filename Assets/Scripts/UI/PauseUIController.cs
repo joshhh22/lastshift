@@ -165,8 +165,12 @@ public class PauseUIController : MonoBehaviour
             }
         }
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        CrosshairManager.ShowCrosshair(false);
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(true);
 
         currentIndex = 0;
         RefreshMenu();
@@ -185,6 +189,10 @@ public class PauseUIController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        CrosshairManager.ShowCrosshair(true);
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(false);
     }
 
     public void ExitToMainMenu()

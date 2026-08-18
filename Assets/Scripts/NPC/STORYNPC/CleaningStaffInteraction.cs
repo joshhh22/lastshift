@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CleaningStaffInteraction : MonoBehaviour, IInteractable
@@ -12,9 +13,17 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
     [Header("Requirements")]
     [SerializeField] private int requiredObjectiveIndex;
 
-    private CleaningStaffController cleaningStaff;
+    [Header("Cinematic Camera Focus Settings")]
+    [SerializeField] private float zoomFOV = 44f;
+    [SerializeField] private float focusSpeed = 3.5f;
 
+    private CleaningStaffController cleaningStaff;
     private bool hasTalked;
+
+    private Camera playerCam;
+    private float defaultFOV = 60f;
+    private Quaternion originalCamRotation;
+    private Coroutine cinematicCoroutine;
 
     public void ResetForNewDay()
     {
@@ -75,6 +84,15 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
             }
         }
 
+        // Matikan goyangan kamera (bobbing/idle breathing) dan sembunyikan crosshair
+        if (CameraHeadBob.Instance != null)
+            CameraHeadBob.Instance.SetBobbingDisabled(true);
+
+        CrosshairManager.ShowCrosshair(false);
+
+        // Mulai fokus & zoom kamera ke Cleaning Staff
+        StartCinematicCamera(true);
+
         DialogueData dialogueToPlay = fallbackDialogue;
 
         if (DayManager.Instance != null)
@@ -92,10 +110,68 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
         }
     }
 
+    private void StartCinematicCamera(bool focusIn)
+    {
+        if (playerCam == null)
+        {
+            playerCam = Camera.main;
+            if (playerCam != null)
+                defaultFOV = playerCam.fieldOfView;
+        }
+
+        if (playerCam == null) return;
+
+        if (cinematicCoroutine != null)
+            StopCoroutine(cinematicCoroutine);
+
+        cinematicCoroutine = StartCoroutine(CinematicCameraRoutine(focusIn));
+    }
+
+    private IEnumerator CinematicCameraRoutine(bool focusIn)
+    {
+        if (playerCam == null) yield break;
+
+        float targetFOV = focusIn ? zoomFOV : defaultFOV;
+        float startFOV = playerCam.fieldOfView;
+
+        Vector3 targetLookPos = transform.position + Vector3.up * 1.52f; // Fokus ke area wajah/dada
+        Quaternion targetRotation = Quaternion.LookRotation((targetLookPos - playerCam.transform.position).normalized);
+        Quaternion startRotation = playerCam.transform.rotation;
+
+        float elapsed = 0f;
+        float duration = 0.6f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+
+            playerCam.fieldOfView = Mathf.Lerp(startFOV, targetFOV, t);
+
+            if (focusIn)
+            {
+                playerCam.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
+            }
+
+            yield return null;
+        }
+
+        playerCam.fieldOfView = targetFOV;
+        cinematicCoroutine = null;
+    }
+
     private void OnDialogueFinished()
     {
         if (hasTalked && cleaningStaff != null)
         {
+            // Kembalikan zoom kamera & aktifkan kembali bobbing dan crosshair
+            StartCinematicCamera(false);
+
+            if (CameraHeadBob.Instance != null)
+                CameraHeadBob.Instance.SetBobbingDisabled(false);
+
+            CrosshairManager.ShowCrosshair(true);
+
             // Buka patroli bebas ke seluruh stasiun
             cleaningStaff.UnlockFullPatrol();
             cleaningStaff.StartPatrol();
