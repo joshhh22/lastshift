@@ -43,6 +43,15 @@ public class PerformanceManager : MonoBehaviour
         dayViolations.Clear();
     }
 
+    public void LoadSavedScores(int perf, int human, int correct, int wrong, int served)
+    {
+        Performance = Mathf.Clamp(perf, 0, 100);
+        Humanity = Mathf.Clamp(human, 0, 100);
+        CorrectDecisions = correct;
+        WrongDecisions = wrong;
+        PassengersServed = served;
+    }
+
     public void AddViolation(string violation)
     {
         string timeStamp = GameTimeManager.Instance != null ? GameTimeManager.Instance.FormattedTime : "00:00";

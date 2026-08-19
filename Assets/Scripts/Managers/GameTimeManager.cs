@@ -148,4 +148,18 @@ public class GameTimeManager : MonoBehaviour
 
         Debug.Log("<color=green>[GameTimeManager]</color> Time Reset to " + FormattedTime);
     }
+
+    public void LoadSavedTime(int hour, int minute)
+    {
+        Hour = Mathf.Clamp(hour, 0, 23);
+        Minute = Mathf.Clamp(minute, 0, 59);
+
+        timer = 0f;
+        IsShiftEnded = (Hour == endHour && Minute >= endMinute);
+        IsTimeRunning = !IsShiftEnded;
+
+        UpdateClockUI();
+
+        Debug.Log("<color=cyan>[GameTimeManager]</color> Time Loaded to " + FormattedTime);
+    }
 }

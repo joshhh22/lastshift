@@ -69,6 +69,13 @@ public class PlayerMonologueManager : MonoBehaviour
         // Tunggu fade-in selesai sebelum monolog dimulai (~1s fade + 1.5s breathing room)
         yield return new WaitForSeconds(2.5f);
 
+        // Jika pemain me-load save di tengah-tengah hari (bukan objective awal 0), lewati intro lock dan tampilkan thought objective
+        if (ObjectiveManager.Instance != null && ObjectiveManager.Instance.GetCurrentIndex() > 0)
+        {
+            ShowThoughtForObjective(ObjectiveManager.Instance.GetCurrentObjective());
+            yield break;
+        }
+
         GameDay day = DayManager.Instance != null ? DayManager.Instance.CurrentDay : GameDay.Day1;
         currentTrackedDay = (int)day;
         TriggerDayOpeningMonologue(day);

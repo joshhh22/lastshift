@@ -221,6 +221,9 @@ public class PauseUIController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        // Auto-save sebelum keluar ke Main Menu
+        SaveManager.SaveCurrentGame();
+
         SceneManager.LoadScene(mainMenuSceneName);
     }
 

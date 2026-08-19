@@ -327,6 +327,9 @@ public class SummaryUIController : MonoBehaviour
         foreach (CCTVScreamer screamer in FindObjectsByType<CCTVScreamer>(FindObjectsSortMode.None))
             screamer.ResetForNewDay();
 
+        // Auto-save hari baru
+        SaveManager.SaveCurrentGame();
+
         yield return FadeController.Instance.FadeIn();
 
         HideOtherUI(false);

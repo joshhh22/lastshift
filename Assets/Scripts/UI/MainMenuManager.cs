@@ -17,6 +17,13 @@ public class MainMenuManager : MonoBehaviour
     public GameObject guidePanel;
     public GameObject creditsPanel;
 
+    [Header("Play Choice (Continue / New Game)")]
+    public GameObject playChoicePanel;
+    public Button continueGameButton;
+    public Button newGameButton;
+    public Button playChoiceBackButton;
+    public TMP_Text saveInfoText;
+
     [Header("Guide Sub-Panels")]
     public Button hintsButton;
     public Button swipeMechanicButton;
@@ -85,12 +92,18 @@ public class MainMenuManager : MonoBehaviour
         if (hintsSubPanel != null) hintsSubPanel.SetActive(false);
         if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
         // Pasang listener tombol utama
-        if (playButton != null) playButton.onClick.AddListener(StartPrologue);
+        if (playButton != null) playButton.onClick.AddListener(OnPlayButtonClicked);
         if (guideButton != null) guideButton.onClick.AddListener(OpenGuide);
         if (creditsButton != null) creditsButton.onClick.AddListener(OpenCredits);
         if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
+
+        // Pasang listener tombol Play Choice (jika sudah ada di scene)
+        if (continueGameButton != null) continueGameButton.onClick.AddListener(ContinueGame);
+        if (newGameButton != null) newGameButton.onClick.AddListener(StartNewGame);
+        if (playChoiceBackButton != null) playChoiceBackButton.onClick.AddListener(ClosePlayChoicePanel);
 
         // Pasang listener tombol Guide sub-menu
         if (hintsButton != null) hintsButton.onClick.AddListener(OpenHints);
@@ -155,7 +168,11 @@ public class MainMenuManager : MonoBehaviour
         // Navigasi Bertahap Tombol ESC
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (hintsSubPanel != null && hintsSubPanel.activeSelf)
+            if (playChoicePanel != null && playChoicePanel.activeSelf)
+            {
+                ClosePlayChoicePanel(); // Kembali dari Play Choice ke Main Menu
+            }
+            else if (hintsSubPanel != null && hintsSubPanel.activeSelf)
             {
                 OpenGuide(); // Kembali dari Hints ke Menu Guide
             }
@@ -279,6 +296,203 @@ public class MainMenuManager : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    public void OnPlayButtonClicked()
+    {
+        if (isTransitioning) return;
+
+        if (SaveManager.HasSaveData())
+        {
+            OpenPlayChoicePanel();
+        }
+        else
+        {
+            StartNewGame();
+        }
+    }
+
+    public void OpenPlayChoicePanel()
+    {
+        CreatePlayChoicePanelIfMissing();
+
+        if (mainMenuCanvas != null) mainMenuCanvas.SetActive(false);
+        if (guidePanel != null) guidePanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (hintsSubPanel != null) hintsSubPanel.SetActive(false);
+        if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
+
+        if (playChoicePanel != null)
+        {
+            playChoicePanel.SetActive(true);
+
+            SaveData data = SaveManager.GetSaveData();
+            if (data != null && data.hasSaveData)
+            {
+                if (saveInfoText != null)
+                {
+                    string objName = !string.IsNullOrEmpty(data.savedObjectiveTitle) ? data.savedObjectiveTitle : "Shift Standby";
+                    saveInfoText.text = $"Last Saved: <color=#00F0FF>DAY {data.currentDay}</color> • {objName}\n<size=11><color=#888888>{data.saveDateFormatted}</color></size>";
+                }
+
+                if (continueGameButton != null)
+                {
+                    TMP_Text btnTxt = continueGameButton.GetComponentInChildren<TMP_Text>();
+                    if (btnTxt != null)
+                    {
+                        btnTxt.text = $"▶ CONTINUE (DAY {data.currentDay})";
+                    }
+                }
+            }
+        }
+    }
+
+    public void ClosePlayChoicePanel()
+    {
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
+        if (mainMenuCanvas != null) mainMenuCanvas.SetActive(true);
+    }
+
+    public void ContinueGame()
+    {
+        if (isTransitioning) return;
+        StartCoroutine(ContinueGameRoutine());
+    }
+
+    private IEnumerator ContinueGameRoutine()
+    {
+        isTransitioning = true;
+        SaveManager.IsContinuingGame = true;
+
+        // Fade out Main Menu ke hitam
+        yield return FadeScreen(0f, 1f, 0.6f);
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        // Langsung load Gameplay scene tanpa prologue
+        SceneManager.LoadScene(gameSceneName);
+    }
+
+    public void StartNewGame()
+    {
+        if (isTransitioning) return;
+        SaveManager.IsContinuingGame = false;
+        SaveManager.ClearSaveData();
+
+        StartPrologue();
+    }
+
+    private void CreatePlayChoicePanelIfMissing()
+    {
+        if (playChoicePanel != null) return;
+
+        Canvas canvas = GetComponentInChildren<Canvas>(true);
+        if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null) return;
+
+        // Container Modal
+        GameObject panelObj = new GameObject("PlayChoiceModal", typeof(RectTransform));
+        panelObj.transform.SetParent(canvas.transform, false);
+        panelObj.transform.SetAsLastSibling();
+
+        RectTransform panelRt = panelObj.GetComponent<RectTransform>();
+        panelRt.anchorMin = new Vector2(0.5f, 0.5f);
+        panelRt.anchorMax = new Vector2(0.5f, 0.5f);
+        panelRt.pivot = new Vector2(0.5f, 0.5f);
+        panelRt.sizeDelta = new Vector2(460, 320);
+        panelRt.anchoredPosition = Vector2.zero;
+
+        Image panelBg = panelObj.AddComponent<Image>();
+        panelBg.color = new Color(0.03f, 0.05f, 0.08f, 0.96f);
+
+        // Header Title
+        GameObject titleObj = new GameObject("Title", typeof(RectTransform));
+        titleObj.transform.SetParent(panelObj.transform, false);
+        RectTransform titleRt = titleObj.GetComponent<RectTransform>();
+        titleRt.anchorMin = new Vector2(0f, 1f);
+        titleRt.anchorMax = new Vector2(1f, 1f);
+        titleRt.pivot = new Vector2(0.5f, 1f);
+        titleRt.sizeDelta = new Vector2(0, 45);
+        titleRt.anchoredPosition = new Vector2(0, -18);
+        TMP_Text titleText = titleObj.AddComponent<TextMeshProUGUI>();
+        titleText.text = "SELECT MISSION";
+        titleText.fontSize = 22;
+        titleText.fontStyle = FontStyles.Bold;
+        titleText.color = new Color(0f, 0.95f, 1f, 1f);
+        titleText.alignment = TextAlignmentOptions.Center;
+
+        // Save Info Text
+        GameObject infoObj = new GameObject("SaveInfo", typeof(RectTransform));
+        infoObj.transform.SetParent(panelObj.transform, false);
+        RectTransform infoRt = infoObj.GetComponent<RectTransform>();
+        infoRt.anchorMin = new Vector2(0.05f, 1f);
+        infoRt.anchorMax = new Vector2(0.95f, 1f);
+        infoRt.pivot = new Vector2(0.5f, 1f);
+        infoRt.sizeDelta = new Vector2(0, 50);
+        infoRt.anchoredPosition = new Vector2(0, -65);
+        saveInfoText = infoObj.AddComponent<TextMeshProUGUI>();
+        saveInfoText.text = "SAVED PROGRESS FOUND";
+        saveInfoText.fontSize = 13;
+        saveInfoText.color = new Color(0.8f, 0.85f, 0.9f, 0.9f);
+        saveInfoText.alignment = TextAlignmentOptions.Center;
+
+        // Continue Button
+        continueGameButton = CreateModalButton(panelObj.transform, "ContinueButton", "▶ CONTINUE SHIFT", new Vector2(0, -135), new Color(0.08f, 0.28f, 0.42f, 1f), new Color(0f, 1f, 0.95f, 1f));
+        continueGameButton.onClick.AddListener(ContinueGame);
+
+        // New Game Button
+        newGameButton = CreateModalButton(panelObj.transform, "NewGameButton", "↺ START NEW GAME", new Vector2(0, -190), new Color(0.18f, 0.18f, 0.22f, 1f), Color.white);
+        newGameButton.onClick.AddListener(StartNewGame);
+
+        // Back Button
+        playChoiceBackButton = CreateModalButton(panelObj.transform, "BackButton", "← BACK", new Vector2(0, -245), new Color(0.12f, 0.12f, 0.14f, 0.8f), new Color(0.7f, 0.7f, 0.7f, 1f));
+        playChoiceBackButton.onClick.AddListener(ClosePlayChoicePanel);
+
+        playChoicePanel = panelObj;
+        playChoicePanel.SetActive(false);
+    }
+
+    private Button CreateModalButton(Transform parent, string name, string label, Vector2 anchoredPos, Color bgColor, Color textColor)
+    {
+        GameObject btnObj = new GameObject(name, typeof(RectTransform));
+        btnObj.transform.SetParent(parent, false);
+
+        RectTransform rt = btnObj.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0.5f, 1f);
+        rt.anchorMax = new Vector2(0.5f, 1f);
+        rt.pivot = new Vector2(0.5f, 1f);
+        rt.sizeDelta = new Vector2(380, 42);
+        rt.anchoredPosition = anchoredPos;
+
+        Image img = btnObj.AddComponent<Image>();
+        img.color = bgColor;
+
+        Button btn = btnObj.AddComponent<Button>();
+        ColorBlock colors = btn.colors;
+        colors.normalColor = bgColor;
+        colors.highlightedColor = bgColor * 1.3f;
+        colors.pressedColor = bgColor * 0.8f;
+        colors.selectedColor = bgColor;
+        btn.colors = colors;
+
+        GameObject txtObj = new GameObject("Text", typeof(RectTransform));
+        txtObj.transform.SetParent(btnObj.transform, false);
+        RectTransform txtRt = txtObj.GetComponent<RectTransform>();
+        txtRt.anchorMin = Vector2.zero;
+        txtRt.anchorMax = Vector2.one;
+        txtRt.sizeDelta = Vector2.zero;
+
+        TMP_Text tmp = txtObj.AddComponent<TextMeshProUGUI>();
+        tmp.text = label;
+        tmp.fontSize = 15;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.color = textColor;
+        tmp.alignment = TextAlignmentOptions.Center;
+
+        btn.onClick.AddListener(PlayClickSound);
+
+        return btn;
     }
 
     public void StartPrologue()

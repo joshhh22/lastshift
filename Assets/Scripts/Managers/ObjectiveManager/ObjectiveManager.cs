@@ -61,6 +61,8 @@ public class ObjectiveManager : MonoBehaviour
 
         RefreshAssignmentPageUI();
 
+        SaveManager.SaveCurrentGame();
+
         if (currentObjectiveIndex >= objectives.Count)
         {
             Debug.Log("All Objectives Completed");
@@ -97,6 +99,8 @@ public class ObjectiveManager : MonoBehaviour
             obj.currentAmount = obj.targetAmount;
 
         ShowCurrentObjective();
+
+        SaveManager.SaveCurrentGame();
 
         if (obj.currentAmount >= obj.targetAmount)
         {
@@ -171,6 +175,43 @@ public class ObjectiveManager : MonoBehaviour
 
         ShowCurrentObjective();
 
+        SaveManager.SaveCurrentGame();
+
         Debug.Log("Objectives Reset");
+    }
+
+    /// <summary>
+    /// Memulihkan status objective dari Save Data saat pemain memilih Continue.
+    /// </summary>
+    public void LoadSavedObjective(int savedIndex, int savedAmount)
+    {
+        if (objectives == null || objectives.Count == 0)
+            return;
+
+        currentObjectiveIndex = Mathf.Clamp(savedIndex, 0, objectives.Count);
+
+        for (int i = 0; i < objectives.Count; i++)
+        {
+            if (i < currentObjectiveIndex)
+            {
+                objectives[i].completed = true;
+                objectives[i].currentAmount = objectives[i].targetAmount;
+            }
+            else if (i == currentObjectiveIndex)
+            {
+                objectives[i].completed = false;
+                objectives[i].currentAmount = savedAmount;
+            }
+            else
+            {
+                objectives[i].completed = false;
+                objectives[i].currentAmount = 0;
+            }
+        }
+
+        RefreshAssignmentPageUI();
+        ShowCurrentObjective();
+
+        Debug.Log($"<color=cyan>[ObjectiveManager]</color> Objective dipulihkan ke Index {currentObjectiveIndex}: {GetCurrentObjective()}");
     }
 }
