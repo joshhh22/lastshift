@@ -40,7 +40,11 @@ public class PlayChoiceUIBuilder
         if (fontRegular == null)
         {
             var fonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
-            if (fonts.Length > 0) fontRegular = fonts[0];
+            foreach (var f in fonts)
+            {
+                if (f.name.Contains("HomeVideo")) { fontRegular = f; break; }
+            }
+            if (fontRegular == null && fonts.Length > 0) fontRegular = fonts[0];
         }
 
         // Hapus panel lama jika ada
@@ -97,6 +101,7 @@ public class PlayChoiceUIBuilder
         titleText.fontStyle = FontStyles.Bold;
         titleText.color = new Color(0f, 0.95f, 1f, 1f);
         titleText.alignment = TextAlignmentOptions.Center;
+        titleText.raycastTarget = false;
 
         // Divider Line
         GameObject divObj = new GameObject("Divider", typeof(RectTransform));
@@ -109,6 +114,7 @@ public class PlayChoiceUIBuilder
         divRt.anchoredPosition = new Vector2(0, -68);
         Image divImg = divObj.AddComponent<Image>();
         divImg.color = new Color(0f, 0.85f, 1f, 0.4f);
+        divImg.raycastTarget = false;
 
         // Save Info Text
         GameObject infoObj = new GameObject("SaveInfoText", typeof(RectTransform));
@@ -126,13 +132,14 @@ public class PlayChoiceUIBuilder
         saveInfoText.fontSize = 14;
         saveInfoText.color = new Color(0.85f, 0.88f, 0.92f, 0.95f);
         saveInfoText.alignment = TextAlignmentOptions.Center;
+        saveInfoText.raycastTarget = false;
 
         // =========================================================================
         // 2. BUTTONS
         // =========================================================================
-        Button continueBtn = CreateButton(panelObj.transform, "ContinueButton", "? CONTINUE SHIFT", new Vector2(0, -150), new Color(0.08f, 0.30f, 0.45f, 1f), new Color(0f, 1f, 0.95f, 1f), fontRegular);
-        Button newGameBtn = CreateButton(panelObj.transform, "NewGameButton", "? START NEW GAME", new Vector2(0, -210), new Color(0.16f, 0.16f, 0.20f, 1f), Color.white, fontRegular);
-        Button backBtn = CreateButton(panelObj.transform, "BackButton", "? BACK TO MENU", new Vector2(0, -270), new Color(0.10f, 0.10f, 0.12f, 0.9f), new Color(0.7f, 0.7f, 0.7f, 1f), fontRegular);
+        Button continueBtn = CreateButton(panelObj.transform, "ContinueButton", "[ > ] CONTINUE SHIFT", new Vector2(0, -150), new Color(0.08f, 0.30f, 0.45f, 1f), new Color(0f, 1f, 0.95f, 1f), fontRegular);
+        Button newGameBtn = CreateButton(panelObj.transform, "NewGameButton", "[ * ] START NEW GAME", new Vector2(0, -210), new Color(0.16f, 0.16f, 0.20f, 1f), Color.white, fontRegular);
+        Button backBtn = CreateButton(panelObj.transform, "BackButton", "KEMBALI (ESC)", new Vector2(0, -270), new Color(0.10f, 0.10f, 0.12f, 0.9f), new Color(0.7f, 0.7f, 0.7f, 1f), fontRegular);
 
         // =========================================================================
         // 3. SERIALIZE REFERENCES TO MAINMENUMANAGER
@@ -151,7 +158,7 @@ public class PlayChoiceUIBuilder
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         EditorSceneManager.SaveOpenScenes();
 
-        Debug.Log("<color=cyan>[PlayChoiceUIBuilder]</color> PlayChoicePanel berhasil dibuat dan dihubungkan ke MainMenuManager!");
+        Debug.Log("<color=cyan>[PlayChoiceUIBuilder]</color> PlayChoicePanel berhasil dibuat dengan font HomeVideo dan pure ASCII!");
     }
 
     private static Button CreateButton(Transform parent, string name, string label, Vector2 anchoredPos, Color bgColor, Color textColor, TMP_FontAsset font)
@@ -168,6 +175,7 @@ public class PlayChoiceUIBuilder
 
         Image img = btnObj.AddComponent<Image>();
         img.color = bgColor;
+        img.raycastTarget = true;
 
         Button btn = btnObj.AddComponent<Button>();
         ColorBlock colors = btn.colors;
@@ -191,6 +199,7 @@ public class PlayChoiceUIBuilder
         tmp.fontStyle = FontStyles.Bold;
         tmp.color = textColor;
         tmp.alignment = TextAlignmentOptions.Center;
+        tmp.raycastTarget = false;
 
         return btn;
     }

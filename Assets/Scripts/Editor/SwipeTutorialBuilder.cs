@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -104,7 +104,7 @@ public class SwipeTutorialBuilder
         if (tutorialUI == null) tutorialUI = swipeObj.AddComponent<SwipeTutorialUI>();
 
         // Ambil Font TMP default yang ada di project
-        TMP_FontAsset defaultFont = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+        TMP_FontAsset defaultFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/OpenType (.otf)/HomeVideo-Regular SDF.asset");
         if (defaultFont == null)
         {
             var fonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
@@ -206,7 +206,7 @@ public class SwipeTutorialBuilder
         footerRect.sizeDelta = new Vector2(-40, 55);
 
         // Prev Button
-        Button prevBtn = CreateButton("PrevButton", footerObj.transform, new Vector2(-280, 0), new Vector2(160, 42), "◀ SEBELUMNYA", defaultFont);
+        Button prevBtn = CreateButton("PrevButton", footerObj.transform, new Vector2(-280, 0), new Vector2(160, 42), "â—€ SEBELUMNYA", defaultFont);
 
         // Page Indicator Dots
         GameObject dotsObj = CreateUIObject("PageDots", footerObj.transform);
@@ -220,13 +220,13 @@ public class SwipeTutorialBuilder
         dotsText.fontSize = 22;
         dotsText.alignment = TextAlignmentOptions.Center;
         dotsText.color = Color.white;
-        dotsText.text = "● ○ ○ ○ ○ ○ ○";
+        dotsText.text = "â— â—‹ â—‹ â—‹ â—‹ â—‹ â—‹";
 
         // Next Button
-        Button nextBtn = CreateButton("NextButton", footerObj.transform, new Vector2(280, 0), new Vector2(160, 42), "SELANJUTNYA ▶", defaultFont);
+        Button nextBtn = CreateButton("NextButton", footerObj.transform, new Vector2(280, 0), new Vector2(160, 42), "SELANJUTNYA â–¶", defaultFont);
 
         // Back / Close Button (Pojok Kanan Atas)
-        Button backBtn = CreateButton("BackButton", swipeObj.transform, new Vector2(435, 270), new Vector2(65, 40), "✕ ESC", defaultFont);
+        Button backBtn = CreateButton("BackButton", swipeObj.transform, new Vector2(435, 270), new Vector2(65, 40), "âœ• ESC", defaultFont);
         ColorBlock cb = backBtn.colors;
         cb.normalColor = new Color(0.8f, 0.2f, 0.2f, 0.8f);
         backBtn.colors = cb;

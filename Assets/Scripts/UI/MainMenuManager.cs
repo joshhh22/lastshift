@@ -109,6 +109,9 @@ public class MainMenuManager : MonoBehaviour
         if (hintsButton != null) hintsButton.onClick.AddListener(OpenHints);
         if (swipeMechanicButton != null) swipeMechanicButton.onClick.AddListener(OpenSwipeMechanic);
 
+        // Pasang listener tombol Back di semua panel secara otomatis & persisten
+        HookAllBackButtons();
+
         // Pasang audio click.mp3 ke SEMUA tombol di scene secara otomatis
         foreach (Button btn in FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
@@ -122,6 +125,99 @@ public class MainMenuManager : MonoBehaviour
         if (fadeOverlay != null)
         {
             StartCoroutine(FadeScreen(1f, 0f, 0.8f));
+        }
+    }
+
+    public TMP_FontAsset GetHomeVideoFont()
+    {
+#if UNITY_EDITOR
+        TMP_FontAsset font = UnityEditor.AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/OpenType (.otf)/HomeVideo-Regular SDF.asset");
+        if (font != null) return font;
+#endif
+        var fonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+        foreach (var f in fonts)
+        {
+            if (f != null && f.name.Contains("HomeVideo")) return f;
+        }
+        if (fonts.Length > 0) return fonts[0];
+        return null;
+    }
+
+    public void HookAllBackButtons()
+    {
+        // 1. Guide Panel Back Buttons
+        if (guidePanel != null)
+        {
+            foreach (Button b in guidePanel.GetComponentsInChildren<Button>(true))
+            {
+                string n = b.gameObject.name.ToLower();
+                if (n.Contains("back") || n.Contains("kembali") || n.Contains("close") || n.Contains("esc"))
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(CloseSubPanels);
+                    b.onClick.AddListener(PlayClickSound);
+                }
+            }
+        }
+
+        // 2. Hints Sub Panel Back Buttons
+        if (hintsSubPanel != null)
+        {
+            foreach (Button b in hintsSubPanel.GetComponentsInChildren<Button>(true))
+            {
+                string n = b.gameObject.name.ToLower();
+                if (n.Contains("back") || n.Contains("kembali") || n.Contains("close") || n.Contains("esc"))
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(OpenGuide);
+                    b.onClick.AddListener(PlayClickSound);
+                }
+            }
+        }
+
+        // 3. Swipe Mechanic Sub Panel Back Buttons
+        if (swipeMechanicSubPanel != null)
+        {
+            foreach (Button b in swipeMechanicSubPanel.GetComponentsInChildren<Button>(true))
+            {
+                string n = b.gameObject.name.ToLower();
+                if (n.Contains("back") || n.Contains("kembali") || n.Contains("close") || n.Contains("esc"))
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(OpenGuide);
+                    b.onClick.AddListener(PlayClickSound);
+                }
+            }
+        }
+
+        // 4. Credits Panel Back Buttons
+        if (creditsPanel != null)
+        {
+            foreach (Button b in creditsPanel.GetComponentsInChildren<Button>(true))
+            {
+                string n = b.gameObject.name.ToLower();
+                if (n.Contains("back") || n.Contains("kembali") || n.Contains("close") || n.Contains("esc"))
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(CloseSubPanels);
+                    b.onClick.AddListener(PlayClickSound);
+                }
+            }
+        }
+
+        // 5. Play Choice Modal Back Buttons
+        if (playChoicePanel != null)
+        {
+            foreach (Button b in playChoicePanel.GetComponentsInChildren<Button>(true))
+            {
+                string n = b.gameObject.name.ToLower();
+                if (n.Contains("back") || n.Contains("kembali") || n.Contains("close") || n.Contains("esc"))
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(ClosePlayChoicePanel);
+                    b.onClick.AddListener(PlayClickSound);
+                }
+            }
         }
     }
 
@@ -241,24 +337,47 @@ public class MainMenuManager : MonoBehaviour
         if (creditsPanel != null) creditsPanel.SetActive(false);
         if (hintsSubPanel != null) hintsSubPanel.SetActive(false);
         if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
-        if (guidePanel != null) guidePanel.SetActive(true);
+        if (guidePanel != null)
+        {
+            guidePanel.SetActive(true);
+            guidePanel.transform.SetAsLastSibling();
+        }
+
+        HookAllBackButtons();
     }
 
     public void OpenHints()
     {
+        if (mainMenuCanvas != null) mainMenuCanvas.SetActive(false);
         if (guidePanel != null) guidePanel.SetActive(false);
         if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
-        if (hintsSubPanel != null) hintsSubPanel.SetActive(true);
+        if (hintsSubPanel != null)
+        {
+            hintsSubPanel.SetActive(true);
+            hintsSubPanel.transform.SetAsLastSibling();
+        }
+
+        HookAllBackButtons();
     }
 
     public void OpenSwipeMechanic()
     {
+        if (mainMenuCanvas != null) mainMenuCanvas.SetActive(false);
         if (guidePanel != null) guidePanel.SetActive(false);
         if (hintsSubPanel != null) hintsSubPanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
-        if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(true);
+        if (swipeMechanicSubPanel != null)
+        {
+            swipeMechanicSubPanel.SetActive(true);
+            swipeMechanicSubPanel.transform.SetAsLastSibling();
+        }
 
         if (swipeScrollRect != null)
         {
@@ -268,6 +387,8 @@ public class MainMenuManager : MonoBehaviour
         {
             swipeTextRect.anchoredPosition = Vector2.zero;
         }
+
+        HookAllBackButtons();
     }
 
     public void OpenCredits()
@@ -276,8 +397,15 @@ public class MainMenuManager : MonoBehaviour
         if (guidePanel != null) guidePanel.SetActive(false);
         if (hintsSubPanel != null) hintsSubPanel.SetActive(false);
         if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
-        if (creditsPanel != null) creditsPanel.SetActive(true);
+        if (creditsPanel != null)
+        {
+            creditsPanel.SetActive(true);
+            creditsPanel.transform.SetAsLastSibling();
+        }
+
+        HookAllBackButtons();
     }
 
     public void CloseSubPanels()
@@ -286,6 +414,7 @@ public class MainMenuManager : MonoBehaviour
         if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
         if (guidePanel != null) guidePanel.SetActive(false);
         if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
         if (mainMenuCanvas != null) mainMenuCanvas.SetActive(true);
     }
@@ -325,6 +454,7 @@ public class MainMenuManager : MonoBehaviour
         if (playChoicePanel != null)
         {
             playChoicePanel.SetActive(true);
+            playChoicePanel.transform.SetAsLastSibling();
 
             SaveData data = SaveManager.GetSaveData();
             if (data != null && data.hasSaveData)
@@ -340,10 +470,12 @@ public class MainMenuManager : MonoBehaviour
                     TMP_Text btnTxt = continueGameButton.GetComponentInChildren<TMP_Text>();
                     if (btnTxt != null)
                     {
-                        btnTxt.text = $"▶ CONTINUE (DAY {data.currentDay})";
+                        btnTxt.text = $"[ > ] CONTINUE (DAY {data.currentDay})";
                     }
                 }
             }
+
+            HookAllBackButtons();
         }
     }
 
@@ -391,6 +523,8 @@ public class MainMenuManager : MonoBehaviour
         if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null) return;
 
+        TMP_FontAsset font = GetHomeVideoFont();
+
         // Container Modal
         GameObject panelObj = new GameObject("PlayChoiceModal", typeof(RectTransform));
         panelObj.transform.SetParent(canvas.transform, false);
@@ -400,11 +534,11 @@ public class MainMenuManager : MonoBehaviour
         panelRt.anchorMin = new Vector2(0.5f, 0.5f);
         panelRt.anchorMax = new Vector2(0.5f, 0.5f);
         panelRt.pivot = new Vector2(0.5f, 0.5f);
-        panelRt.sizeDelta = new Vector2(460, 320);
+        panelRt.sizeDelta = new Vector2(480, 340);
         panelRt.anchoredPosition = Vector2.zero;
 
         Image panelBg = panelObj.AddComponent<Image>();
-        panelBg.color = new Color(0.03f, 0.05f, 0.08f, 0.96f);
+        panelBg.color = new Color(0.04f, 0.06f, 0.09f, 0.96f);
 
         // Header Title
         GameObject titleObj = new GameObject("Title", typeof(RectTransform));
@@ -416,6 +550,7 @@ public class MainMenuManager : MonoBehaviour
         titleRt.sizeDelta = new Vector2(0, 45);
         titleRt.anchoredPosition = new Vector2(0, -18);
         TMP_Text titleText = titleObj.AddComponent<TextMeshProUGUI>();
+        if (font != null) titleText.font = font;
         titleText.text = "SELECT MISSION";
         titleText.fontSize = 22;
         titleText.fontStyle = FontStyles.Bold;
@@ -432,28 +567,29 @@ public class MainMenuManager : MonoBehaviour
         infoRt.sizeDelta = new Vector2(0, 50);
         infoRt.anchoredPosition = new Vector2(0, -65);
         saveInfoText = infoObj.AddComponent<TextMeshProUGUI>();
+        if (font != null) saveInfoText.font = font;
         saveInfoText.text = "SAVED PROGRESS FOUND";
         saveInfoText.fontSize = 13;
         saveInfoText.color = new Color(0.8f, 0.85f, 0.9f, 0.9f);
         saveInfoText.alignment = TextAlignmentOptions.Center;
 
         // Continue Button
-        continueGameButton = CreateModalButton(panelObj.transform, "ContinueButton", "▶ CONTINUE SHIFT", new Vector2(0, -135), new Color(0.08f, 0.28f, 0.42f, 1f), new Color(0f, 1f, 0.95f, 1f));
+        continueGameButton = CreateModalButton(panelObj.transform, "ContinueButton", "[ > ] CONTINUE SHIFT", new Vector2(0, -135), new Color(0.08f, 0.28f, 0.42f, 1f), new Color(0f, 1f, 0.95f, 1f), font);
         continueGameButton.onClick.AddListener(ContinueGame);
 
         // New Game Button
-        newGameButton = CreateModalButton(panelObj.transform, "NewGameButton", "↺ START NEW GAME", new Vector2(0, -190), new Color(0.18f, 0.18f, 0.22f, 1f), Color.white);
+        newGameButton = CreateModalButton(panelObj.transform, "NewGameButton", "[ * ] START NEW GAME", new Vector2(0, -190), new Color(0.18f, 0.18f, 0.22f, 1f), Color.white, font);
         newGameButton.onClick.AddListener(StartNewGame);
 
         // Back Button
-        playChoiceBackButton = CreateModalButton(panelObj.transform, "BackButton", "← BACK", new Vector2(0, -245), new Color(0.12f, 0.12f, 0.14f, 0.8f), new Color(0.7f, 0.7f, 0.7f, 1f));
+        playChoiceBackButton = CreateModalButton(panelObj.transform, "BackButton", "KEMBALI (ESC)", new Vector2(0, -245), new Color(0.12f, 0.12f, 0.14f, 0.8f), new Color(0.7f, 0.7f, 0.7f, 1f), font);
         playChoiceBackButton.onClick.AddListener(ClosePlayChoicePanel);
 
         playChoicePanel = panelObj;
         playChoicePanel.SetActive(false);
     }
 
-    private Button CreateModalButton(Transform parent, string name, string label, Vector2 anchoredPos, Color bgColor, Color textColor)
+    private Button CreateModalButton(Transform parent, string name, string label, Vector2 anchoredPos, Color bgColor, Color textColor, TMP_FontAsset font)
     {
         GameObject btnObj = new GameObject(name, typeof(RectTransform));
         btnObj.transform.SetParent(parent, false);
@@ -462,11 +598,12 @@ public class MainMenuManager : MonoBehaviour
         rt.anchorMin = new Vector2(0.5f, 1f);
         rt.anchorMax = new Vector2(0.5f, 1f);
         rt.pivot = new Vector2(0.5f, 1f);
-        rt.sizeDelta = new Vector2(380, 42);
+        rt.sizeDelta = new Vector2(400, 44);
         rt.anchoredPosition = anchoredPos;
 
         Image img = btnObj.AddComponent<Image>();
         img.color = bgColor;
+        img.raycastTarget = true;
 
         Button btn = btnObj.AddComponent<Button>();
         ColorBlock colors = btn.colors;
@@ -484,11 +621,13 @@ public class MainMenuManager : MonoBehaviour
         txtRt.sizeDelta = Vector2.zero;
 
         TMP_Text tmp = txtObj.AddComponent<TextMeshProUGUI>();
+        if (font != null) tmp.font = font;
         tmp.text = label;
         tmp.fontSize = 15;
         tmp.fontStyle = FontStyles.Bold;
         tmp.color = textColor;
         tmp.alignment = TextAlignmentOptions.Center;
+        tmp.raycastTarget = false;
 
         btn.onClick.AddListener(PlayClickSound);
 

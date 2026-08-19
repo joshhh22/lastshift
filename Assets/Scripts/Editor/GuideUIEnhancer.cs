@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -30,11 +30,15 @@ public class GuideUIEnhancer
             return;
         }
 
-        TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+        TMP_FontAsset font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/OpenType (.otf)/HomeVideo-Regular SDF.asset");
         if (font == null)
         {
             var fonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
-            if (fonts.Length > 0) font = fonts[0];
+            foreach (var f in fonts)
+            {
+                if (f.name.Contains("HomeVideo")) { font = f; break; }
+            }
+            if (font == null && fonts.Length > 0) font = fonts[0];
         }
 
         // =========================================================================
@@ -73,9 +77,9 @@ public class GuideUIEnhancer
             hRt.anchoredPosition = new Vector2(0, -25);
             hRt.sizeDelta = new Vector2(-40, 75);
 
-            var badge = CreateTMPText("Badge", header.transform, new Vector2(0, 0), new Vector2(0, 20), "TERMINAL ARSIP STASIUN // PUSAT PANDUAN", 14, font, FontStyles.Bold, new Color(0f, 1f, 0.85f, 1f));
-            var title = CreateTMPText("Title", header.transform, new Vector2(0, -24), new Vector2(0, 32), "PANDUAN OPERASIONAL PETUGAS", 24, font, FontStyles.Bold, Color.white);
-            var subtitle = CreateTMPText("Subtitle", header.transform, new Vector2(0, -56), new Vector2(0, 20), "Pilih topik panduan di bawah ini untuk melihat tata cara bertugas:", 15, font, FontStyles.Normal, new Color(0.7f, 0.8f, 0.9f, 1f));
+            CreateTMPText("Badge", header.transform, new Vector2(0, 0), new Vector2(0, 20), "TERMINAL ARSIP STASIUN // PUSAT PANDUAN", 14, font, FontStyles.Bold, new Color(0f, 1f, 0.85f, 1f));
+            CreateTMPText("Title", header.transform, new Vector2(0, -24), new Vector2(0, 32), "PANDUAN OPERASIONAL PETUGAS", 24, font, FontStyles.Bold, Color.white);
+            CreateTMPText("Subtitle", header.transform, new Vector2(0, -56), new Vector2(0, 20), "Pilih topik panduan di bawah ini untuk melihat tata cara bertugas:", 15, font, FontStyles.Normal, new Color(0.7f, 0.8f, 0.9f, 1f));
 
             // --- 2 Menu Cards (Hints & Swipe) ---
             GameObject cardsContainer = CreateUIObject("CardsContainer", guideObj.transform);
@@ -88,7 +92,7 @@ public class GuideUIEnhancer
 
             // Card 1: KONTROL (Hints)
             Button hintsBtn = CreateGuideCard("HintsCard", cardsContainer.transform, new Vector2(-205, 0), new Vector2(370, 260),
-                "🎮 KONTROL & NAVIGASI",
+                "// KONTROL & NAVIGASI",
                 "Tata Cara Kontrol Karakter",
                 "Panduan lengkap tombol gerak [WASD], interaksi loket [E], tombol mouse, dan navigasi di stasiun.",
                 font,
@@ -96,14 +100,14 @@ public class GuideUIEnhancer
 
             // Card 2: SWIPE (Swipe Tutorial)
             Button swipeBtn = CreateGuideCard("SwipeCard", cardsContainer.transform, new Vector2(205, 0), new Vector2(370, 260),
-                "💳 PEMINDAIAN TIKET",
+                "// PEMINDAIAN TIKET",
                 "Tutorial Gesek Kartu (7 Langkah)",
                 "Panduan visual bergambar langkah demi langkah: ambil kartu, snap di mesin scanner, hingga gesek ke kanan.",
                 font,
                 () => { if (MainMenuManager.Instance != null) MainMenuManager.Instance.OpenSwipeMechanic(); });
 
             // Close Button
-            Button backBtn = CreateButton("BackButton", guideObj.transform, new Vector2(0, -225), new Vector2(180, 44), "✕ KEMBALI (ESC)", font);
+            Button backBtn = CreateButton("BackButton", guideObj.transform, new Vector2(0, -225), new Vector2(200, 44), "KEMBALI (ESC)", font);
             backBtn.onClick.AddListener(() => { if (MainMenuManager.Instance != null) MainMenuManager.Instance.CloseSubPanels(); });
 
             // Link ke MainMenuManager
@@ -150,6 +154,10 @@ public class GuideUIEnhancer
             CreateTMPText("Badge", header.transform, new Vector2(0, 0), new Vector2(0, 20), "SISTEM KONTROL PETUGAS // LAST SHIFT", 14, font, FontStyles.Bold, new Color(0f, 1f, 0.85f, 1f));
             CreateTMPText("Title", header.transform, new Vector2(0, -22), new Vector2(0, 32), "PANDUAN KONTROL & NAVIGASI", 24, font, FontStyles.Bold, Color.white);
 
+            // Top-right Back Button
+            Button topBackBtn = CreateButton("BackButton", header.transform, new Vector2(240, -10), new Vector2(170, 38), "KEMBALI (ESC)", font);
+            topBackBtn.onClick.AddListener(() => { if (MainMenuManager.Instance != null) MainMenuManager.Instance.OpenGuide(); });
+
             // --- Grid Kontrol ---
             GameObject gridObj = CreateUIObject("ControlsGrid", hintsObj.transform);
             RectTransform gRt = gridObj.GetComponent<RectTransform>();
@@ -160,7 +168,7 @@ public class GuideUIEnhancer
             gRt.sizeDelta = new Vector2(840, 340);
 
             // 6 Baris Kontrol Rapi & Keren
-            CreateControlRow(gridObj.transform, new Vector2(0, 125), "[ W ] [ A ] [ S ] [ D ]  /  [ ◀ ▲ ▼ ▶ ]", "Navigasi & Berjalan Menjelajahi Area Stasiun", font);
+            CreateControlRow(gridObj.transform, new Vector2(0, 125), "[ W ] [ A ] [ S ] [ D ]  /  [ PANAH ]", "Navigasi & Berjalan Menjelajahi Area Stasiun", font);
             CreateControlRow(gridObj.transform, new Vector2(0, 75), "[ KURSOR MOUSE ]", "Mengarahkan Sudut Pandang Kamera (First Person Look)", font);
             CreateControlRow(gridObj.transform, new Vector2(0, 25), "[ E ]", "Melayani Penumpang di Meja Loket & Interaksi Objek", font);
             CreateControlRow(gridObj.transform, new Vector2(0, -25), "[ KLIK KIRI MOUSE ]", "Memegang Tiket Penumpang & Menekan Tombol Komputer", font);
@@ -180,22 +188,17 @@ public class GuideUIEnhancer
             tipBg.color = new Color(0.12f, 0.2f, 0.28f, 0.6f);
 
             var tipTxt = CreateTMPText("TipText", tipBox.transform, Vector2.zero, new Vector2(-20, 0),
-                "💡 <b>TIPS PETUGAS:</b> Selalu periksa data tiket penumpang di log komputer loket sebelum memutuskan menerima atau menolak!",
+                "<b>[TIPS PETUGAS]</b> Selalu periksa data tiket penumpang di log komputer loket sebelum memutuskan menerima atau menolak!",
                 14, font, FontStyles.Normal, new Color(0.85f, 0.95f, 1f, 1f));
             tipTxt.alignment = TextAlignmentOptions.Center;
-
-            // Back Button
-            Button backBtn = CreateButton("BackButton", hintsObj.transform, new Vector2(0, 20), new Vector2(180, 42), "◀ KEMBALI (ESC)", font);
-            backBtn.onClick.AddListener(() => { if (MainMenuManager.Instance != null) MainMenuManager.Instance.OpenGuide(); });
         }
 
         // Simpan Scene
         EditorUtility.SetDirty(menuMgr);
         EditorSceneManager.MarkSceneDirty(currentScene);
-        EditorSceneManager.SaveScene(currentScene);
+        EditorSceneManager.SaveOpenScenes();
 
-        EditorUtility.DisplayDialog("Sukses!", "Seluruh tampilan GuidePanel dan Halaman Kontrol berhasil dipercantik dengan gaya Sci-Fi Retro CRT yang modern dan senada dengan Swipe Page!", "Mantap Sekali!");
-        Debug.Log("<color=green>[GuideUIEnhancer]</color> GuidePanel dan Halaman Kontrol berhasil dipercantik.");
+        Debug.Log("<color=green>[GuideUIEnhancer]</color> GuidePanel dan Halaman Kontrol berhasil dipercantik dengan font HomeVideo dan pure ASCII.");
     }
 
     private static GameObject CreateUIObject(string name, Transform parent)
@@ -219,9 +222,9 @@ public class GuideUIEnhancer
         if (font != null) t.font = font;
         t.fontSize = fontSize;
         t.fontStyle = style;
-        t.alignment = TextAlignmentOptions.Center;
         t.color = color;
         t.text = text;
+        t.raycastTarget = false;
         return t;
     }
 
@@ -234,46 +237,49 @@ public class GuideUIEnhancer
         rt.anchoredPosition = pos;
         rt.sizeDelta = size;
 
-        Image img = cardObj.AddComponent<Image>();
-        img.color = new Color(0.12f, 0.18f, 0.25f, 0.85f);
+        Image bg = cardObj.AddComponent<Image>();
+        bg.color = new Color(0.08f, 0.14f, 0.20f, 0.9f);
+        bg.raycastTarget = true;
 
         Button btn = cardObj.AddComponent<Button>();
         ColorBlock cb = btn.colors;
-        cb.highlightedColor = new Color(0f, 0.85f, 0.75f, 0.95f);
-        cb.pressedColor = new Color(0f, 0.55f, 0.5f, 1f);
+        cb.highlightedColor = new Color(0f, 0.7f, 0.85f, 1f);
+        cb.pressedColor = new Color(0f, 0.45f, 0.6f, 1f);
         btn.colors = cb;
 
-        // Tag
+        // Tag Badge
         GameObject tagObj = CreateUIObject("Tag", cardObj.transform);
         RectTransform tagRt = tagObj.GetComponent<RectTransform>();
-        tagRt.anchorMin = new Vector2(0, 1);
-        tagRt.anchorMax = new Vector2(1, 1);
+        tagRt.anchorMin = new Vector2(0.5f, 1);
+        tagRt.anchorMax = new Vector2(0.5f, 1);
         tagRt.pivot = new Vector2(0.5f, 1);
         tagRt.anchoredPosition = new Vector2(0, -18);
-        tagRt.sizeDelta = new Vector2(-20, 20);
+        tagRt.sizeDelta = new Vector2(300, 24);
         TMP_Text tagText = tagObj.AddComponent<TextMeshProUGUI>();
         if (font != null) tagText.font = font;
-        tagText.fontSize = 13;
+        tagText.fontSize = 14;
         tagText.fontStyle = FontStyles.Bold;
         tagText.alignment = TextAlignmentOptions.Center;
         tagText.color = new Color(0f, 1f, 0.85f, 1f);
         tagText.text = tag;
+        tagText.raycastTarget = false;
 
         // Title
         GameObject titleObj = CreateUIObject("Title", cardObj.transform);
         RectTransform titleRt = titleObj.GetComponent<RectTransform>();
-        titleRt.anchorMin = new Vector2(0, 1);
-        titleRt.anchorMax = new Vector2(1, 1);
+        titleRt.anchorMin = new Vector2(0.5f, 1);
+        titleRt.anchorMax = new Vector2(0.5f, 1);
         titleRt.pivot = new Vector2(0.5f, 1);
-        titleRt.anchoredPosition = new Vector2(0, -45);
-        titleRt.sizeDelta = new Vector2(-24, 45);
+        titleRt.anchoredPosition = new Vector2(0, -48);
+        titleRt.sizeDelta = new Vector2(330, 40);
         TMP_Text titleText = titleObj.AddComponent<TextMeshProUGUI>();
         if (font != null) titleText.font = font;
-        titleText.fontSize = 19;
+        titleText.fontSize = 17;
         titleText.fontStyle = FontStyles.Bold;
         titleText.alignment = TextAlignmentOptions.Center;
         titleText.color = Color.white;
         titleText.text = title;
+        titleText.raycastTarget = false;
 
         // Divider
         GameObject divObj = CreateUIObject("Divider", cardObj.transform);
@@ -285,6 +291,7 @@ public class GuideUIEnhancer
         divRt.sizeDelta = new Vector2(300, 2);
         Image divImg = divObj.AddComponent<Image>();
         divImg.color = new Color(0.2f, 0.35f, 0.45f, 0.5f);
+        divImg.raycastTarget = false;
 
         // Description
         GameObject descObj = CreateUIObject("Desc", cardObj.transform);
@@ -296,10 +303,11 @@ public class GuideUIEnhancer
         descRt.sizeDelta = new Vector2(-30, -120);
         TMP_Text descText = descObj.AddComponent<TextMeshProUGUI>();
         if (font != null) descText.font = font;
-        descText.fontSize = 14;
+        descText.fontSize = 13;
         descText.alignment = TextAlignmentOptions.Center;
         descText.color = new Color(0.8f, 0.9f, 1f, 1f);
         descText.text = desc;
+        descText.raycastTarget = false;
 
         // Button Click CTA
         GameObject ctaObj = CreateUIObject("CTA", cardObj.transform);
@@ -316,55 +324,10 @@ public class GuideUIEnhancer
         ctaText.alignment = TextAlignmentOptions.Center;
         ctaText.color = new Color(0f, 0.9f, 1f, 1f);
         ctaText.text = "[ KLIK UNTUK MEMBUKA ]";
+        ctaText.raycastTarget = false;
 
         if (onClick != null) btn.onClick.AddListener(onClick);
         return btn;
-    }
-
-    private static void CreateControlRow(Transform parent, Vector2 pos, string keyText, string descText, TMP_FontAsset font)
-    {
-        GameObject row = CreateUIObject("ControlRow", parent);
-        RectTransform rt = row.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0.5f, 0.5f);
-        rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = pos;
-        rt.sizeDelta = new Vector2(800, 42);
-
-        Image rowBg = row.AddComponent<Image>();
-        rowBg.color = new Color(0.1f, 0.15f, 0.22f, 0.7f);
-
-        // Keycap Badge (Kiri)
-        GameObject keyObj = CreateUIObject("Keycap", row.transform);
-        RectTransform keyRt = keyObj.GetComponent<RectTransform>();
-        keyRt.anchorMin = new Vector2(0, 0.5f);
-        keyRt.anchorMax = new Vector2(0, 0.5f);
-        keyRt.pivot = new Vector2(0, 0.5f);
-        keyRt.anchoredPosition = new Vector2(15, 0);
-        keyRt.sizeDelta = new Vector2(300, 30);
-
-        TMP_Text kt = keyObj.AddComponent<TextMeshProUGUI>();
-        if (font != null) kt.font = font;
-        kt.fontSize = 15;
-        kt.fontStyle = FontStyles.Bold;
-        kt.alignment = TextAlignmentOptions.Left;
-        kt.color = new Color(0f, 1f, 0.85f, 1f);
-        kt.text = keyText;
-
-        // Description (Kanan)
-        GameObject descObj = CreateUIObject("Desc", row.transform);
-        RectTransform descRt = descObj.GetComponent<RectTransform>();
-        descRt.anchorMin = new Vector2(0, 0.5f);
-        descRt.anchorMax = new Vector2(1, 0.5f);
-        descRt.pivot = new Vector2(0, 0.5f);
-        descRt.anchoredPosition = new Vector2(320, 0);
-        descRt.sizeDelta = new Vector2(-335, 30);
-
-        TMP_Text dt = descObj.AddComponent<TextMeshProUGUI>();
-        if (font != null) dt.font = font;
-        dt.fontSize = 15;
-        dt.alignment = TextAlignmentOptions.Left;
-        dt.color = Color.white;
-        dt.text = descText;
     }
 
     private static Button CreateButton(string name, Transform parent, Vector2 pos, Vector2 size, string text, TMP_FontAsset font)
@@ -377,7 +340,8 @@ public class GuideUIEnhancer
         rt.sizeDelta = size;
 
         Image img = btnObj.AddComponent<Image>();
-        img.color = new Color(0.18f, 0.28f, 0.38f, 0.9f);
+        img.color = new Color(0.18f, 0.28f, 0.38f, 0.95f);
+        img.raycastTarget = true;
 
         Button btn = btnObj.AddComponent<Button>();
         ColorBlock cb = btn.colors;
@@ -393,11 +357,12 @@ public class GuideUIEnhancer
 
         TMP_Text t = txtObj.AddComponent<TextMeshProUGUI>();
         if (font != null) t.font = font;
-        t.fontSize = 15;
+        t.fontSize = 14;
         t.fontStyle = FontStyles.Bold;
         t.alignment = TextAlignmentOptions.Center;
         t.color = Color.white;
         t.text = text;
+        t.raycastTarget = false;
 
         return btn;
     }
