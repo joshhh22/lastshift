@@ -76,6 +76,10 @@ public class CleaningStaffController : MonoBehaviour
             {
                 UnlockFullPatrol();
             }
+            else
+            {
+                HasTalked = false;
+            }
         }
 
         StartPatrol();
@@ -103,10 +107,9 @@ public class CleaningStaffController : MonoBehaviour
                 allPatrolPoints.Add(wp);
 
                 string wpName = wp.name.ToLower().Trim();
-                // Filter waypoint restricted dekat pemain: Coffee, Counter, Rail, Stair, 1, 2
+                // Filter waypoint restricted dekat pemain (tanpa Rail): Coffee, Counter, Stair, 1, 2
                 if (wpName == "coffee" || wpName.Contains("coffee") ||
                     wpName == "counter" || wpName.Contains("counter") ||
-                    wpName == "rail" || wpName.Contains("rail") ||
                     wpName == "stair" || wpName.Contains("stair") ||
                     wpName == "1" || wpName == "2")
                 {
@@ -136,7 +139,7 @@ public class CleaningStaffController : MonoBehaviour
         HasTalked = false;
         currentIndex = 0;
 
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
         {
             agent.Warp(initialPosition);
         }
@@ -152,6 +155,9 @@ public class CleaningStaffController : MonoBehaviour
             animator.SetFloat("Speed", 0f);
             animator.SetInteger("IdleType", 0);
         }
+
+        // Mulai kembali roaming di waypoint area awal (Coffee, Counter, Stair, 1, 2) untuk hari baru
+        StartPatrol();
     }
 
     private List<Transform> GetCurrentPatrolPool()
