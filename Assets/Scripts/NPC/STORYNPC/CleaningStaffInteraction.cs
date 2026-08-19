@@ -14,7 +14,7 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
     [SerializeField] private int requiredObjectiveIndex;
 
     [Header("Cinematic Camera Focus Settings")]
-    [SerializeField] private float zoomFOV = 44f;
+    [SerializeField] private float zoomFOV = 56f;
     [SerializeField] private float focusSpeed = 3.5f;
 
     private CleaningStaffController cleaningStaff;
@@ -161,15 +161,21 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
     {
         if (playerCam == null) yield break;
 
-        float targetFOV = focusIn ? zoomFOV : (defaultFOV > 0 ? defaultFOV : 60f);
+        float targetFOV = focusIn ? zoomFOV : (defaultFOV > 0 ? defaultFOV : 71.2f);
         float startFOV = playerCam.fieldOfView;
 
-        Vector3 targetLookPos = transform.position + Vector3.up * 1.52f; // Fokus ke area wajah/dada
-        Quaternion targetRotation = Quaternion.LookRotation((targetLookPos - playerCam.transform.position).normalized);
-        Quaternion startRotation = playerCam.transform.rotation;
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        Vector3 targetLookPos = transform.position + Vector3.up * 1.45f;
+        Vector3 lookDir = (targetLookPos - playerCam.transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(lookDir);
+        Quaternion startCamRotation = playerCam.transform.rotation;
+        Quaternion startPlayerRotation = playerObj != null ? playerObj.transform.rotation : Quaternion.identity;
+
+        Vector3 flatLookDir = new Vector3(lookDir.x, 0, lookDir.z).normalized;
+        Quaternion targetPlayerRotation = flatLookDir.sqrMagnitude > 0.001f ? Quaternion.LookRotation(flatLookDir) : startPlayerRotation;
 
         float elapsed = 0f;
-        float duration = 0.55f;
+        float duration = 0.45f;
 
         while (elapsed < duration)
         {
@@ -180,7 +186,11 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
 
             if (focusIn)
             {
-                playerCam.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
+                playerCam.transform.rotation = Quaternion.Slerp(startCamRotation, targetRotation, t);
+                if (playerObj != null)
+                {
+                    playerObj.transform.rotation = Quaternion.Slerp(startPlayerRotation, targetPlayerRotation, t);
+                }
             }
 
             yield return null;

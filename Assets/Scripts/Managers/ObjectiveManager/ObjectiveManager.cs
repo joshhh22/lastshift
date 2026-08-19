@@ -234,14 +234,6 @@ public class ObjectiveManager : MonoBehaviour
                 SpawnManager.Instance.SpawnPassenger(remaining, 5f, 10f);
             }
         }
-        else if (title.Contains("continue") || title.Contains("working"))
-        {
-            if (SpawnManager.Instance != null)
-            {
-                Debug.Log($"<color=cyan>[ObjectiveManager]</color> Melanjutkan spawn penumpang berkala untuk: {curObj.title}");
-                SpawnManager.Instance.SpawnContinueWorking();
-            }
-        }
         else if (title.Contains("phone"))
         {
             if (PhoneManager.Instance != null)

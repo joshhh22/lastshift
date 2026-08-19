@@ -104,6 +104,12 @@ public class PhoneManager : MonoBehaviour
             phoneUI.SetActive(true);
         }
 
+        // Sembunyikan pemikiran objektif aktif agar tidak menutupi tampilan chat HP
+        if (PlayerMonologueManager.Instance != null)
+        {
+            PlayerMonologueManager.Instance.HideActiveThought();
+        }
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 

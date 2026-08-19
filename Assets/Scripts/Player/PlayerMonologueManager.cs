@@ -20,6 +20,7 @@ public class PlayerMonologueManager : MonoBehaviour
     private int currentTrackedDay = -1;
     private bool isOpeningMonologueActive = false;
     private string lastThoughtObjectiveTitle = "";
+    private string pendingObjectiveThought = null;
 
     private void Awake()
     {
@@ -71,6 +72,24 @@ public class PlayerMonologueManager : MonoBehaviour
         {
             currentTrackedDay = (int)DayManager.Instance.CurrentDay;
             TriggerDayOpeningMonologue(DayManager.Instance.CurrentDay);
+        }
+
+        // Jika ada pending thought dari objektif baru yang sempat terhalang Phone UI atau Dialog
+        if (!string.IsNullOrEmpty(pendingObjectiveThought))
+        {
+            if (!isOpeningMonologueActive &&
+                (DialogueManager.Instance == null || !DialogueManager.Instance.IsPlaying()) &&
+                (PhoneManager.Instance == null || !PhoneManager.Instance.IsOpen))
+            {
+                string thoughtTitle = pendingObjectiveThought;
+                pendingObjectiveThought = null;
+                lastThoughtObjectiveTitle = thoughtTitle;
+                string thought = GetContextualThought(thoughtTitle);
+                if (!string.IsNullOrEmpty(thought))
+                {
+                    ShowThought(thought);
+                }
+            }
         }
     }
 
@@ -262,9 +281,14 @@ public class PlayerMonologueManager : MonoBehaviour
         if (baseTitle.Equals(lastThoughtObjectiveTitle, System.StringComparison.OrdinalIgnoreCase))
             return;
 
-        // Jangan tampilkan pemikiran objektif jika monolog pembuka atau dialog lain sedang berjalan
-        if (isOpeningMonologueActive || (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying()))
+        // Jangan tampilkan pemikiran objektif jika Phone UI sedang terbuka, monolog pembuka, atau dialog lain sedang berjalan
+        if (isOpeningMonologueActive || 
+            (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying()) ||
+            (PhoneManager.Instance != null && PhoneManager.Instance.IsOpen))
+        {
+            pendingObjectiveThought = baseTitle;
             return;
+        }
 
         lastThoughtObjectiveTitle = baseTitle;
 
@@ -272,6 +296,19 @@ public class PlayerMonologueManager : MonoBehaviour
         if (!string.IsNullOrEmpty(thought))
         {
             ShowThought(thought);
+        }
+    }
+
+    public void HideActiveThought()
+    {
+        if (activeThoughtRoutine != null)
+        {
+            StopCoroutine(activeThoughtRoutine);
+            activeThoughtRoutine = null;
+        }
+        if (thoughtContainer != null)
+        {
+            thoughtContainer.SetActive(false);
         }
     }
 

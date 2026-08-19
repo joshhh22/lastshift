@@ -54,6 +54,9 @@ public class SpawnManager : MonoBehaviour
     {
         Debug.Log("Coroutine Spawn Jalan");
 
+        // Berikan jeda sejenak agar transisi fade-in selesai sebelum NPC pertama muncul
+        yield return new WaitForSeconds(3.5f);
+
         for (int i = 0; i < amount; i++)
         {
             Debug.Log("Spawn NPC Ke-" + (i + 1));
