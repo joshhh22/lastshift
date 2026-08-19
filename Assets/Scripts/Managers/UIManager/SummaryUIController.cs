@@ -236,13 +236,14 @@ public class SummaryUIController : MonoBehaviour
 
     IEnumerator NextDayRoutine()
     {
-        // Fade ke hitam
-        yield return FadeController.Instance.FadeOut();
+        // 1. Fade out ke layar hitam dengan halus
+        yield return FadeController.Instance.FadeOut(1.0f);
 
-        // Tutup summary
+        // 2. Tutup summary & sembunyikan UI lain saat transisi
         if (root != null) root.SetActive(false);
+        HideOtherUI(true);
 
-        // Teleport player
+        // 3. Teleport player ke posisi spawn lorong awal
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         if (playerSpawnPoint == null)
@@ -271,7 +272,7 @@ public class SummaryUIController : MonoBehaviour
 
             player.transform.SetPositionAndRotation(spawnPos, playerSpawnPoint.rotation);
 
-            // Reset camera pitch agar hadap lurus ke depan (tidak nengok ke atas)
+            // Reset camera pitch agar hadap lurus ke depan
             Transform camTarget = player.transform.Find("CinemachineCameraTarget");
             if (camTarget != null) camTarget.localRotation = Quaternion.identity;
 
@@ -284,18 +285,12 @@ public class SummaryUIController : MonoBehaviour
             if (fpc != null) fpc.enabled = true;
         }
 
-        // Ganti hari tepat 1 kali
-        if (DayManager.Instance != null)
-        {
-            DayManager.Instance.NextDay();
-        }
-
-        // Bersihkan remaining NPCs dan counter status
+        // 4. Bersihkan remaining NPCs dan counter status
         if (NPCSpawner.Instance != null) NPCSpawner.Instance.ClearRuntimeNPCs();
         if (CounterManager.Instance != null) CounterManager.Instance.ReleaseCounter();
         if (NPCDatabase.Instance != null) NPCDatabase.Instance.ResetDayNPCs();
 
-        // Reset semua manager
+        // 5. Reset semua manager & objek interaktif
         if (ObjectiveManager.Instance != null) ObjectiveManager.Instance.ResetObjectives();
         if (PerformanceManager.Instance != null) PerformanceManager.Instance.ResetDay();
         if (GameTimeManager.Instance != null) GameTimeManager.Instance.ResetTime();
@@ -327,13 +322,31 @@ public class SummaryUIController : MonoBehaviour
         foreach (CCTVScreamer screamer in FindObjectsByType<CCTVScreamer>(FindObjectsSortMode.None))
             screamer.ResetForNewDay();
 
+        // 6. Ganti hari resmi
+        if (DayManager.Instance != null)
+        {
+            DayManager.Instance.NextDay();
+        }
+
         // Auto-save hari baru
         SaveManager.SaveCurrentGame();
 
-        yield return FadeController.Instance.FadeIn();
+        // Jeda sejenak di layar hitam pekat sebelum membuka fade-in
+        yield return new WaitForSeconds(0.6f);
+
+        // 7. Fade In halus membuka ke game (durasi 1.2s)
+        yield return FadeController.Instance.FadeIn(1.2f);
 
         HideOtherUI(false);
         isTransitioning = false;
+
+        // 8. Beri jeda 1.0 detik setelah layar terbuka penuh & jernih barulah monolog pembuka hari muncul
+        yield return new WaitForSeconds(1.0f);
+
+        if (PlayerMonologueManager.Instance != null && DayManager.Instance != null)
+        {
+            PlayerMonologueManager.Instance.TriggerDayOpeningMonologue(DayManager.Instance.CurrentDay);
+        }
     }
 
     private void HideOtherUI(bool hide)

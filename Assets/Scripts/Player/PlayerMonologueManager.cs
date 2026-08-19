@@ -67,11 +67,10 @@ public class PlayerMonologueManager : MonoBehaviour
 
     private void Update()
     {
-        // Deteksi pergantian hari untuk memicu monolog harian baru
+        // Update tracking hari (monolog hari baru dipanggil terkoordinasi setelah fade-in selesai)
         if (DayManager.Instance != null && currentTrackedDay > 0 && (int)DayManager.Instance.CurrentDay != currentTrackedDay)
         {
             currentTrackedDay = (int)DayManager.Instance.CurrentDay;
-            TriggerDayOpeningMonologue(DayManager.Instance.CurrentDay);
         }
 
         // Jika ada pending thought dari objektif baru yang sempat terhalang Phone UI atau Dialog

@@ -28,35 +28,38 @@ public class FadeController : MonoBehaviour
         }
     }
 
+    public bool IsFading { get; private set; } = false;
+
     private void Start()
     {
-        StartCoroutine(FadeIn());
+        StartCoroutine(FadeIn(1.2f));
     }
 
-    public IEnumerator FadeOut()
+    public IEnumerator FadeOut(float customDuration = -1f)
     {
-        yield return Fade(0f, 1f);
+        yield return Fade(0f, 1f, customDuration > 0 ? customDuration : fadeDuration);
     }
 
-    public IEnumerator FadeIn()
+    public IEnumerator FadeIn(float customDuration = -1f)
     {
-        yield return Fade(1f, 0f);
+        yield return Fade(1f, 0f, customDuration > 0 ? customDuration : fadeDuration);
     }
 
-    IEnumerator Fade(float from, float to)
+    IEnumerator Fade(float from, float to, float duration)
     {
         if (fadeImage == null) yield break;
 
+        IsFading = true;
         fadeImage.gameObject.SetActive(true);
         Color color = Color.black;
 
         float time = 0f;
 
-        while (time < fadeDuration)
+        while (time < duration)
         {
             time += Time.deltaTime;
 
-            color.a = Mathf.Lerp(from, to, time / fadeDuration);
+            color.a = Mathf.Lerp(from, to, time / duration);
             fadeImage.color = color;
 
             yield return null;
@@ -69,5 +72,7 @@ public class FadeController : MonoBehaviour
         {
             fadeImage.gameObject.SetActive(false);
         }
+
+        IsFading = false;
     }
 }
