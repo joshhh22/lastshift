@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -122,7 +122,7 @@ public class PlayChoiceUIBuilder
 
         TMP_Text saveInfoText = infoObj.AddComponent<TextMeshProUGUI>();
         if (fontRegular != null) saveInfoText.font = fontRegular;
-        saveInfoText.text = "LAST SAVED PROGRESS:\n<color=#00F0FF>DAY 1 � Shift Standby</color>";
+        saveInfoText.text = "LAST SAVED PROGRESS:\n<color=#00F0FF>DAY 1 • Shift Standby</color>";
         saveInfoText.fontSize = 14;
         saveInfoText.color = new Color(0.85f, 0.88f, 0.92f, 0.95f);
         saveInfoText.alignment = TextAlignmentOptions.Center;
@@ -149,7 +149,7 @@ public class PlayChoiceUIBuilder
 
         EditorUtility.SetDirty(menuMgr);
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-        EditorSceneManager.SaveOpenScenesAndGenerateGIs();
+        EditorSceneManager.SaveOpenScenes();
 
         Debug.Log("<color=cyan>[PlayChoiceUIBuilder]</color> PlayChoicePanel berhasil dibuat dan dihubungkan ke MainMenuManager!");
     }
