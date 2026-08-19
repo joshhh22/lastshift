@@ -86,6 +86,15 @@ public class CleaningStaffController : MonoBehaviour
         allPatrolPoints.Clear();
         restrictedPatrolPoints.Clear();
 
+        if (waypointParent == null)
+        {
+            GameObject found = GameObject.Find("Waypoints");
+            if (found == null) found = GameObject.Find("Waypoint");
+            if (found == null) found = GameObject.Find("PatrolPoints");
+            if (found == null) found = GameObject.Find("CleaningWaypoints");
+            if (found != null) waypointParent = found.transform;
+        }
+
         if (waypointParent != null)
         {
             for (int i = 0; i < waypointParent.childCount; i++)
@@ -94,9 +103,10 @@ public class CleaningStaffController : MonoBehaviour
                 allPatrolPoints.Add(wp);
 
                 string wpName = wp.name.ToLower().Trim();
-                // Filter waypoint restricted: Coffee, Counter, Stair, 1, 2
+                // Filter waypoint restricted dekat pemain: Coffee, Counter, Rail, Stair, 1, 2
                 if (wpName == "coffee" || wpName.Contains("coffee") ||
                     wpName == "counter" || wpName.Contains("counter") ||
+                    wpName == "rail" || wpName.Contains("rail") ||
                     wpName == "stair" || wpName.Contains("stair") ||
                     wpName == "1" || wpName == "2")
                 {
