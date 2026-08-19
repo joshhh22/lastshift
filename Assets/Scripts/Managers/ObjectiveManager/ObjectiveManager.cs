@@ -212,6 +212,42 @@ public class ObjectiveManager : MonoBehaviour
         RefreshAssignmentPageUI();
         ShowCurrentObjective();
 
+        // Pemicu sistem gameplay yang sesuai dengan objektif yang sedang dipulihkan (misal: spawn NPC penumpang)
+        TriggerRestoredObjectiveLogic();
+
         Debug.Log($"<color=cyan>[ObjectiveManager]</color> Objective dipulihkan ke Index {currentObjectiveIndex}: {GetCurrentObjective()}");
+    }
+
+    private void TriggerRestoredObjectiveLogic()
+    {
+        if (currentObjectiveIndex >= objectives.Count) return;
+
+        Objective curObj = objectives[currentObjectiveIndex];
+        string title = curObj.title.ToLower();
+
+        if (title.Contains("serve") || title.Contains("passenger"))
+        {
+            int remaining = curObj.targetAmount > 0 ? Mathf.Max(1, curObj.targetAmount - curObj.currentAmount) : 5;
+            if (SpawnManager.Instance != null)
+            {
+                Debug.Log($"<color=cyan>[ObjectiveManager]</color> Melanjutkan spawn {remaining} penumpang untuk objektif: {curObj.title}");
+                SpawnManager.Instance.SpawnPassenger(remaining, 5f, 10f);
+            }
+        }
+        else if (title.Contains("continue") || title.Contains("working"))
+        {
+            if (SpawnManager.Instance != null)
+            {
+                Debug.Log($"<color=cyan>[ObjectiveManager]</color> Melanjutkan spawn penumpang berkala untuk: {curObj.title}");
+                SpawnManager.Instance.SpawnContinueWorking();
+            }
+        }
+        else if (title.Contains("phone"))
+        {
+            if (PhoneManager.Instance != null)
+            {
+                PhoneManager.Instance.ReceiveNotification();
+            }
+        }
     }
 }
