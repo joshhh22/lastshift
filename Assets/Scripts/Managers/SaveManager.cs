@@ -17,6 +17,13 @@ public class SaveData
     public int gameMinute = 0;
     public string savedObjectiveTitle = "";
     public string saveDateFormatted = "";
+
+    // Posisi & Rotasi Pemain
+    public bool hasPlayerPos = false;
+    public float playerPosX;
+    public float playerPosY;
+    public float playerPosZ;
+    public float playerRotY;
 }
 
 /// <summary>
@@ -176,6 +183,22 @@ public class SaveManager : MonoBehaviour
             }
         }
 
+        // Simpan Posisi & Rotasi Pemain
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            var fpc = UnityEngine.Object.FindAnyObjectByType<StarterAssets.FirstPersonController>();
+            if (fpc != null) player = fpc.gameObject;
+        }
+        if (player != null)
+        {
+            data.playerPosX = player.transform.position.x;
+            data.playerPosY = player.transform.position.y;
+            data.playerPosZ = player.transform.position.z;
+            data.playerRotY = player.transform.eulerAngles.y;
+            data.hasPlayerPos = true;
+        }
+
         cachedSaveData = data;
         string json = JsonUtility.ToJson(data, true);
         PlayerPrefs.SetString(SAVE_KEY, json);
@@ -222,6 +245,26 @@ public class SaveManager : MonoBehaviour
         if (ObjectiveManager.Instance != null)
         {
             ObjectiveManager.Instance.LoadSavedObjective(data.currentObjectiveIndex, data.objectiveCurrentAmount);
+        }
+
+        // 5. Pulihkan Posisi & Rotasi Pemain
+        if (data.hasPlayerPos)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+            {
+                var fpc = UnityEngine.Object.FindAnyObjectByType<StarterAssets.FirstPersonController>();
+                if (fpc != null) player = fpc.gameObject;
+            }
+            if (player != null)
+            {
+                CharacterController cc = player.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false;
+                player.transform.position = new Vector3(data.playerPosX, data.playerPosY, data.playerPosZ);
+                player.transform.rotation = Quaternion.Euler(0f, data.playerRotY, 0f);
+                if (cc != null) cc.enabled = true;
+                Debug.Log($"<color=cyan>[SaveManager]</color> Player Position Restored: {player.transform.position}");
+            }
         }
     }
 

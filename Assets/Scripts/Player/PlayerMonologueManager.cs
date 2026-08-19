@@ -36,14 +36,24 @@ public class PlayerMonologueManager : MonoBehaviour
 
     private void Start()
     {
+        currentTrackedDay = DayManager.Instance != null ? (int)DayManager.Instance.CurrentDay : 1;
+
         // Listen to Objective updates
         if (ObjectiveManager.Instance != null)
         {
             ObjectiveManager.Instance.OnObjectiveChanged += OnObjectiveUpdated;
         }
 
-        // Jalankan monolog pembuka harian saat game mulai
-        StartCoroutine(DelayedInitialDayMonologue());
+        // Jika continue dari save, JANGAN jalankan monologue pembuka hari
+        if (SaveManager.IsContinuingGame)
+        {
+            StartCoroutine(DelayedContinueThought());
+        }
+        else
+        {
+            // Jalankan monolog pembuka harian saat game baru mulai
+            StartCoroutine(DelayedInitialDayMonologue());
+        }
     }
 
     private void OnDestroy()
@@ -57,10 +67,32 @@ public class PlayerMonologueManager : MonoBehaviour
     private void Update()
     {
         // Deteksi pergantian hari untuk memicu monolog harian baru
-        if (DayManager.Instance != null && (int)DayManager.Instance.CurrentDay != currentTrackedDay)
+        if (DayManager.Instance != null && currentTrackedDay > 0 && (int)DayManager.Instance.CurrentDay != currentTrackedDay)
         {
             currentTrackedDay = (int)DayManager.Instance.CurrentDay;
             TriggerDayOpeningMonologue(DayManager.Instance.CurrentDay);
+        }
+    }
+
+    private IEnumerator DelayedContinueThought()
+    {
+        // Tunggu 1 frame hingga save data diterapkan ke manager
+        yield return new WaitForSeconds(0.5f);
+
+        // Pastikan dialog pembuka tidak aktif dan player tidak terkunci
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying())
+        {
+            DialogueManager.Instance.EndDialogue();
+        }
+
+        if (PlayerLockManager.Instance != null)
+        {
+            PlayerLockManager.Instance.UnlockPlayer();
+        }
+
+        if (ObjectiveManager.Instance != null)
+        {
+            OnObjectiveUpdated(ObjectiveManager.Instance.GetCurrentObjective());
         }
     }
 

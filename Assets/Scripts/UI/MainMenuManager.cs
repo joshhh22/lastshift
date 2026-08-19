@@ -94,20 +94,65 @@ public class MainMenuManager : MonoBehaviour
         if (creditsPanel != null) creditsPanel.SetActive(false);
         if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
-        // Pasang listener tombol utama
-        if (playButton != null) playButton.onClick.AddListener(OnPlayButtonClicked);
-        if (guideButton != null) guideButton.onClick.AddListener(OpenGuide);
-        if (creditsButton != null) creditsButton.onClick.AddListener(OpenCredits);
-        if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
+        // Pasang listener tombol utama (bersihkan listener lama di inspector agar tidak dobel)
+        if (playButton != null)
+        {
+            playButton.onClick.RemoveAllListeners();
+            playButton.onClick.AddListener(OnPlayButtonClicked);
+            playButton.onClick.AddListener(PlayClickSound);
+        }
+        if (guideButton != null)
+        {
+            guideButton.onClick.RemoveAllListeners();
+            guideButton.onClick.AddListener(OpenGuide);
+            guideButton.onClick.AddListener(PlayClickSound);
+        }
+        if (creditsButton != null)
+        {
+            creditsButton.onClick.RemoveAllListeners();
+            creditsButton.onClick.AddListener(OpenCredits);
+            creditsButton.onClick.AddListener(PlayClickSound);
+        }
+        if (quitButton != null)
+        {
+            quitButton.onClick.RemoveAllListeners();
+            quitButton.onClick.AddListener(QuitGame);
+            quitButton.onClick.AddListener(PlayClickSound);
+        }
 
-        // Pasang listener tombol Play Choice (jika sudah ada di scene)
-        if (continueGameButton != null) continueGameButton.onClick.AddListener(ContinueGame);
-        if (newGameButton != null) newGameButton.onClick.AddListener(StartNewGame);
-        if (playChoiceBackButton != null) playChoiceBackButton.onClick.AddListener(ClosePlayChoicePanel);
+        // Pasang listener tombol Play Choice
+        if (continueGameButton != null)
+        {
+            continueGameButton.onClick.RemoveAllListeners();
+            continueGameButton.onClick.AddListener(ContinueGame);
+            continueGameButton.onClick.AddListener(PlayClickSound);
+        }
+        if (newGameButton != null)
+        {
+            newGameButton.onClick.RemoveAllListeners();
+            newGameButton.onClick.AddListener(StartNewGame);
+            newGameButton.onClick.AddListener(PlayClickSound);
+        }
+        if (playChoiceBackButton != null)
+        {
+            playChoiceBackButton.onClick.RemoveAllListeners();
+            playChoiceBackButton.onClick.AddListener(ClosePlayChoicePanel);
+            playChoiceBackButton.onClick.AddListener(PlayClickSound);
+        }
 
         // Pasang listener tombol Guide sub-menu
-        if (hintsButton != null) hintsButton.onClick.AddListener(OpenHints);
-        if (swipeMechanicButton != null) swipeMechanicButton.onClick.AddListener(OpenSwipeMechanic);
+        if (hintsButton != null)
+        {
+            hintsButton.onClick.RemoveAllListeners();
+            hintsButton.onClick.AddListener(OpenHints);
+            hintsButton.onClick.AddListener(PlayClickSound);
+        }
+        if (swipeMechanicButton != null)
+        {
+            swipeMechanicButton.onClick.RemoveAllListeners();
+            swipeMechanicButton.onClick.AddListener(OpenSwipeMechanic);
+            swipeMechanicButton.onClick.AddListener(PlayClickSound);
+        }
 
         // Pasang listener tombol Back di semua panel secara otomatis & persisten
         HookAllBackButtons();
@@ -482,6 +527,8 @@ public class MainMenuManager : MonoBehaviour
     public void ClosePlayChoicePanel()
     {
         if (playChoicePanel != null) playChoicePanel.SetActive(false);
+        if (prologueCanvas != null) prologueCanvas.SetActive(false);
+        isTransitioning = false;
         if (mainMenuCanvas != null) mainMenuCanvas.SetActive(true);
     }
 
@@ -494,10 +541,11 @@ public class MainMenuManager : MonoBehaviour
     private IEnumerator ContinueGameRoutine()
     {
         isTransitioning = true;
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
         SaveManager.IsContinuingGame = true;
 
         // Fade out Main Menu ke hitam
-        yield return FadeScreen(0f, 1f, 0.6f);
+        yield return FadeScreen(0f, 1f, 0.5f);
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -509,6 +557,7 @@ public class MainMenuManager : MonoBehaviour
     public void StartNewGame()
     {
         if (isTransitioning) return;
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
         SaveManager.IsContinuingGame = false;
         SaveManager.ClearSaveData();
 
@@ -643,16 +692,23 @@ public class MainMenuManager : MonoBehaviour
     private IEnumerator StartPrologueWithFadeRoutine()
     {
         isTransitioning = true;
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
 
         // 1. Fade out Main Menu ke hitam
-        yield return FadeScreen(0f, 1f, 0.5f);
+        yield return FadeScreen(0f, 1f, 0.4f);
 
         if (mainMenuCanvas != null) mainMenuCanvas.SetActive(false);
+        if (playChoicePanel != null) playChoicePanel.SetActive(false);
+        if (guidePanel != null) guidePanel.SetActive(false);
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (hintsSubPanel != null) hintsSubPanel.SetActive(false);
+        if (swipeMechanicSubPanel != null) swipeMechanicSubPanel.SetActive(false);
+
         if (prologueCanvas != null) prologueCanvas.SetActive(true);
         if (prologueText != null) prologueText.text = "";
 
         // 2. Fade in ke Prologue Screen
-        yield return FadeScreen(1f, 0f, 0.5f);
+        yield return FadeScreen(1f, 0f, 0.4f);
 
         // 3. Mainkan Prologue baris demi baris
         yield return StartCoroutine(PrologueRoutine());
