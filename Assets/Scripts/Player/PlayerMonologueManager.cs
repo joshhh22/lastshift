@@ -72,7 +72,7 @@ public class PlayerMonologueManager : MonoBehaviour
         // Jika pemain me-load save di tengah-tengah hari (bukan objective awal 0), lewati intro lock dan tampilkan thought objective
         if (ObjectiveManager.Instance != null && ObjectiveManager.Instance.GetCurrentIndex() > 0)
         {
-            ShowThoughtForObjective(ObjectiveManager.Instance.GetCurrentObjective());
+            OnObjectiveUpdated(ObjectiveManager.Instance.GetCurrentObjective());
             yield break;
         }
 
