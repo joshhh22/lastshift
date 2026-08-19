@@ -41,6 +41,46 @@ public class CleaningStaffController : MonoBehaviour
         InitializeWaypoints();
     }
 
+    private void Start()
+    {
+        StartCoroutine(InitializePatrolOnStart());
+    }
+
+    private System.Collections.IEnumerator InitializePatrolOnStart()
+    {
+        yield return null; // Tunggu 1 frame agar ObjectiveManager selesai inisialisasi
+        CheckAndResumePatrol();
+    }
+
+    public void CheckAndResumePatrol()
+    {
+        if (ObjectiveManager.Instance != null)
+        {
+            int currentIdx = ObjectiveManager.Instance.GetCurrentIndex();
+            var objectives = ObjectiveManager.Instance.GetObjectives();
+            int talkIndex = -1;
+            if (objectives != null)
+            {
+                for (int i = 0; i < objectives.Count; i++)
+                {
+                    string t = objectives[i].title.ToLower();
+                    if (t.Contains("cleaning") || t.Contains("staff"))
+                    {
+                        talkIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (talkIndex != -1 && currentIdx > talkIndex)
+            {
+                UnlockFullPatrol();
+            }
+        }
+
+        StartPatrol();
+    }
+
     private void InitializeWaypoints()
     {
         allPatrolPoints.Clear();

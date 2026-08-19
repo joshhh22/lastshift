@@ -249,5 +249,12 @@ public class ObjectiveManager : MonoBehaviour
                 PhoneManager.Instance.ReceiveNotification();
             }
         }
+
+        // Pastikan Cleaning Staff selalu melanjutkan patroli/roaming
+        CleaningStaffController staff = FindFirstObjectByType<CleaningStaffController>();
+        if (staff != null)
+        {
+            staff.CheckAndResumePatrol();
+        }
     }
 }

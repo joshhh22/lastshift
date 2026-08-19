@@ -38,6 +38,33 @@ public class CleaningStaffInteraction : MonoBehaviour, IInteractable
             DialogueManager.Instance.onDialogueFinished.AddListener(OnDialogueFinished);
     }
 
+    private void Start()
+    {
+        StartCoroutine(CheckInitialTalkState());
+    }
+
+    private IEnumerator CheckInitialTalkState()
+    {
+        yield return null;
+        if (ObjectiveManager.Instance != null)
+        {
+            int currentIdx = ObjectiveManager.Instance.GetCurrentIndex();
+            var objectives = ObjectiveManager.Instance.GetObjectives();
+            if (objectives != null)
+            {
+                for (int i = 0; i < objectives.Count; i++)
+                {
+                    string t = objectives[i].title.ToLower();
+                    if ((t.Contains("cleaning") || t.Contains("staff")) && currentIdx > i)
+                    {
+                        hasTalked = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         if (DialogueManager.Instance != null)
