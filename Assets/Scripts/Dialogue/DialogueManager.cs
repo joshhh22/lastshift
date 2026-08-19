@@ -155,7 +155,7 @@ public class DialogueManager : MonoBehaviour
     // END
     // =========================
 
-    private void EndDialogue()
+    public void EndDialogue()
     {
         isPlaying = false;
 
