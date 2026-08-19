@@ -228,6 +228,55 @@ public class GuideUIEnhancer
         return t;
     }
 
+    private static void CreateControlRow(Transform parent, Vector2 pos, string keyText, string descText, TMP_FontAsset font)
+    {
+        GameObject row = CreateUIObject("ControlRow", parent);
+        RectTransform rt = row.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta = new Vector2(800, 42);
+
+        Image rowBg = row.AddComponent<Image>();
+        rowBg.color = new Color(0.1f, 0.15f, 0.22f, 0.7f);
+        rowBg.raycastTarget = false;
+
+        // Keycap Badge (Kiri)
+        GameObject keyObj = CreateUIObject("Keycap", row.transform);
+        RectTransform keyRt = keyObj.GetComponent<RectTransform>();
+        keyRt.anchorMin = new Vector2(0, 0.5f);
+        keyRt.anchorMax = new Vector2(0, 0.5f);
+        keyRt.pivot = new Vector2(0, 0.5f);
+        keyRt.anchoredPosition = new Vector2(15, 0);
+        keyRt.sizeDelta = new Vector2(300, 30);
+
+        TMP_Text kt = keyObj.AddComponent<TextMeshProUGUI>();
+        if (font != null) kt.font = font;
+        kt.fontSize = 15;
+        kt.fontStyle = FontStyles.Bold;
+        kt.alignment = TextAlignmentOptions.Left;
+        kt.color = new Color(0f, 1f, 0.85f, 1f);
+        kt.text = keyText;
+        kt.raycastTarget = false;
+
+        // Description (Kanan)
+        GameObject descObj = CreateUIObject("Desc", row.transform);
+        RectTransform descRt = descObj.GetComponent<RectTransform>();
+        descRt.anchorMin = new Vector2(0, 0.5f);
+        descRt.anchorMax = new Vector2(1, 0.5f);
+        descRt.pivot = new Vector2(0, 0.5f);
+        descRt.anchoredPosition = new Vector2(320, 0);
+        descRt.sizeDelta = new Vector2(-335, 30);
+
+        TMP_Text dt = descObj.AddComponent<TextMeshProUGUI>();
+        if (font != null) dt.font = font;
+        dt.fontSize = 14;
+        dt.alignment = TextAlignmentOptions.Left;
+        dt.color = Color.white;
+        dt.text = descText;
+        dt.raycastTarget = false;
+    }
+
     private static Button CreateGuideCard(string name, Transform parent, Vector2 pos, Vector2 size, string tag, string title, string desc, TMP_FontAsset font, UnityEngine.Events.UnityAction onClick)
     {
         GameObject cardObj = CreateUIObject(name, parent);
